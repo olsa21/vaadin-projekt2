@@ -1,4 +1,4 @@
-package org.vaadin.example.Views;
+package org.vaadin.example.views;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
@@ -8,9 +8,10 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
+import org.vaadin.example.MainLayout;
 import org.vaadin.example.NavigationBar;
 
-@Route("ProjektErstellen")
+@Route(value = "/ProjektErstellen", layout = MainLayout.class)
 public class ProjektErstellenView extends VerticalLayout {
     private TextField titel = new TextField();
     private TextArea beschreibung = new TextArea();
@@ -19,7 +20,7 @@ public class ProjektErstellenView extends VerticalLayout {
     private Button speichern = new Button("Speichern");
     public ProjektErstellenView() {
         titel.setAutofocus(true);
-        add(NavigationBar.getInstance());
+        //add(NavigationBar.getInstance());
         add("Projekt erstellen");
         add(
                 new HorizontalLayout(new Text("Titel"), titel),

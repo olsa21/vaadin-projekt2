@@ -11,8 +11,8 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
-import org.vaadin.example.Views.ProfilEditView;
-import org.vaadin.example.Views.ProjektErstellenView;
+import org.vaadin.example.views.ProfilEditView;
+import org.vaadin.example.views.ProjektErstellenView;
 
 @Route("app-layout-navbar-placement")
 // tag::snippet[]

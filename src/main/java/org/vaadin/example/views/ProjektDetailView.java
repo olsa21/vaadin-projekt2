@@ -1,4 +1,4 @@
-package org.vaadin.example.Views;
+package org.vaadin.example.views;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
