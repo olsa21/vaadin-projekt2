@@ -8,12 +8,13 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.router.Route;
+import org.vaadin.example.MainLayout;
 import org.vaadin.example.NavigationBar;
 import org.vaadin.example.entity.Abteilung;
 
 import java.util.ArrayList;
 
-@Route("ProfilEdit")
+@Route(value = "/profil-edit", layout = MainLayout.class)
 public class ProfilEditView extends VerticalLayout {
     private TextField benutzername = new TextField();
     private TextField passwort1 = new TextField();
@@ -51,7 +52,7 @@ public class ProfilEditView extends VerticalLayout {
         abteilung.setItems(abteilungList.stream().map(Abteilung::getName));
         abteilung.setValue(abteilungList.get(0).getName());
 
-        add(NavigationBar.getInstance());
+        //add(NavigationBar.getInstance());
         add("Profil bearbeiten");
         add(
                 new HorizontalLayout(new Text("Benutzername"), benutzername),

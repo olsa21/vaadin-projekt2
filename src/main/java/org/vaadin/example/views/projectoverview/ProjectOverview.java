@@ -2,6 +2,7 @@ package org.vaadin.example.views.projectoverview;
 
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
@@ -106,7 +107,11 @@ public class ProjectOverview extends VerticalLayout
         grid.addColumn(spec -> spec.getReleaseDatum()).setHeader("Release Datum");
         grid.addComponentColumn(spec->{
             Icon icon = new Icon(VaadinIcon.INFO_CIRCLE_O);
-            return new Button("Details", icon);
+            Button btnDetails = new Button("Details", icon);
+            btnDetails.addClickListener(e->{
+                UI.getCurrent().navigate("projekt-details");
+            });
+            return btnDetails;
         }).setHeader("Optionen");
         grid.getColumns().forEach(column -> column.setAutoWidth(true));
         grid.getColumns().forEach(column -> column.setSortable(true));

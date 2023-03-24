@@ -2,106 +2,84 @@ package org.vaadin.example.views.editor;
 
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.vaadin.example.MainLayout;
 import org.vaadin.example.model.Mitarbeiter;
 import org.vaadin.example.model.Pflichtenheft;
+import org.vaadin.example.views.ProjektDetailMitExport;
 import org.vaadin.example.views.editor.EditorBar;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
 
 @PageTitle("Projektübersicht")
-@Route(value = "/project-editor")
+@Route(value = "/project-editor", layout = MainLayout.class)
 public class PflichtenheftEditor extends HorizontalLayout
 {
-
-
     private TreeGrid<String> chapterOverview;
 
     //---------------------------------------------Testbeispieldaten für horizontalen Prototyp
     private ArrayList<Pflichtenheft> pflichtenhefter;
     //---------------------------------------------Ende
-
-    public ArrayList<String> getChapter(String chapter){
-        TreeMap<String, ArrayList<String>> treeMap = new TreeMap<>();
-        ArrayList<String> rootDir = new ArrayList<>();
-        ArrayList<String> ausgangsSituation = new ArrayList<>();
-        ArrayList<String> dekomposition = new ArrayList<>();
-        ArrayList<String> funktionaleAnforderungen = new ArrayList<>();
-        ArrayList<String> abnahmeKriterien = new ArrayList<>();
-
-        rootDir.add("Einleitung");
-        rootDir.add("Ausgangssituation und Zielsetzung");
-        rootDir.add("Dekomposition des Gesamtsystems");
-        rootDir.add("Funktionale Anforderungen");
-        rootDir.add("Nicht-Funktionale Anforderungen");
-        rootDir.add("Sicherheitsanfoderungen");
-        rootDir.add("Lieferumfang");
-        rootDir.add("Abnahmekriterien und Vorgehen zur Ausgangsprüfung");
-
-        ausgangsSituation.add("Gegenwärtige Defizite");
-        ausgangsSituation.add("Argumente für Durchführung");
-        ausgangsSituation.add("Stakeholder");
-        ausgangsSituation.add("Ziele");
-
-        dekomposition.add("Präzisierung des Kontextes des Softwareproduktes");
-
-        funktionaleAnforderungen.add("Liste mit funktionalen Anforderungen");
-        funktionaleAnforderungen.add("Anwendungsfälle");
-        funktionaleAnforderungen.add("Geschäftsprozess zur Projektbeantragung");
-
-        abnahmeKriterien.add("Testfälle für das Softwareprodukt");
-
-        treeMap.put("", rootDir);
-        treeMap.put("Ausgangssituation und Zielsetzung", ausgangsSituation);
-        treeMap.put("Dekomposition des Gesamtsystems", dekomposition);
-        treeMap.put("Funktionale Anforderungen", funktionaleAnforderungen);
-        treeMap.put("Abnahmekriterien und Vorgehen zur Ausgangsprüfung", abnahmeKriterien);
-        if (chapter == null)
-            return rootDir;
-        if(treeMap.get(chapter) == null)
-            return new ArrayList<>();
-        return treeMap.get(chapter);
-    }
+    EditorBar editBar;
+    ProjektDetailMitExport projektDetailMitExport;
 
     public PflichtenheftEditor(){
-       // add(NavigationBar.getInstance());
+        // add(NavigationBar.getInstance());
         this.pflichtenhefter = new ArrayList<>();
+        editBar = new EditorBar();
+        projektDetailMitExport = new ProjektDetailMitExport();
         addClassName("editor-view");
         setSizeFull();
         setWidthFull();
         TreeGrid<String> testGrid = new TreeGrid<>();
-        ArrayList<String> root = this.getChapter(null);
-        testGrid.setItems(root, this::getChapter);
-        testGrid.addHierarchyColumn(String::toString).setHeader("Kapitel");
+        ArrayList<String> root = SpecificationBookChapters.getInstance().getChapter(null);
+        testGrid.setItems(root, SpecificationBookChapters.getInstance()::getChapter);
+        testGrid.addHierarchyColumn(String::toString).setSortable(false);
+
+
+
         testGrid.setHeightFull();
-        setFlexGrow(0.4, testGrid);
-        add(testGrid);
+        //setFlexGrow(0.4, testGrid);
+        Button projectButton = new Button("Pflichtenheft: Verkabelung von Systemen");
+        projectButton.addClickListener(event -> {
+            Notification.show("Pflichtenheft: Verkabelung von Systemen");
 
-        EditorBar editorBar = new EditorBar();
-        setFlexGrow(0.6, editorBar);
+            remove(editBar);
+            add(projektDetailMitExport);
 
-        add(editorBar);
+        });
+        HorizontalLayout projectTree = new HorizontalLayout( new VerticalLayout(projectButton, testGrid));
+        setFlexGrow(0.3, projectTree);
+        add(projectTree);
+
+
+
+        //EditorBar editorBar = new EditorBar();
+        //setFlexGrow(0.7, editorBar);
+
+        //ProjektDetailMitExport projektDetailMitExport = new ProjektDetailMitExport();
+        //setFlexGrow(0.7, projektDetailMitExport);
+
+        //add(editorBar);
 
         testGrid.addItemClickListener(event -> {
-            editorBar.resetComponents();
+            Notification.show("ITEM CLICKED");
+            remove(projektDetailMitExport);
+            add(editBar);
+
         });
 
         //beispielDatensaetze();
 
     }
 
-    private Component getChapterOverview() {
-
-        chapterOverview = new TreeGrid<>();
-        chapterOverview.addColumn(String::toString).setHeader("Kapitel");
-        chapterOverview.addColumn(String::toString).setHeader("Modifziert");
-
-        return chapterOverview;
-    }
 
     private void beispielDatensaetze() {
         Mitarbeiter m1 = new Mitarbeiter("Cihan","W.","Softwareentwicklung");

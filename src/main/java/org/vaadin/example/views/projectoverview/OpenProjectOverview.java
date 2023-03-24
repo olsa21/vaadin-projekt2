@@ -2,6 +2,7 @@ package org.vaadin.example.views.projectoverview;
 
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
@@ -100,6 +101,9 @@ public class OpenProjectOverview extends VerticalLayout
         grid.addColumn(spec -> spec.getVerantwortlicher().getFullName()).setHeader("Verantwortlicher");
         grid.addComponentColumn(spec->{
             Button btn1 = new Button("Details", new Icon(VaadinIcon.INFO_CIRCLE_O));
+            btn1.addClickListener(e->{
+                UI.getCurrent().navigate("projekt-details");
+            });
             Button btn2 = new Button("Beitreten", new Icon(VaadinIcon.KEY_O));
             HorizontalLayout lay = new HorizontalLayout();
             lay.add(btn1, btn2);

@@ -14,7 +14,7 @@ public class ProjektDetailMitExport extends VerticalLayout {
         export.setItems("PDF", "Word");
         export.setValue("PDF");
 
-        add(NavigationBar.getInstance());
+        //add(NavigationBar.getInstance());
         add("ProjektDetailMitExport");
         add(new ProjektDetailView());//Beitreten Button separat einfügen wie unten
         add(new HorizontalLayout(new Button("Exportieren"), export));

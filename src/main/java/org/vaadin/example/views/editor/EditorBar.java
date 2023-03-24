@@ -82,7 +82,6 @@ public class EditorBar extends HorizontalLayout {
                 Notification.show("Textfeld hinzugefügt!");
                 TextArea textArea = new TextArea();
 
-
                 textArea.setWidth("160%");
                 tempLayout.add(textArea);
 
