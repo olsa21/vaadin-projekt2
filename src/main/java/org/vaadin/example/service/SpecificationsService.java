@@ -28,7 +28,7 @@ public class SpecificationsService {
         }
     }
 
-    public void addBenutzer(MitarbeiterEntity benutzer){
+    public void addMitarbeiter(MitarbeiterEntity benutzer){
         if (benutzer == null){
             System.err.println("Benutzer darf nicht null sein!");
         }
