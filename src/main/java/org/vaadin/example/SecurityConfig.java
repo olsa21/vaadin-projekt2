@@ -5,13 +5,14 @@ import java.util.Collections;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
-import org.vaadin.example.views.LoginPage;
+import org.vaadin.example.views.login.LoginPage;
 
 @EnableWebSecurity
 @Configuration
@@ -40,9 +41,28 @@ public class SecurityConfig extends VaadinWebSecurity {
         //TODO optional
         http.authorizeRequests().antMatchers("/images/**").permitAll();
 
-        super.configure(http);
+         super.configure(http);
 
-        setLoginView(http, LoginPage.class);
+         setLoginView(http, LoginPage.class);
+
+        /*http.authorizeRequests().antMatchers("/login", "/register").permitAll().anyRequest().authenticated().and()
+                .formLogin().loginPage("/login").defaultSuccessUrl("/").permitAll().and().logout().logoutSuccessUrl("/login").permitAll();*/
+    }
+
+    @Override
+    public void configure(WebSecurity web) {
+        web.ignoring().antMatchers(
+                // Client-side JS
+                "/VAADIN/**",
+
+                // icons and images
+                "/icons/**",
+                "/images/**",
+                "/styles/**",
+
+                // (development mode) H2 debugging console
+                "/login",
+                "/register");
     }
 
     @Bean

@@ -1,4 +1,4 @@
-package org.vaadin.example.views;
+package org.vaadin.example.views.login;
 
 import com.vaadin.flow.component.HasValueAndElement;
 import com.vaadin.flow.component.Text;
@@ -17,14 +17,21 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.vaadin.example.entity.MitarbeiterEntity;
 import org.vaadin.example.service.SpecificationsService;
 
+import javax.annotation.security.PermitAll;
+import javax.xml.bind.DatatypeConverter;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 
 import static com.vaadin.flow.component.button.ButtonVariant.LUMO_TERTIARY_INLINE;
 
+@AnonymousAllowed
 @Route("/register")
 public class RegisterView extends VerticalLayout {
 
@@ -96,7 +103,20 @@ public class RegisterView extends VerticalLayout {
             //TODO schöner machen
             MitarbeiterEntity mitarbeiter = new MitarbeiterEntity();
             mitarbeiter.setBenutzername(username.getValue());
-            mitarbeiter.setPasswort(password.getValue());
+            String hashedPassword;
+
+            MessageDigest md = null;
+            try {
+                md = MessageDigest.getInstance("SHA-256");
+                byte[] digest = md.digest(password.getValue().getBytes(StandardCharsets.UTF_8));
+                hashedPassword = DatatypeConverter.printHexBinary(digest).toLowerCase();
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+
+            mitarbeiter.setPasswort(hashedPassword);
+
+            //mitarbeiter.setPasswort(password.getValue());
             mitarbeiter.setMail(email.getValue());
             mitarbeiter.setVorname(firstName.getValue());
             mitarbeiter.setNachname(lastName.getValue());

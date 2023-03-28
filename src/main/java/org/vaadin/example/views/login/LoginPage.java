@@ -1,6 +1,9 @@
-package org.vaadin.example.views;
+package org.vaadin.example.views.login;
 
 import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.notification.Notification;
@@ -23,7 +26,12 @@ public class LoginPage extends VerticalLayout implements BeforeEnterObserver {
         setJustifyContentMode(JustifyContentMode.CENTER);
 
         add(login);
-        add(new Text("Hier kommt noch ein Text"));
+        Button createAccount = new Button("Create an account");
+        createAccount.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+        createAccount.addClickListener(e -> {
+            UI.getCurrent().navigate("register");
+        });
+        add(createAccount);
 
         login.setAction("login");
 
