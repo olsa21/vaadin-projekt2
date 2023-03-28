@@ -9,6 +9,9 @@ import com.vaadin.flow.router.Route;
 import org.vaadin.example.MainLayout;
 import org.vaadin.example.NavigationBar;
 
+import javax.annotation.security.PermitAll;
+
+@PermitAll
 @Route(value = "/projekt-details", layout = MainLayout.class)
 public class ProjektDetailView extends VerticalLayout {
     private Text titel = new Text("");

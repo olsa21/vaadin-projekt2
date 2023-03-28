@@ -5,6 +5,10 @@ import org.springframework.stereotype.Service;
 import org.vaadin.example.entity.MitarbeiterEntity;
 import org.vaadin.example.repository.MitarbeiterRepository;
 
+import javax.xml.bind.DatatypeConverter;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @Service
@@ -46,4 +50,19 @@ public class SpecificationsService {
         benutzerRepository.save(benutzer);
     }
 
+    public boolean credentialsCorrect(String username, String password){
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] digest = md.digest(password.getBytes(StandardCharsets.UTF_8));
+            String sha256 = DatatypeConverter.printHexBinary(digest).toLowerCase();
+
+            MitarbeiterEntity benutzer = benutzerRepository.readUserWhere(username, sha256);
+            return benutzer.getBenutzername().equals(username) && benutzer.getPasswort().equals(sha256);
+        } catch (NoSuchAlgorithmException e) {
+            System.err.println("Fehler beim Hashen des Passworts!");
+        } catch (NullPointerException e){
+            System.err.println("Benutzername oder Passwort falsch!");
+        }
+        return false;
+    }
 }

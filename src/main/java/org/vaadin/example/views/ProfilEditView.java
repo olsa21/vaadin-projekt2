@@ -12,8 +12,10 @@ import org.vaadin.example.MainLayout;
 import org.vaadin.example.NavigationBar;
 import org.vaadin.example.entity.Abteilung;
 
+import javax.annotation.security.PermitAll;
 import java.util.ArrayList;
 
+@PermitAll
 @Route(value = "/profil-edit", layout = MainLayout.class)
 public class ProfilEditView extends VerticalLayout {
     private TextField benutzername = new TextField();

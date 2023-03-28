@@ -18,8 +18,10 @@ import org.vaadin.example.NavigationBar;
 import org.vaadin.example.model.Mitarbeiter;
 import org.vaadin.example.model.Pflichtenheft;
 
+import javax.annotation.security.PermitAll;
 import java.util.ArrayList;
 
+@PermitAll
 @PageTitle("Projektübersicht")
 //ursprünglicher value="/project-overview", jedoch zu Testzwecken geändert TODO
 @Route(value = "", layout = MainLayout.class)

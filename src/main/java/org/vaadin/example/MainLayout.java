@@ -10,20 +10,20 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.HighlightConditions;
 import com.vaadin.flow.router.RouterLink;
 import org.vaadin.example.components.ClickableAvatar;
-import org.vaadin.example.views.ProfilEditView;
 import org.vaadin.example.views.ProjektErstellenView;
 import org.vaadin.example.views.projectoverview.OpenProjectOverview;
 import org.vaadin.example.views.projectoverview.ProjectOverview;
 
 
 public class MainLayout extends AppLayout {
-    MainLayout(){
+    private final SecurityService securityService;
+    MainLayout(SecurityService securityService){
+        this.securityService = securityService;
         createHeader();
         createDrawer();
     }
@@ -37,7 +37,7 @@ public class MainLayout extends AppLayout {
 
 
         Button logOut = new Button("Abmelden", e -> {
-            getUI().ifPresent(ui -> ui.navigate("login"));
+            securityService.logout();
         });
 
         HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), logo, clickableAvatar, logOut);

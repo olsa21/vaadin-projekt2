@@ -18,8 +18,10 @@ import org.vaadin.example.NavigationBar;
 import org.vaadin.example.model.Mitarbeiter;
 import org.vaadin.example.model.Pflichtenheft;
 
+import javax.annotation.security.PermitAll;
 import java.util.ArrayList;
 
+@PermitAll
 @PageTitle("Projektübersicht")
 @Route(value = "/open-project-overview", layout = MainLayout.class)
 public class OpenProjectOverview extends VerticalLayout

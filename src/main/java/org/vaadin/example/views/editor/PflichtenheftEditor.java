@@ -15,9 +15,11 @@ import org.vaadin.example.model.Pflichtenheft;
 import org.vaadin.example.views.ProjektDetailMitExport;
 import org.vaadin.example.views.editor.EditorBar;
 
+import javax.annotation.security.PermitAll;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+@PermitAll
 @PageTitle("Projektübersicht")
 @Route(value = "/project-editor", layout = MainLayout.class)
 public class PflichtenheftEditor extends HorizontalLayout

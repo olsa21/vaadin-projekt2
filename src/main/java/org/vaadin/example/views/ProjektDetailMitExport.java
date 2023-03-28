@@ -7,6 +7,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import org.vaadin.example.NavigationBar;
 
+import javax.annotation.security.PermitAll;
+
+@PermitAll
 @Route("ProjektDetailMitExport")
 public class ProjektDetailMitExport extends VerticalLayout {
     public ProjektDetailMitExport() {
