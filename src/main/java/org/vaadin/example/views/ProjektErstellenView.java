@@ -9,19 +9,26 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import org.vaadin.example.MainLayout;
-import org.vaadin.example.NavigationBar;
+import org.vaadin.example.SecurityService;
+import org.vaadin.example.entity.MitarbeiterEntity;
+import org.vaadin.example.service.SpecificationsService;
 
 import javax.annotation.security.PermitAll;
 
 @PermitAll
 @Route(value = "/ProjektErstellen", layout = MainLayout.class)
 public class ProjektErstellenView extends VerticalLayout {
+    private final SpecificationsService service;
     private TextField titel = new TextField();
     private TextArea beschreibung = new TextArea();
     private DatePicker frist = new DatePicker();
     private TextField repo = new TextField();
     private Button speichern = new Button("Speichern");
-    public ProjektErstellenView() {
+    public ProjektErstellenView(SpecificationsService service) {
+        this.service = service;
+
+        MitarbeiterEntity mitarbeiter = service.findSpecificUser(SecurityService.getLoggedInUsername());
+
         titel.setAutofocus(true);
         //add(NavigationBar.getInstance());
         add("Projekt erstellen");
@@ -35,6 +42,17 @@ public class ProjektErstellenView extends VerticalLayout {
         getChildren().forEach(item -> {
             if (item instanceof HorizontalLayout) {
                 ((HorizontalLayout) item).setAlignItems(Alignment.BASELINE);
+            }
+        });
+
+        speichern.addClickListener(event -> {
+            if(!titel.getValue().isBlank() && !beschreibung.getValue().isBlank())
+                service.addPflichtenheft(mitarbeiter.getMitarbeiterOid(), titel.getValue(), beschreibung.getValue(), frist.getValue(), repo.getValue(), 0);
+            else{
+                if (titel.getValue().isBlank())
+                    titel.setInvalid(true);
+                if(beschreibung.getValue().isBlank())
+                    beschreibung.setInvalid(true);
             }
         });
     }

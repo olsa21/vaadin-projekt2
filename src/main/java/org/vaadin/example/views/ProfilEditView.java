@@ -3,17 +3,31 @@ package org.vaadin.example.views;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.router.Route;
 import org.vaadin.example.MainLayout;
-import org.vaadin.example.NavigationBar;
-import org.vaadin.example.entity.Abteilung;
+import org.vaadin.example.SecurityService;
+import org.vaadin.example.components.AbteilungComboBox;
+import org.vaadin.example.components.CustomPicUpload;
+import org.vaadin.example.entity.AbteilungEntity;
+import org.vaadin.example.entity.AbteilungszuweisungEntity;
+import org.vaadin.example.entity.AbteilungszuweisungEntityPK;
+import org.vaadin.example.entity.MitarbeiterEntity;
+import org.vaadin.example.service.SpecificationsService;
 
 import javax.annotation.security.PermitAll;
+import javax.xml.bind.DatatypeConverter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.List;
 
 @PermitAll
 @Route(value = "/profil-edit", layout = MainLayout.class)
@@ -24,37 +38,27 @@ public class ProfilEditView extends VerticalLayout {
     private TextField mail = new TextField();
     private TextField vorname = new TextField();
     private TextField nachname = new TextField();
-    private MultiSelectComboBox<String> abteilung = new MultiSelectComboBox<>();
-    private Upload profilbild = new Upload();
-    public ProfilEditView() {
-        //Statische Liste erstmal
-        ArrayList<Abteilung> abteilungList = new ArrayList<>();
-        abteilungList.add(new Abteilung(1, "IT"));
-        abteilungList.add(new Abteilung(2, "Marketing"));
-        abteilungList.add(new Abteilung(3, "Vertrieb"));
-        abteilungList.add(new Abteilung(4, "Logistik"));
-        abteilungList.add(new Abteilung(5, "Personal"));
-        abteilungList.add(new Abteilung(6, "Buchhaltung"));
-        abteilungList.add(new Abteilung(7, "Controlling"));
+    private AbteilungComboBox abteilung;
+    private CustomPicUpload profilbild = new CustomPicUpload();
+    private Button save = new Button("Speichern");
+    private MitarbeiterEntity mitarbeiter;
+    private final SpecificationsService service;
+    public ProfilEditView(SpecificationsService service) {
+        this.service = service;
+        mitarbeiter = service.findSpecificUser(SecurityService.getLoggedInUsername());
+        List<AbteilungEntity> alleAbteilungenList = service.getAbteilungList();
+        List<AbteilungEntity> selektierteAbteilungen = service.getAbteilungListWhere(mitarbeiter.getMitarbeiterOid());
+        abteilung = new AbteilungComboBox(alleAbteilungenList, selektierteAbteilungen);
 
+        benutzername.setValue(mitarbeiter.getBenutzername());
 
+        mail.setValue(mitarbeiter.getMail());
+        vorname.setValue(mitarbeiter.getVorname());
+        nachname.setValue(mitarbeiter.getNachname());
 
-        profilbild.setAcceptedFileTypes("image/jpeg", "image/png", "image/gif");
-        profilbild.setMaxFileSize(16777216);
-        profilbild.setDropAllowed(true);
-        profilbild.setUploadButton(new Button("Profilbild hochladen"));
+        //erstmal
+        benutzername.setEnabled(false);
 
-
-        //Setzen der vorhanden Werte aus DB
-        benutzername.setValue("Benutzername");
-        mail.setValue("max.mustermann@gigasoft.de");
-        vorname.setValue("Max");
-        nachname.setValue("Mustermann");
-
-        abteilung.setItems(abteilungList.stream().map(Abteilung::getName));
-        abteilung.setValue(abteilungList.get(0).getName());
-
-        //add(NavigationBar.getInstance());
         add("Profil bearbeiten");
         add(
                 new HorizontalLayout(new Text("Benutzername"), benutzername),
@@ -65,13 +69,31 @@ public class ProfilEditView extends VerticalLayout {
                 new HorizontalLayout(new Text("Nachname"), nachname),
                 new HorizontalLayout(new Text("Abteilung"), abteilung),
                 new HorizontalLayout(new Text("Profilbild"), profilbild),
-                new Button("Speichern")
-
+                save
         );
         getChildren().forEach(item -> {
             if (item instanceof HorizontalLayout) {
                 ((HorizontalLayout) item).setAlignItems(Alignment.BASELINE);
             }
+        });
+
+        save.addClickListener(event -> {
+            //Mitarbeiter Tabelle bearbeiten
+            mitarbeiter.setBenutzername(benutzername.getValue());
+            mitarbeiter.setMail(mail.getValue());
+            mitarbeiter.setVorname(vorname.getValue());
+            mitarbeiter.setNachname(nachname.getValue());
+
+            mitarbeiter.setProfilbild(profilbild.getBytes());
+
+            if (!passwort1.getValue().isEmpty() && passwort1.getValue().equals(passwort2.getValue()))
+                mitarbeiter.setPasswort(SecurityService.hash(passwort1.getValue()));
+
+            service.saveBenutzer(mitarbeiter);
+
+            service.saveAbteilungZuweisungen(mitarbeiter.getMitarbeiterOid(), abteilung.ausgewaehlteAbteilungen());
+
+            Notification.show("Profil erfolgreich bearbeitet");
         });
     }
 }

@@ -15,6 +15,9 @@ import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.HighlightConditions;
 import com.vaadin.flow.router.RouterLink;
 import org.vaadin.example.components.ClickableAvatar;
+import org.vaadin.example.entity.MitarbeiterEntity;
+import org.vaadin.example.model.Mitarbeiter;
+import org.vaadin.example.service.SpecificationsService;
 import org.vaadin.example.views.ProjektErstellenView;
 import org.vaadin.example.views.projectoverview.OpenProjectOverview;
 import org.vaadin.example.views.projectoverview.ProjectOverview;
@@ -22,8 +25,10 @@ import org.vaadin.example.views.projectoverview.ProjectOverview;
 
 public class MainLayout extends AppLayout {
     private final SecurityService securityService;
-    MainLayout(SecurityService securityService){
+    private final SpecificationsService service;
+    MainLayout(SecurityService securityService, SpecificationsService service){
         this.securityService = securityService;
+        this.service = service;
         createHeader();
         createDrawer();
     }
@@ -33,7 +38,9 @@ public class MainLayout extends AppLayout {
         //logo.addClassNames("text-l", "m-m");
         logo.getStyle().set("font-size", "var(--lumo-font-size-l)");
 
-        ClickableAvatar clickableAvatar = new ClickableAvatar("Cihan Wiatrowski");
+        MitarbeiterEntity mitarbeiter = service.findSpecificUser(SecurityService.getLoggedInUsername());
+        ClickableAvatar clickableAvatar = new ClickableAvatar(mitarbeiter.getVorname() + " " + mitarbeiter.getNachname());
+        clickableAvatar.setPicture(mitarbeiter.getProfilbild());
 
 
         Button logOut = new Button("Abmelden", e -> {

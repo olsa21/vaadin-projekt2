@@ -4,6 +4,9 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.server.StreamResource;
+
+import java.io.ByteArrayInputStream;
 
 public class ClickableAvatar extends HorizontalLayout {
     private Avatar avatar;
@@ -29,5 +32,11 @@ public class ClickableAvatar extends HorizontalLayout {
     public ClickableAvatar(Avatar avatar) {
         this.avatar = avatar;
         init();
+    }
+
+    //erstmal so hinzugefügt, ansonsten über den Konstruktor
+    public void setPicture(byte[] imageData){
+        if(imageData != null)
+            avatar.setImageResource(new StreamResource("image.png", () -> new ByteArrayInputStream(imageData)));
     }
 }
