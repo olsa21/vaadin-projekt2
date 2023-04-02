@@ -9,8 +9,9 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import org.vaadin.example.MainLayout;
-import org.vaadin.example.SecurityService;
+
 import org.vaadin.example.entity.MitarbeiterEntity;
+import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
 
 import javax.annotation.security.PermitAll;

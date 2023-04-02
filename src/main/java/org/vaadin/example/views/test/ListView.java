@@ -13,10 +13,11 @@ import com.vaadin.flow.router.Route;
 import org.vaadin.example.entity.MitarbeiterEntity;
 import org.vaadin.example.service.SpecificationsService;
 
+import javax.annotation.security.PermitAll;
 import java.util.Collections;
 
 
-
+@PermitAll
 @PageTitle("Kontaktliste")
 @Route(value = "/testversuch")
 public class ListView extends VerticalLayout {

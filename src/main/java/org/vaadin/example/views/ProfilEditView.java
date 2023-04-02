@@ -2,31 +2,20 @@ package org.vaadin.example.views;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.router.Route;
 import org.vaadin.example.MainLayout;
-import org.vaadin.example.SecurityService;
 import org.vaadin.example.components.AbteilungComboBox;
 import org.vaadin.example.components.CustomPicUpload;
 import org.vaadin.example.entity.AbteilungEntity;
-import org.vaadin.example.entity.AbteilungszuweisungEntity;
-import org.vaadin.example.entity.AbteilungszuweisungEntityPK;
 import org.vaadin.example.entity.MitarbeiterEntity;
+import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
 
 import javax.annotation.security.PermitAll;
-import javax.xml.bind.DatatypeConverter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.List;
 
 @PermitAll

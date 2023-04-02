@@ -16,7 +16,7 @@ import com.vaadin.flow.router.HighlightConditions;
 import com.vaadin.flow.router.RouterLink;
 import org.vaadin.example.components.ClickableAvatar;
 import org.vaadin.example.entity.MitarbeiterEntity;
-import org.vaadin.example.model.Mitarbeiter;
+import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
 import org.vaadin.example.views.ProjektErstellenView;
 import org.vaadin.example.views.projectoverview.OpenProjectOverview;

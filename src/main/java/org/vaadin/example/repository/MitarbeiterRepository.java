@@ -2,9 +2,7 @@ package org.vaadin.example.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.vaadin.example.entity.Abteilung;
 import org.vaadin.example.entity.AbteilungEntity;
-import org.vaadin.example.entity.AbteilungszuweisungEntity;
 import org.vaadin.example.entity.MitarbeiterEntity;
 
 import java.util.List;
@@ -20,6 +18,5 @@ public interface MitarbeiterRepository extends JpaRepository<MitarbeiterEntity, 
     //TODO In separates Repository auslagern
     @Query("select c from AbteilungEntity c")
     public List<AbteilungEntity> readAbteilungen();
-
 
 }

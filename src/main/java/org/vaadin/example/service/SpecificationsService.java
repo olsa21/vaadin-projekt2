@@ -2,27 +2,29 @@ package org.vaadin.example.service;
 
 
 import org.springframework.stereotype.Service;
-import org.vaadin.example.entity.*;
+import org.vaadin.example.entity.AbteilungEntity;
+import org.vaadin.example.entity.AbteilungszuweisungEntity;
+import org.vaadin.example.entity.MitarbeiterEntity;
+import org.vaadin.example.entity.PflichtenheftEntity;
 import org.vaadin.example.repository.AbteilungzuweisungRepository;
 import org.vaadin.example.repository.MitarbeiterRepository;
 import org.vaadin.example.repository.PflichtenheftRepository;
 import org.vaadin.example.repository.ProjektZuweisungRepository;
+import org.vaadin.example.utility.PasswordEncoder;
 
 import javax.transaction.Transactional;
-import javax.xml.bind.DatatypeConverter;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+
 
 @Service
 public class SpecificationsService {
 
     private final MitarbeiterRepository benutzerRepository;
     private final AbteilungzuweisungRepository abteilungzuweisungRepository;
-
     private final ProjektZuweisungRepository projektZuweisungRepository;
     private final PflichtenheftRepository pflichtenheftRepository;
 
@@ -32,6 +34,7 @@ public class SpecificationsService {
         this.abteilungzuweisungRepository = abteilungzuweisungRepository;
         this.projektZuweisungRepository = projektZuweisungRepository;
         this.pflichtenheftRepository = pflichtenheftRepository;
+
     }
 
     public List<MitarbeiterEntity> findAllUser(String filterText){
@@ -44,6 +47,25 @@ public class SpecificationsService {
 
     public MitarbeiterEntity findSpecificUser(String username){
         return benutzerRepository.readUserWhere(username, "%");
+    }
+
+    public boolean authenticateUser(String username, String password){
+        if (username == null || username.isEmpty()){
+            System.err.println("Benutzername darf nicht leer sein!");
+            return false;
+        }
+        if (password == null || password.isEmpty()){
+            System.err.println("Passwort darf nicht leer sein!");
+            return false;
+        }
+
+        try {
+            String hashedSHA256Password = PasswordEncoder.hashPassword(password);
+            MitarbeiterEntity benutzer = benutzerRepository.readUserWhere(username, hashedSHA256Password);
+            return benutzer != null;
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void addMitarbeiter(MitarbeiterEntity benutzer){
@@ -73,21 +95,6 @@ public class SpecificationsService {
         abteilungzuweisungRepository.deleteZuweisung(benutzerOID);
     }
 
-    public boolean credentialsCorrect(String username, String password){
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] digest = md.digest(password.getBytes(StandardCharsets.UTF_8));
-            String sha256 = DatatypeConverter.printHexBinary(digest).toLowerCase();
-
-            MitarbeiterEntity benutzer = benutzerRepository.readUserWhere(username, sha256);
-            return benutzer.getBenutzername().equals(username) && benutzer.getPasswort().equals(sha256);
-        } catch (NoSuchAlgorithmException e) {
-            System.err.println("Fehler beim Hashen des Passworts!");
-        } catch (NullPointerException e){
-            System.err.println("Benutzername oder Passwort falsch!");
-        }
-        return false;
-    }
 
     public List<AbteilungEntity> getAbteilungList() {
         try {

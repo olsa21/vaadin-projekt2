@@ -1,4 +1,4 @@
-package org.vaadin.example;
+package org.vaadin.example.security;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinServletRequest;
