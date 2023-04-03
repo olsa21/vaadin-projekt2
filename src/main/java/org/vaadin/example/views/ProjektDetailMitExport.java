@@ -19,7 +19,7 @@ public class ProjektDetailMitExport extends VerticalLayout {
 
         //add(NavigationBar.getInstance());
         add("ProjektDetailMitExport");
-        add(new ProjektDetailView());//Beitreten Button separat einfügen wie unten
+        //add(new ProjektDetailView());//Beitreten Button separat einfügen wie unten
         add(new HorizontalLayout(new Button("Exportieren"), export));
     }
 }

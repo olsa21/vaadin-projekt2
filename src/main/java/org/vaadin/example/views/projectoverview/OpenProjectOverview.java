@@ -4,6 +4,7 @@ package org.vaadin.example.views.projectoverview;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -17,6 +18,7 @@ import org.vaadin.example.MainLayout;
 import org.vaadin.example.NavigationBar;
 import org.vaadin.example.model.Mitarbeiter;
 import org.vaadin.example.model.Pflichtenheft;
+import org.vaadin.example.views.ProjektDetailView;
 
 import javax.annotation.security.PermitAll;
 import java.util.ArrayList;
@@ -104,7 +106,12 @@ public class OpenProjectOverview extends VerticalLayout
         grid.addComponentColumn(spec->{
             Button btn1 = new Button("Details", new Icon(VaadinIcon.INFO_CIRCLE_O));
             btn1.addClickListener(e->{
-                UI.getCurrent().navigate("projekt-details");
+                //UI.getCurrent().navigate("projekt-details");
+                //Dialog dialog = new Dialog();
+                //dialog.add(new ProjektDetailView(service, spec));
+                //dialog.setHeight("90%");
+                //dialog.setWidth("80%");
+                //dialog.open();
             });
             Button btn2 = new Button("Beitreten", new Icon(VaadinIcon.KEY_O));
             HorizontalLayout lay = new HorizontalLayout();

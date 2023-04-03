@@ -13,4 +13,6 @@ public interface PflichtenheftRepository extends JpaRepository<PflichtenheftEnti
     @Query("select c from " +
             "PflichtenheftEntity c inner join ProjektzuweisungEntity p on p.projektOid = c.projektOid inner join MitarbeiterEntity m on m.mitarbeiterOid = p.mitarbeiterOid where m.mitarbeiterOid = ?1")
     ArrayList<PflichtenheftEntity> readPflichtenheftWhere(int mitarbeiterOID);
+    @Query("select m from MitarbeiterEntity m where m.mitarbeiterOid = (select p.verantwortlicher from PflichtenheftEntity p where p.projektOid = ?1)")
+    MitarbeiterEntity readVerantwortlicher(int projektOid);
 }

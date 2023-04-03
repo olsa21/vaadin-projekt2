@@ -2,8 +2,8 @@ package org.vaadin.example.views.projectoverview;
 
 
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -18,6 +18,7 @@ import org.vaadin.example.entity.MitarbeiterEntity;
 import org.vaadin.example.entity.PflichtenheftEntity;
 import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
+import org.vaadin.example.views.ProjektDetailView;
 
 import javax.annotation.security.PermitAll;
 import java.util.ArrayList;
@@ -29,9 +30,9 @@ import java.util.ArrayList;
 public class ProjectOverview extends VerticalLayout
 {
     Grid<PflichtenheftEntity> grid = new Grid<>(PflichtenheftEntity.class);
+    private final SpecificationsService service;
     TextField filterText = new TextField();
 
-    private final SpecificationsService service;
 
     //---------------------------------------------Testbeispieldaten für horizontalen Prototyp
     private ArrayList<PflichtenheftEntity> pflichtenhefter;
@@ -93,7 +94,13 @@ public class ProjectOverview extends VerticalLayout
             Icon icon = new Icon(VaadinIcon.INFO_CIRCLE_O);
             Button btnDetails = new Button("Details", icon);
             btnDetails.addClickListener(e->{
-                UI.getCurrent().navigate("projekt-details");
+                //UI.getCurrent().navigate("projekt-details");
+                //So dann auch in OpenProjectOverview
+                Dialog dialog = new Dialog();
+                dialog.add(new ProjektDetailView(service, spec));
+                dialog.setHeight("90%");
+                dialog.setWidth("80%");
+                dialog.open();
             });
             return btnDetails;
         }).setHeader("Optionen");

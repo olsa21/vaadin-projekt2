@@ -10,6 +10,7 @@ import org.vaadin.example.repository.AbteilungzuweisungRepository;
 import org.vaadin.example.repository.MitarbeiterRepository;
 import org.vaadin.example.repository.PflichtenheftRepository;
 import org.vaadin.example.repository.ProjektZuweisungRepository;
+import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.utility.PasswordEncoder;
 
 import javax.transaction.Transactional;
@@ -143,14 +144,37 @@ public class SpecificationsService {
         pflichtenheftEntity.setFrist(frist.toString());
         pflichtenheftEntity.setRepositoryLink(repoLink);
         pflichtenheftEntity.setOeffentlich((byte) oeffentlich);
+        pflichtenheftEntity.setVerantwortlicher(mitarbeiterOid);
 
         PflichtenheftEntity entity = pflichtenheftRepository.save(pflichtenheftEntity);
 
         addProjektZuweisung(mitarbeiterOid, entity.getProjektOid());
     }
 
+    //In Zukunft entfernen
+    public void addProjektZuweisung(String username, int projektOid) {
+        int mitarbeiterOid = findSpecificUser(username).getMitarbeiterOid();
+        addProjektZuweisung(mitarbeiterOid, projektOid);
+    }
     @Transactional
     public void addProjektZuweisung(int mitarbeiterOid, int projektOid) {
         projektZuweisungRepository.saveRaw(mitarbeiterOid, projektOid);
+    }
+
+    public boolean isMember(String username, PflichtenheftEntity pflichtenheft) {
+        return projektZuweisungRepository.readProjektZuweisungWhere(username, pflichtenheft.getProjektOid()) != null;
+    }
+
+    public List<MitarbeiterEntity> readMitglieder(PflichtenheftEntity pflichtenheft) {
+        List<MitarbeiterEntity> mitglieder = projektZuweisungRepository.readMitglieder(pflichtenheft.getProjektOid());
+        return mitglieder;
+    }
+
+    public MitarbeiterEntity readVerantwortlicher(PflichtenheftEntity pflichtenheft) {
+        return pflichtenheftRepository.readVerantwortlicher(pflichtenheft.getProjektOid());
+    }
+
+    public void savePflichtenheft(PflichtenheftEntity pflichtenheft) {
+        pflichtenheftRepository.save(pflichtenheft);
     }
 }

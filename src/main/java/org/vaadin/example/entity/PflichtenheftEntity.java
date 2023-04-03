@@ -24,6 +24,9 @@ public class PflichtenheftEntity {
     @Basic
     @Column(name = "repositoryLink")
     private String repositoryLink;
+    @Basic
+    @Column(name = "verantwortlicher")
+    private int verantwortlicher;
 
     public int getProjektOid() {
         return projektOid;
@@ -73,6 +76,14 @@ public class PflichtenheftEntity {
         this.repositoryLink = repositoryLink;
     }
 
+    public int getVerantwortlicher() {
+        return verantwortlicher;
+    }
+
+    public void setVerantwortlicher(int verantwortlicher) {
+        this.verantwortlicher = verantwortlicher;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -81,6 +92,7 @@ public class PflichtenheftEntity {
         PflichtenheftEntity that = (PflichtenheftEntity) o;
 
         if (projektOid != that.projektOid) return false;
+        if (verantwortlicher != that.verantwortlicher) return false;
         if (titel != null ? !titel.equals(that.titel) : that.titel != null) return false;
         if (beschreibung != null ? !beschreibung.equals(that.beschreibung) : that.beschreibung != null) return false;
         if (oeffentlich != null ? !oeffentlich.equals(that.oeffentlich) : that.oeffentlich != null) return false;
@@ -99,6 +111,7 @@ public class PflichtenheftEntity {
         result = 31 * result + (oeffentlich != null ? oeffentlich.hashCode() : 0);
         result = 31 * result + (frist != null ? frist.hashCode() : 0);
         result = 31 * result + (repositoryLink != null ? repositoryLink.hashCode() : 0);
+        result = 31 * result + verantwortlicher;
         return result;
     }
 }

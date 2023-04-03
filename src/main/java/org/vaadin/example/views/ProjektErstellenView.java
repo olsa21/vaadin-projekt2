@@ -3,6 +3,7 @@ package org.vaadin.example.views;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -55,6 +56,7 @@ public class ProjektErstellenView extends VerticalLayout {
                 if(beschreibung.getValue().isBlank())
                     beschreibung.setInvalid(true);
             }
+            Notification.show("Projekt angelegt");
         });
     }
 }
