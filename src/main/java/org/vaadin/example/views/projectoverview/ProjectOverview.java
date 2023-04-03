@@ -14,9 +14,10 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.vaadin.example.MainLayout;
-import org.vaadin.example.NavigationBar;
-import org.vaadin.example.model.Mitarbeiter;
-import org.vaadin.example.model.Pflichtenheft;
+import org.vaadin.example.entity.MitarbeiterEntity;
+import org.vaadin.example.entity.PflichtenheftEntity;
+import org.vaadin.example.security.SecurityService;
+import org.vaadin.example.service.SpecificationsService;
 
 import javax.annotation.security.PermitAll;
 import java.util.ArrayList;
@@ -27,52 +28,33 @@ import java.util.ArrayList;
 @Route(value = "", layout = MainLayout.class)
 public class ProjectOverview extends VerticalLayout
 {
-
-    Grid<Pflichtenheft> grid = new Grid<>(Pflichtenheft.class);
+    Grid<PflichtenheftEntity> grid = new Grid<>(PflichtenheftEntity.class);
     TextField filterText = new TextField();
 
+    private final SpecificationsService service;
+
     //---------------------------------------------Testbeispieldaten für horizontalen Prototyp
-    private ArrayList<Pflichtenheft> pflichtenhefter;
+    private ArrayList<PflichtenheftEntity> pflichtenhefter;
     //---------------------------------------------Ende
 
-    public ProjectOverview(){
+    public ProjectOverview(SpecificationsService service){
+        this.service = service;
 
         this.pflichtenhefter = new ArrayList<>();
         addClassName("list-view");
         setSizeFull();
-
         configureGrid();
-
         add(
-                //NavigationBar.getInstance()
-                getToolbar(),
-                getContent()
+            getToolbar(),
+            getContent()
         );
-        //VerticalLayout test = new VerticalLayout();
-        //test.add(getToolbar(),getContent());
-
-        //test.setHeight("100%");
-        //add(test);
-        beispielDatensaetze();
+        loadSpecificProjects();
         updateList();
     }
 
-    private void beispielDatensaetze() {
-        Mitarbeiter m1 = new Mitarbeiter("Cihan","W.","Softwareentwicklung");
-        Mitarbeiter m2 = new Mitarbeiter("Oliver", "S.", "Softwareentwicklung");
-        Mitarbeiter m3 = new Mitarbeiter("Rainer", "Drenor", "Systemintegration");
-        Mitarbeiter m4 = new Mitarbeiter("Harald", "Krause", "Chefetage");
-        Pflichtenheft p1 = new Pflichtenheft("Pflichtenheftgenerator","..","2023-10-10", m3);
-        Pflichtenheft p2 = new Pflichtenheft("Verkabelung von Systemen","..","2025-01-01", m2);
-        Pflichtenheft p3 = new Pflichtenheft("Testprojekt","..","2024-10-10", m1);
-        p1.addMitarbeiter(m1);p1.addMitarbeiter(m2);p1.addMitarbeiter(m3);p1.addMitarbeiter(m4);
-        p2.addMitarbeiter(m1);p2.addMitarbeiter(m4);
-        p3.addMitarbeiter(m1);
-        this.pflichtenhefter.clear();
-        this.pflichtenhefter.add(p1);
-        this.pflichtenhefter.add(p2);
-        this.pflichtenhefter.add(p3);
-
+    private void loadSpecificProjects(){
+        MitarbeiterEntity mitarbeiter = service.findSpecificUser(SecurityService.getLoggedInUsername());
+        this.pflichtenhefter = service.getPflichtenheftListWhere(mitarbeiter.getMitarbeiterOid());
     }
 
     private void updateList() {
@@ -91,7 +73,6 @@ public class ProjectOverview extends VerticalLayout
         return content;
     }
 
-
     private Component getToolbar() {
         filterText.setPlaceholder("Filter by name");
         filterText.setClearButtonVisible(true);
@@ -105,8 +86,9 @@ public class ProjectOverview extends VerticalLayout
         grid.addClassName("contact-grid");
         grid.setSizeFull();
         grid.setColumns("titel");
-        grid.addColumn(spec -> spec.getMitarbeiterListSize()).setHeader("Mitarbeiteranzahl");
-        grid.addColumn(spec -> spec.getReleaseDatum()).setHeader("Release Datum");
+        //grid.addColumn(spec -> spec.getMitarbeiterListSize()).setHeader("Mitarbeiteranzahl");
+        grid.addColumn(spec -> "500").setHeader("Mitarbeiteranzahl");//FIXME Daten korrekt eintragen!
+        grid.addColumn(spec -> spec.getFrist()).setHeader("Release Datum");
         grid.addComponentColumn(spec->{
             Icon icon = new Icon(VaadinIcon.INFO_CIRCLE_O);
             Button btnDetails = new Button("Details", icon);
@@ -119,12 +101,4 @@ public class ProjectOverview extends VerticalLayout
         grid.getColumns().forEach(column -> column.setSortable(true));
     }
 
-
-
 }
-
-
-
-
-
-

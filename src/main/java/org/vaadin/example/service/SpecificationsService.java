@@ -75,6 +75,10 @@ public class SpecificationsService {
         benutzerRepository.save(benutzer);
     }
 
+    public ArrayList<PflichtenheftEntity> getPflichtenheftListWhere(int mitarbeiterOID){
+        return pflichtenheftRepository.readPflichtenheftWhere(mitarbeiterOID);
+    }
+
     public long countBenutzer(){
         return benutzerRepository.count();
     }
