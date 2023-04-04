@@ -60,13 +60,11 @@ public class ProjektDetailView extends VerticalLayout {
             UI.getCurrent().navigate("project-editor/" + pflichtenheft.getProjektOid());
         });
         freischaltenBtn.addClickListener(e -> {
-            pflichtenheft.setOeffentlich((byte) 1);
-            service.savePflichtenheft(pflichtenheft);
+            service.setOeffentlich(pflichtenheft, 1);
             setButtonVisibility(isMember);
         });
         schliessenBtn.addClickListener(e -> {
-            pflichtenheft.setOeffentlich((byte) 0);
-            service.savePflichtenheft(pflichtenheft);
+            service.setOeffentlich(pflichtenheft, 0);
             setButtonVisibility(isMember);
         });
 

@@ -33,7 +33,7 @@ public class PflichtenheftBroadcaster {
 
     @PostUpdate
     public void onUpdate(PflichtenheftEntity pflichtenheftEntity) {
-        System.out.println("UPDATE");
-        PflichtenheftBroadcaster.broadcast("");
+        System.out.println("UPDATE " + pflichtenheftEntity.getProjektOid());
+        //PflichtenheftBroadcaster.broadcast("");
     }
 }

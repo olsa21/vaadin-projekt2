@@ -6,6 +6,7 @@ import org.vaadin.example.entity.AbteilungEntity;
 import org.vaadin.example.entity.AbteilungszuweisungEntity;
 import org.vaadin.example.entity.MitarbeiterEntity;
 import org.vaadin.example.entity.PflichtenheftEntity;
+import org.vaadin.example.listener.PflichtenheftBroadcaster;
 import org.vaadin.example.repository.AbteilungzuweisungRepository;
 import org.vaadin.example.repository.MitarbeiterRepository;
 import org.vaadin.example.repository.PflichtenheftRepository;
@@ -189,5 +190,13 @@ public class SpecificationsService {
 
     public List<PflichtenheftEntity> findOpenProjects() {
         return pflichtenheftRepository.findOpenProjects();
+    }
+
+    //Methode wird nur verwendet um Broadcasts bei Änderungden der Sichtbarkeit zu senden
+    public void setOeffentlich(PflichtenheftEntity pflichtenheft, int oeffentlich) {
+        System.out.println("Öffentlichkeit wird geändert: =="  + oeffentlich);
+        pflichtenheft.setOeffentlich((byte) oeffentlich);
+        pflichtenheftRepository.save(pflichtenheft);
+        PflichtenheftBroadcaster.broadcast("");
     }
 }
