@@ -155,6 +155,7 @@ public class SpecificationsService {
     }
 
     //In Zukunft entfernen
+    @Transactional
     public void addProjektZuweisung(String username, int projektOid) {
         int mitarbeiterOid = findSpecificUser(username).getMitarbeiterOid();
         addProjektZuweisung(mitarbeiterOid, projektOid);
@@ -184,5 +185,9 @@ public class SpecificationsService {
     public PflichtenheftEntity readPflichtenheft(int projektOid) {
         Optional<PflichtenheftEntity> result = pflichtenheftRepository.findById(projektOid);
         return result.orElse(null);
+    }
+
+    public List<PflichtenheftEntity> findOpenProjects() {
+        return pflichtenheftRepository.findOpenProjects();
     }
 }
