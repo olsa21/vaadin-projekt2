@@ -2,7 +2,6 @@ package org.vaadin.example.views;
 
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.Route;
 
 /**
  * A sample Vaadin view class.
@@ -20,7 +19,7 @@ import com.vaadin.flow.router.Route;
 @CssImport(value = "./styles/vaadin-text-field-styles.css", themeFor = "vaadin-text-field")
 public class MainView extends VerticalLayout {
     public MainView() {
-        add(new ProjektDetailMitExport());
+        //add(new ProjektDetailMitExport(service));
 
     }
 }

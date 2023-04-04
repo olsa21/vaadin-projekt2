@@ -1,28 +1,28 @@
 package org.vaadin.example.views.editor;
 
 
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
+import com.vaadin.flow.router.BeforeEvent;
+import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.vaadin.example.MainLayout;
 import org.vaadin.example.model.Mitarbeiter;
 import org.vaadin.example.model.Pflichtenheft;
+import org.vaadin.example.service.SpecificationsService;
 import org.vaadin.example.views.ProjektDetailMitExport;
-import org.vaadin.example.views.editor.EditorBar;
 
 import javax.annotation.security.PermitAll;
 import java.util.ArrayList;
-import java.util.TreeMap;
 
 @PermitAll
 @PageTitle("Projektübersicht")
 @Route(value = "/project-editor", layout = MainLayout.class)
-public class PflichtenheftEditor extends HorizontalLayout
+public class PflichtenheftEditor extends HorizontalLayout implements HasUrlParameter<String>
 {
     private TreeGrid<String> chapterOverview;
 
@@ -31,12 +31,17 @@ public class PflichtenheftEditor extends HorizontalLayout
     //---------------------------------------------Ende
     EditorBar editBar;
     ProjektDetailMitExport projektDetailMitExport;
+    final SpecificationsService service;
 
-    public PflichtenheftEditor(){
+    private int pflichtenheftOid;
+
+    public PflichtenheftEditor(SpecificationsService service){
+        System.out.println("=>2");
+        this.service = service;
         // add(NavigationBar.getInstance());
         this.pflichtenhefter = new ArrayList<>();
         editBar = new EditorBar();
-        projektDetailMitExport = new ProjektDetailMitExport();
+
         addClassName("editor-view");
         setSizeFull();
         setWidthFull();
@@ -100,18 +105,13 @@ public class PflichtenheftEditor extends HorizontalLayout
         this.pflichtenhefter.add(p3);
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
+    @Override
+    public void setParameter(BeforeEvent beforeEvent, String s) {
+        pflichtenheftOid = Integer.parseInt(s);
+        Notification.show("Parameter: " + s);
+        System.out.println("=>1");
+        projektDetailMitExport = new ProjektDetailMitExport(this.service, pflichtenheftOid);
+    }
 }
 
 

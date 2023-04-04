@@ -18,7 +18,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Optional;
 
 
 @Service
@@ -136,6 +136,9 @@ public class SpecificationsService {
         });
     }
 
+    public void addPflichtenheft(PflichtenheftEntity pflichtenheftEntity) {
+        pflichtenheftRepository.save(pflichtenheftEntity);
+    }
     @Transactional
     public void addPflichtenheft(int mitarbeiterOid, String titel, String beschreibung, LocalDate frist, String repoLink, int oeffentlich) {
         PflichtenheftEntity pflichtenheftEntity = new PflichtenheftEntity();
@@ -176,5 +179,10 @@ public class SpecificationsService {
 
     public void savePflichtenheft(PflichtenheftEntity pflichtenheft) {
         pflichtenheftRepository.save(pflichtenheft);
+    }
+
+    public PflichtenheftEntity readPflichtenheft(int projektOid) {
+        Optional<PflichtenheftEntity> result = pflichtenheftRepository.findById(projektOid);
+        return result.orElse(null);
     }
 }

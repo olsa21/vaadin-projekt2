@@ -52,13 +52,13 @@ public class ProjektDetailView extends VerticalLayout {
         editBtn.addClickListener(e -> {
             UI.getCurrent().getPage().executeJs("document.querySelector('vaadin-dialog-overlay').close()");
             //TODO ID oder so mitgeben
-            UI.getCurrent().navigate("project-editor");
+            UI.getCurrent().navigate("project-editor/" + pflichtenheft.getProjektOid());
         });
         beitretenBtn.addClickListener(e -> {
             service.addProjektZuweisung(SecurityService.getLoggedInUsername(), pflichtenheft.getProjektOid());
             UI.getCurrent().getPage().executeJs("document.querySelector('vaadin-dialog-overlay').close()");
             //TODO ID oder so mitgeben
-            UI.getCurrent().navigate("project-editor");
+            UI.getCurrent().navigate("project-editor/" + pflichtenheft.getProjektOid());
         });
         freischaltenBtn.addClickListener(e -> {
             pflichtenheft.setOeffentlich((byte) 1);
