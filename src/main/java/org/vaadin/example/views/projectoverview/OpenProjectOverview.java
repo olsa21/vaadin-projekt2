@@ -1,7 +1,9 @@
 package org.vaadin.example.views.projectoverview;
 
 
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -14,9 +16,11 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.shared.Registration;
 import org.vaadin.example.MainLayout;
 import org.vaadin.example.entity.MitarbeiterEntity;
 import org.vaadin.example.entity.PflichtenheftEntity;
+import org.vaadin.example.listener.PflichtenheftBroadcaster;
 import org.vaadin.example.model.PflichtenheftZeile;
 import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
@@ -39,33 +43,52 @@ public class OpenProjectOverview extends VerticalLayout {
     private final SpecificationsService service;
     List<PflichtenheftZeile> pflichtenheftZeilen = new ArrayList<>();
 
+    Registration broadcasterRegistration;
+
+    @Override
+    protected void onDetach(DetachEvent detachEvent) {
+        super.onDetach(detachEvent);
+        System.out.println("detach layout");
+        broadcasterRegistration.remove();
+    }
+
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        super.onAttach(attachEvent);
+        UI ui = attachEvent.getUI();
+        broadcasterRegistration = PflichtenheftBroadcaster.register(newMessage -> {
+            System.out.println("New message received: " + newMessage);
+            getData();
+            ui.access(() -> updateList());
+        });
+    }
+
     public OpenProjectOverview(SpecificationsService service) {
         this.service = service;
         //add(NavigationBar.getInstance());
-        List<PflichtenheftEntity> pflichtenheftEntities2 = service.findOpenProjects();
-        pflichtenheftEntities2.forEach(pflichtenheftEntity -> {
-            pflichtenheftZeilen.add(new PflichtenheftZeile(pflichtenheftEntity));
-        });
+        getData();
 
         addClassName("list-view");
         setSizeFull();
 
         configureGrid();
 
+
         add(
                 getToolbar(),
                 getContent()
         );
-        beispielDatensaetze();
         //Laden der Daten
         updateList();
     }
 
-    private void beispielDatensaetze() {
+    private void getData() {
+            pflichtenheftZeilen.clear();
+            List<PflichtenheftEntity> pflichtenheftEntities2 = service.findOpenProjects();
+            pflichtenheftEntities2.forEach(pflichtenheftEntity -> {
+                pflichtenheftZeilen.add(new PflichtenheftZeile(pflichtenheftEntity));
+            });
 
-        //for (PflichtenheftEntity e : pflichtenheftEntities) {
-        //    pflichtenhefter.add(new Pflichtenheft(e.getTitel(), e.getBeschreibung(), e.getFrist(), new Mitarbeiter("", "", "")));
-        //}
     }
 
     private void updateList() {
