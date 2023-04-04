@@ -1,6 +1,8 @@
 package org.vaadin.example.entity;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "pflichtenheft", schema = "pflichtenhefter", catalog = "")
@@ -27,6 +29,33 @@ public class PflichtenheftEntity {
     @Basic
     @Column(name = "verantwortlicher")
     private int verantwortlicher;
+
+    @OneToMany(mappedBy = "projekt", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<KapitelEntity> kapitel = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "projektzuweisung",
+            joinColumns = @JoinColumn(name = "projektOID"),
+            inverseJoinColumns = @JoinColumn(name = "mitarbeiterOID")
+    )
+    private Set<MitarbeiterEntity> mitarbeiter = new HashSet<>();
+
+    public Set<KapitelEntity> getKapitel(){
+        return kapitel;
+    }
+
+    public void setKapitel(Set<KapitelEntity> kapitel){
+        this.kapitel = kapitel;
+    }
+
+    public Set<MitarbeiterEntity> getMitarbeiter(){
+        return mitarbeiter;
+    }
+
+    public void setMitarbeiter(Set<MitarbeiterEntity> mitarbeiter){
+        this.mitarbeiter = mitarbeiter;
+    }
 
     public int getProjektOid() {
         return projektOid;
@@ -83,6 +112,8 @@ public class PflichtenheftEntity {
     public void setVerantwortlicher(int verantwortlicher) {
         this.verantwortlicher = verantwortlicher;
     }
+
+
 
     @Override
     public boolean equals(Object o) {

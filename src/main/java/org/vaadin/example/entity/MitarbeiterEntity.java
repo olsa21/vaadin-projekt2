@@ -2,6 +2,8 @@ package org.vaadin.example.entity;
 
 import javax.persistence.*;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "mitarbeiter", schema = "pflichtenhefter", catalog = "")
@@ -28,6 +30,17 @@ public class MitarbeiterEntity {
     @Basic
     @Column(name = "profilbild")
     private byte[] profilbild;
+
+    @ManyToMany(mappedBy = "mitarbeiter")
+    private Set<PflichtenheftEntity> pflichtenhefte = new HashSet<>();
+
+    public Set<PflichtenheftEntity> getPflichtenhefte(){
+        return pflichtenhefte;
+    }
+
+    public void setPflichtenhefte(Set<PflichtenheftEntity> pflichtenhefte){
+        this.pflichtenhefte = pflichtenhefte;
+    }
 
     public int getMitarbeiterOid() {
         return mitarbeiterOid;
