@@ -2,16 +2,9 @@ package org.vaadin.example.service;
 
 
 import org.springframework.stereotype.Service;
-import org.vaadin.example.entity.AbteilungEntity;
-import org.vaadin.example.entity.AbteilungszuweisungEntity;
-import org.vaadin.example.entity.MitarbeiterEntity;
-import org.vaadin.example.entity.PflichtenheftEntity;
+import org.vaadin.example.entity.*;
 import org.vaadin.example.listener.PflichtenheftBroadcaster;
-import org.vaadin.example.repository.AbteilungzuweisungRepository;
-import org.vaadin.example.repository.MitarbeiterRepository;
-import org.vaadin.example.repository.PflichtenheftRepository;
-import org.vaadin.example.repository.ProjektZuweisungRepository;
-import org.vaadin.example.security.SecurityService;
+import org.vaadin.example.repository.*;
 import org.vaadin.example.utility.PasswordEncoder;
 
 import javax.transaction.Transactional;
@@ -29,14 +22,15 @@ public class SpecificationsService {
     private final AbteilungzuweisungRepository abteilungzuweisungRepository;
     private final ProjektZuweisungRepository projektZuweisungRepository;
     private final PflichtenheftRepository pflichtenheftRepository;
+    private final KapitelvordefiniertRepository kapitelvordefiniertRepository;
 
 
-    public SpecificationsService(MitarbeiterRepository benutzerRepository, AbteilungzuweisungRepository abteilungzuweisungRepository, ProjektZuweisungRepository projektZuweisungRepository, PflichtenheftRepository pflichtenheftRepository){
+    public SpecificationsService(MitarbeiterRepository benutzerRepository, AbteilungzuweisungRepository abteilungzuweisungRepository, ProjektZuweisungRepository projektZuweisungRepository, PflichtenheftRepository pflichtenheftRepository, KapitelvordefiniertRepository kapitelvordefiniertRepository){
         this.benutzerRepository = benutzerRepository;
         this.abteilungzuweisungRepository = abteilungzuweisungRepository;
         this.projektZuweisungRepository = projektZuweisungRepository;
         this.pflichtenheftRepository = pflichtenheftRepository;
-
+        this.kapitelvordefiniertRepository = kapitelvordefiniertRepository;
     }
 
     public List<MitarbeiterEntity> findAllUser(String filterText){
@@ -205,5 +199,9 @@ public class SpecificationsService {
         pflichtenheft.setOeffentlich((byte) oeffentlich);
         pflichtenheftRepository.save(pflichtenheft);
         PflichtenheftBroadcaster.broadcast("");
+    }
+
+    public List<KapitelvordefiniertEntity> readAllKapitelvordefiniert() {
+        return kapitelvordefiniertRepository.findAll();
     }
 }

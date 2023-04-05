@@ -11,6 +11,7 @@ import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.vaadin.example.MainLayout;
+import org.vaadin.example.entity.PflichtenheftEntity;
 import org.vaadin.example.model.Mitarbeiter;
 import org.vaadin.example.model.Pflichtenheft;
 import org.vaadin.example.service.SpecificationsService;
@@ -32,6 +33,7 @@ public class PflichtenheftEditor extends HorizontalLayout implements HasUrlParam
     EditorBar editBar;
     ProjektDetailMitExport projektDetailMitExport;
     final SpecificationsService service;
+    PflichtenheftEntity pflichtenheftEntity;
 
     private int pflichtenheftOid;
 
@@ -40,14 +42,16 @@ public class PflichtenheftEditor extends HorizontalLayout implements HasUrlParam
         this.service = service;
         // add(NavigationBar.getInstance());
         this.pflichtenhefter = new ArrayList<>();
+        pflichtenheftEntity = service.readPflichtenheft(pflichtenheftOid);
         editBar = new EditorBar();
 
         addClassName("editor-view");
         setSizeFull();
         setWidthFull();
         TreeGrid<String> testGrid = new TreeGrid<>();
-        ArrayList<String> root = SpecificationBookChapters.getInstance().getChapter(null);
-        testGrid.setItems(root, SpecificationBookChapters.getInstance()::getChapter);
+        //Service wird erstmal mitgegeben
+        ArrayList<String> root = SpecificationBookChapters.getInstance(service).getChapter(null);
+        testGrid.setItems(root, SpecificationBookChapters.getInstance(service)::getChapter);
         testGrid.addHierarchyColumn(String::toString).setSortable(false);
 
 
@@ -79,6 +83,8 @@ public class PflichtenheftEditor extends HorizontalLayout implements HasUrlParam
         testGrid.addItemClickListener(event -> {
             Notification.show("ITEM CLICKED");
             remove(projektDetailMitExport);
+            remove(editBar);
+            editBar = new EditorBar();
             add(editBar);
 
         });
