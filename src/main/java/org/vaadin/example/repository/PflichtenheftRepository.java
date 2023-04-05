@@ -15,4 +15,7 @@ public interface PflichtenheftRepository extends JpaRepository<PflichtenheftEnti
     ArrayList<PflichtenheftEntity> readPflichtenheftWhere(int mitarbeiterOID);
     @Query("select m from MitarbeiterEntity m where m.mitarbeiterOid = (select p.verantwortlicher from PflichtenheftEntity p where p.projektOid = ?1)")
     MitarbeiterEntity readVerantwortlicher(int projektOid);
+
+    @Query("select c from PflichtenheftEntity c where c.oeffentlich = 1")
+    List<PflichtenheftEntity> findOpenProjects();
 }

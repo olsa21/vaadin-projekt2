@@ -13,7 +13,8 @@ import org.vaadin.example.entity.PflichtenheftEntity;
 import org.vaadin.example.service.SpecificationsService;
 
 import javax.annotation.security.PermitAll;
-import java.util.List;
+import java.util.Set;
+
 
 @PermitAll
 @Route(value = "/projekt-details", layout = MainLayout.class)
@@ -36,38 +37,34 @@ public class ProjektDetailView extends VerticalLayout {
     public ProjektDetailView(SpecificationsService service, PflichtenheftEntity pflichtenheft) {
         this.service = service;
         this.pflichtenheft = pflichtenheft;
-        boolean isMember = service.isMember(SecurityService.getLoggedInUsername(), pflichtenheft);
+        boolean isMember = isMember();
         titel.setText(pflichtenheft.getTitel());
         beschreibung.setText(pflichtenheft.getBeschreibung());
         frist.setText(pflichtenheft.getFrist());
 
-        MitarbeiterEntity verantwortlichePerson = service.readVerantwortlicher(pflichtenheft);
-        verantwortlicher.setText(verantwortlichePerson.getVorname() + " " + verantwortlichePerson.getNachname());
+        verantwortlicher.setText(createVerantwortlicherString());
 
-        mitglieder.setText(readMitgliederString());
+        mitglieder.setText(createMitgliederString());
         repo.setText(pflichtenheft.getRepositoryLink());
 
         setButtonVisibility(isMember);
 
         editBtn.addClickListener(e -> {
             UI.getCurrent().getPage().executeJs("document.querySelector('vaadin-dialog-overlay').close()");
-            //TODO ID oder so mitgeben
             UI.getCurrent().navigate("project-editor/" + pflichtenheft.getProjektOid());
         });
         beitretenBtn.addClickListener(e -> {
+            //TODO Check ob immer noch offen
             service.addProjektZuweisung(SecurityService.getLoggedInUsername(), pflichtenheft.getProjektOid());
             UI.getCurrent().getPage().executeJs("document.querySelector('vaadin-dialog-overlay').close()");
-            //TODO ID oder so mitgeben
             UI.getCurrent().navigate("project-editor/" + pflichtenheft.getProjektOid());
         });
         freischaltenBtn.addClickListener(e -> {
-            pflichtenheft.setOeffentlich((byte) 1);
-            service.savePflichtenheft(pflichtenheft);
+            service.setOeffentlich(pflichtenheft, 1);
             setButtonVisibility(isMember);
         });
         schliessenBtn.addClickListener(e -> {
-            pflichtenheft.setOeffentlich((byte) 0);
-            service.savePflichtenheft(pflichtenheft);
+            service.setOeffentlich(pflichtenheft, 0);
             setButtonVisibility(isMember);
         });
 
@@ -90,6 +87,16 @@ public class ProjektDetailView extends VerticalLayout {
         });
     }
 
+    private boolean isMember() {
+        //SecurityService.getLoggedInUsername(), pflichtenheft
+        for(MitarbeiterEntity mitarbeiterEntity : pflichtenheft.getMitarbeiter()) {
+            if(mitarbeiterEntity.getBenutzername().equals(SecurityService.getLoggedInUsername())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void setButtonVisibility(boolean isMember) {
         if (isMember) {
             beitretenBtn.setVisible(false);
@@ -101,16 +108,27 @@ public class ProjektDetailView extends VerticalLayout {
                 schliessenBtn.setVisible(true);
             }
         } else {
+            freischaltenBtn.setVisible(false);
+            schliessenBtn.setVisible(false);
             editBtn.setVisible(false);
         }
     }
 
-    private String readMitgliederString() {
-        List<MitarbeiterEntity> mitgliederList = service.readMitglieder(pflichtenheft);
+    private String createMitgliederString() {
+        Set<MitarbeiterEntity> mitgliederList = pflichtenheft.getMitarbeiter();
         String mitgliederString = "";
         for (MitarbeiterEntity mitglied : mitgliederList) {
             mitgliederString += mitglied.getVorname() + " " + mitglied.getNachname() + ", ";
         }
         return mitgliederString;
+    }
+
+    private String createVerantwortlicherString(){
+        for(MitarbeiterEntity mitarbeiterEntity : pflichtenheft.getMitarbeiter()) {
+            if(mitarbeiterEntity.getMitarbeiterOid() == pflichtenheft.getVerantwortlicher()){
+                return mitarbeiterEntity.getVorname() + " " + mitarbeiterEntity.getNachname();
+            }
+        }
+        return null;
     }
 }

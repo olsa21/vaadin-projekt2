@@ -16,12 +16,14 @@ import com.vaadin.flow.router.Route;
 import org.vaadin.example.MainLayout;
 import org.vaadin.example.entity.MitarbeiterEntity;
 import org.vaadin.example.entity.PflichtenheftEntity;
+import org.vaadin.example.model.PflichtenheftZeile;
 import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
 import org.vaadin.example.views.ProjektDetailView;
 
 import javax.annotation.security.PermitAll;
 import java.util.ArrayList;
+import java.util.List;
 
 @PermitAll
 @PageTitle("Projektübersicht")
@@ -29,13 +31,13 @@ import java.util.ArrayList;
 @Route(value = "", layout = MainLayout.class)
 public class ProjectOverview extends VerticalLayout
 {
-    Grid<PflichtenheftEntity> grid = new Grid<>(PflichtenheftEntity.class);
+    Grid<PflichtenheftZeile> grid = new Grid<>();
     private final SpecificationsService service;
     TextField filterText = new TextField();
 
 
     //---------------------------------------------Testbeispieldaten für horizontalen Prototyp
-    private ArrayList<PflichtenheftEntity> pflichtenhefter;
+    private ArrayList<PflichtenheftZeile> pflichtenhefter;
     //---------------------------------------------Ende
 
     public ProjectOverview(SpecificationsService service){
@@ -46,8 +48,8 @@ public class ProjectOverview extends VerticalLayout
         setSizeFull();
         configureGrid();
         add(
-            getToolbar(),
-            getContent()
+                getToolbar(),
+                getContent()
         );
         loadSpecificProjects();
         updateList();
@@ -55,14 +57,17 @@ public class ProjectOverview extends VerticalLayout
 
     private void loadSpecificProjects(){
         MitarbeiterEntity mitarbeiter = service.findSpecificUser(SecurityService.getLoggedInUsername());
-        this.pflichtenhefter = service.getPflichtenheftListWhere(mitarbeiter.getMitarbeiterOid());
+        List<PflichtenheftEntity> list = service.getPflichtenheftListWhere(mitarbeiter.getMitarbeiterOid());
+        for(PflichtenheftEntity pflichtenheftEntity : list){
+            pflichtenhefter.add(new PflichtenheftZeile(pflichtenheftEntity));
+        }
     }
 
     private void updateList() {
         if (filterText.isEmpty()) {
             grid.setItems(this.pflichtenhefter);
         }else{
-            grid.setItems(this.pflichtenhefter.stream().filter(spec -> spec.getTitel().toLowerCase().startsWith(filterText.getValue().toLowerCase())));
+            grid.setItems(this.pflichtenhefter.stream().filter(spec -> spec.getPflichtenheftEntity().getTitel().toLowerCase().startsWith(filterText.getValue().toLowerCase())));
         }
     }
 
@@ -86,10 +91,10 @@ public class ProjectOverview extends VerticalLayout
     private void configureGrid() {
         grid.addClassName("contact-grid");
         grid.setSizeFull();
-        grid.setColumns("titel");
+        grid.addColumn(spec -> spec.getPflichtenheftEntity().getTitel()).setHeader("titel");
         //grid.addColumn(spec -> spec.getMitarbeiterListSize()).setHeader("Mitarbeiteranzahl");
-        grid.addColumn(spec -> "500").setHeader("Mitarbeiteranzahl");//FIXME Daten korrekt eintragen!
-        grid.addColumn(spec -> spec.getFrist()).setHeader("Release Datum");
+        grid.addColumn(spec -> spec.anzahlMitarbeiter()).setHeader("Mitarbeiteranzahl");//FIXME Daten korrekt eintragen!
+        grid.addColumn(spec -> spec.getPflichtenheftEntity().getFrist()).setHeader("Release Datum");
         grid.addComponentColumn(spec->{
             Icon icon = new Icon(VaadinIcon.INFO_CIRCLE_O);
             Button btnDetails = new Button("Details", icon);
@@ -97,7 +102,7 @@ public class ProjectOverview extends VerticalLayout
                 //UI.getCurrent().navigate("projekt-details");
                 //So dann auch in OpenProjectOverview
                 Dialog dialog = new Dialog();
-                dialog.add(new ProjektDetailView(service, spec));
+                dialog.add(new ProjektDetailView(service, spec.getPflichtenheftEntity()));
                 dialog.setHeight("90%");
                 dialog.setWidth("80%");
                 dialog.open();

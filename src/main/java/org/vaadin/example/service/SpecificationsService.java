@@ -6,6 +6,7 @@ import org.vaadin.example.entity.AbteilungEntity;
 import org.vaadin.example.entity.AbteilungszuweisungEntity;
 import org.vaadin.example.entity.MitarbeiterEntity;
 import org.vaadin.example.entity.PflichtenheftEntity;
+import org.vaadin.example.listener.PflichtenheftBroadcaster;
 import org.vaadin.example.repository.AbteilungzuweisungRepository;
 import org.vaadin.example.repository.MitarbeiterRepository;
 import org.vaadin.example.repository.PflichtenheftRepository;
@@ -155,6 +156,7 @@ public class SpecificationsService {
     }
 
     //In Zukunft entfernen
+    @Transactional
     public void addProjektZuweisung(String username, int projektOid) {
         int mitarbeiterOid = findSpecificUser(username).getMitarbeiterOid();
         addProjektZuweisung(mitarbeiterOid, projektOid);
@@ -184,5 +186,17 @@ public class SpecificationsService {
     public PflichtenheftEntity readPflichtenheft(int projektOid) {
         Optional<PflichtenheftEntity> result = pflichtenheftRepository.findById(projektOid);
         return result.orElse(null);
+    }
+
+    public List<PflichtenheftEntity> findOpenProjects() {
+        return pflichtenheftRepository.findOpenProjects();
+    }
+
+    //Methode wird nur verwendet um Broadcasts bei Änderungden der Sichtbarkeit zu senden
+    public void setOeffentlich(PflichtenheftEntity pflichtenheft, int oeffentlich) {
+        System.out.println("Öffentlichkeit wird geändert: =="  + oeffentlich);
+        pflichtenheft.setOeffentlich((byte) oeffentlich);
+        pflichtenheftRepository.save(pflichtenheft);
+        PflichtenheftBroadcaster.broadcast("");
     }
 }

@@ -1,11 +1,14 @@
 package org.vaadin.example.entity;
 
+import org.vaadin.example.listener.PflichtenheftBroadcaster;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "pflichtenheft", schema = "pflichtenhefter", catalog = "")
+@EntityListeners(PflichtenheftBroadcaster.class)
 public class PflichtenheftEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
