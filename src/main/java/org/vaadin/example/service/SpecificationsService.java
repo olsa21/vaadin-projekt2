@@ -51,6 +51,13 @@ public class SpecificationsService {
         return benutzerRepository.readUserWhere(username, "%");
     }
 
+    public MitarbeiterEntity findSpecificUserById(Integer id){
+        if (id == null || id < 0){
+            throw new IllegalArgumentException("Die OID muss einen gültigen nicht negativen Wert beinhalten!");
+        }
+        return benutzerRepository.findByOid(id);
+    }
+
     public boolean authenticateUser(String username, String password){
         if (username == null || username.isEmpty()){
             System.err.println("Benutzername darf nicht leer sein!");
@@ -140,19 +147,19 @@ public class SpecificationsService {
     public void addPflichtenheft(PflichtenheftEntity pflichtenheftEntity) {
         pflichtenheftRepository.save(pflichtenheftEntity);
     }
-    @Transactional
-    public void addPflichtenheft(int mitarbeiterOid, String titel, String beschreibung, LocalDate frist, String repoLink, int oeffentlich) {
+
+    public void addPflichtenheft(MitarbeiterEntity mitarbeiter, String titel, String beschreibung, LocalDate frist, String repoLink, int oeffentlich) {
         PflichtenheftEntity pflichtenheftEntity = new PflichtenheftEntity();
         pflichtenheftEntity.setTitel(titel);
         pflichtenheftEntity.setBeschreibung(beschreibung);
         pflichtenheftEntity.setFrist(frist.toString());
         pflichtenheftEntity.setRepositoryLink(repoLink);
         pflichtenheftEntity.setOeffentlich((byte) oeffentlich);
-        pflichtenheftEntity.setVerantwortlicher(mitarbeiterOid);
+        pflichtenheftEntity.setVerantwortlicher(mitarbeiter.getMitarbeiterOid());
 
-        PflichtenheftEntity entity = pflichtenheftRepository.save(pflichtenheftEntity);
-
-        addProjektZuweisung(mitarbeiterOid, entity.getProjektOid());
+        PflichtenheftEntity test =pflichtenheftRepository.save(pflichtenheftEntity);
+        test.addMitarbeiter(mitarbeiter);
+        pflichtenheftRepository.save(test);
     }
 
     //In Zukunft entfernen

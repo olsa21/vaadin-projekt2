@@ -31,7 +31,7 @@ public class MitarbeiterEntity {
     @Column(name = "profilbild")
     private byte[] profilbild;
 
-    @ManyToMany(mappedBy = "mitarbeiter")
+    @ManyToMany(mappedBy = "mitarbeiter", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<PflichtenheftEntity> pflichtenhefte = new HashSet<>();
 
     public Set<PflichtenheftEntity> getPflichtenhefte(){
@@ -40,6 +40,10 @@ public class MitarbeiterEntity {
 
     public void setPflichtenhefte(Set<PflichtenheftEntity> pflichtenhefte){
         this.pflichtenhefte = pflichtenhefte;
+    }
+
+    public void addPflichtenheft(PflichtenheftEntity pflichtenheft){
+        pflichtenhefte.add(pflichtenheft);
     }
 
     public int getMitarbeiterOid() {

@@ -19,4 +19,7 @@ public interface MitarbeiterRepository extends JpaRepository<MitarbeiterEntity, 
     @Query("select c from AbteilungEntity c")
     public List<AbteilungEntity> readAbteilungen();
 
+    @Query("select c from MitarbeiterEntity c where c.mitarbeiterOid = ?1")
+    public MitarbeiterEntity findByOid(Integer id);
+
 }

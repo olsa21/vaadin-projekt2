@@ -60,6 +60,10 @@ public class PflichtenheftEntity {
         this.mitarbeiter = mitarbeiter;
     }
 
+    public void addMitarbeiter(MitarbeiterEntity mitarbeiter){
+        this.mitarbeiter.add(mitarbeiter);
+    }
+
     public int getProjektOid() {
         return projektOid;
     }

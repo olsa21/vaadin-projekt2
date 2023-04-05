@@ -36,7 +36,8 @@ public class ProjektErstellenView extends VerticalLayout {
 
         projectForm.speichern.addClickListener(event -> {
             if(!projectForm.titel.getValue().isBlank() && !projectForm.beschreibung.getValue().isBlank())
-                service.addPflichtenheft(mitarbeiter.getMitarbeiterOid(), projectForm.titel.getValue(), projectForm.beschreibung.getValue(), projectForm.frist.getValue(), projectForm.repo.getValue(), 0);
+                //service.addPflichtenheft(mitarbeiter.getMitarbeiterOid(), projectForm.titel.getValue(), projectForm.beschreibung.getValue(), projectForm.frist.getValue(), projectForm.repo.getValue(), 0);
+                service.addPflichtenheft(mitarbeiter, projectForm.titel.getValue(), projectForm.beschreibung.getValue(), projectForm.frist.getValue(), projectForm.repo.getValue(), 0);
             else{
                 if (projectForm.titel.getValue().isBlank())
                     projectForm.titel.setInvalid(true);
