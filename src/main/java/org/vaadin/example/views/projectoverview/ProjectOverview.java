@@ -22,7 +22,12 @@ import org.vaadin.example.service.SpecificationsService;
 import org.vaadin.example.views.ProjektDetailView;
 
 import javax.annotation.security.PermitAll;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @PermitAll
@@ -92,9 +97,18 @@ public class ProjectOverview extends VerticalLayout
         grid.addClassName("contact-grid");
         grid.setSizeFull();
         grid.addColumn(spec -> spec.getPflichtenheftEntity().getTitel()).setHeader("titel");
-        //grid.addColumn(spec -> spec.getMitarbeiterListSize()).setHeader("Mitarbeiteranzahl");
-        grid.addColumn(spec -> spec.anzahlMitarbeiter()).setHeader("Mitarbeiteranzahl");//FIXME Daten korrekt eintragen!
-        grid.addColumn(spec -> spec.getPflichtenheftEntity().getFrist()).setHeader("Release Datum");
+        grid.addColumn(spec -> spec.anzahlMitarbeiter()).setHeader("Mitarbeiteranzahl");
+
+        SimpleDateFormat dfInput = new SimpleDateFormat("yyyy-mm-dd");
+        SimpleDateFormat dfOutput = new SimpleDateFormat("dd. MMMM yyyy");
+        grid.addColumn(spec -> {
+            try {
+                return dfOutput.format( dfInput.parse(spec.getPflichtenheftEntity().getFrist()) );
+            } catch (Exception e) {
+                return "Ungültiges Datum!";
+            }
+        }
+        ).setHeader("Release Datum");
         grid.addComponentColumn(spec->{
             Icon icon = new Icon(VaadinIcon.INFO_CIRCLE_O);
             Button btnDetails = new Button("Details", icon);

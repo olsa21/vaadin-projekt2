@@ -2,6 +2,7 @@ package org.vaadin.example.views.editor;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -10,9 +11,10 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import org.vaadin.example.components.CustomPicUpload;
+import org.vaadin.example.components.CustomPicUploadWithCaptionAndScaling;
 import org.vaadin.example.entity.InhaltEntity;
 import org.vaadin.example.entity.KapitelEntity;
-import org.vaadin.example.model.CustomGrid;
+
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,7 +25,6 @@ public class EditorBar extends HorizontalLayout {
     ArrayList<Component> components;
 
     private void updateComponentView() {
-
         this.getStyle().set("background-color", "#f5f5f5");
         removeAll();
         VerticalLayout tempLayout = new VerticalLayout();
@@ -54,11 +55,46 @@ public class EditorBar extends HorizontalLayout {
         updateComponentView();
     }
 
+    private void removeComponent(Component c) {
+        components.remove(c);
+        updateComponentView();
+    }
+
     public void resetComponents() {
         this.components = new ArrayList<>();
         updateComponentView();
     }
 
+    /**
+     * Die Methode ermöglicht es, bei der Erstellung einer Komponente (Textfeld, Abbildung, ...), dass zugehörige Buttons
+     * zur Verschiebung der Komponente nach oben oder unten zu erstellen, oder zur Löschung erstellt werden und neben der
+     * Komponente angezeigt werden
+     * @return Toolbar zu einer bestimmten Komponente
+     */
+    private VerticalLayout getComponentToolbar(Component tempLayout){
+        VerticalLayout buttonLayout = new VerticalLayout();
+        Button upButton = new Button(new Icon(VaadinIcon.ARROW_UP));
+        upButton.addClickListener(click1 -> {
+            moveComponentUp(tempLayout);
+        });
+        Button downButton = new Button(new Icon(VaadinIcon.ARROW_DOWN));
+        downButton.addClickListener(click1 -> {
+            moveComponentDown(tempLayout);
+        });
+        Button deleteButton = new Button(new Icon(VaadinIcon.TRASH));
+        deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        deleteButton.addClickListener(click1 -> {
+            removeComponent(tempLayout);
+        });
+        buttonLayout.add(upButton, downButton, deleteButton);
+        return buttonLayout;
+    }
+
+    /**
+     * Ermöglicht es eine Komponente hinzuzufügen und stellt die Toolbar dar, um das Erstellen der Komponente
+     * zu ermöglichen
+     * @return Toolbar bestehend aus einem Hinzufügen-Button, ComboBox und einem Speichern-Button
+     */
     private Component getToolbar() {
         HorizontalLayout toolbar = new HorizontalLayout();
         toolbar.addClassName("toolbar");
@@ -66,48 +102,49 @@ public class EditorBar extends HorizontalLayout {
         this.cb = new ComboBox<>();
         cb.setItems("Textfeld", "Abbildung", "Tabelle");
         cb.setValue("Textfeld");
+
         addBtn.addClickListener(click -> {
             HorizontalLayout tempLayout = new HorizontalLayout();
             tempLayout.setWidth("100%");
-            VerticalLayout buttonLayout = new VerticalLayout();
-            Button upButton = new Button(new Icon(VaadinIcon.ARROW_UP));
-            upButton.addClickListener(click1 -> {
-                moveComponentUp(tempLayout);
-            });
-            Button downButton = new Button(new Icon(VaadinIcon.ARROW_DOWN));
-            downButton.addClickListener(click1 -> {
-                moveComponentDown(tempLayout);
-            });
-            buttonLayout.add(upButton, downButton);
+
+            VerticalLayout buttonLayout = getComponentToolbar(tempLayout);
+
             if (cb.getValue() == null) {
                 Notification.show("Bitte wählen Sie eine Komponente aus!");
                 return;
-            } else if (cb.getValue().equals("Textfeld")) {
-                Notification.show("Textfeld hinzugefügt!");
-                TextArea textArea = new TextArea();
-
-                textArea.setWidth("160%");
-                tempLayout.add(textArea);
-
-                tempLayout.add(buttonLayout);
-                this.components.add(tempLayout);
-            } else if (cb.getValue().equals("Abbildung")) {
-                Notification.show("Abbildung hinzugefügt!");
-                tempLayout.add(new CustomPicUpload());
-                tempLayout.add(buttonLayout);
-                this.components.add(tempLayout);
-            } else if (cb.getValue().equals("Tabelle")) {
-                Notification.show("Tabelle hinzugefügt!");
-                //TODO AUSLAGERN
-                //DynamicGrid2 grid = new DynamicGrid2();
-                CustomGrid grid = new CustomGrid();
-
-                this.components.add(new VerticalLayout(grid));
             }
+
+            switch (cb.getValue()){
+                case "Textfeld":
+                    TextArea textArea = new TextArea();
+                    textArea.setWidth("160%");
+                    tempLayout.add(textArea);
+                    tempLayout.add(buttonLayout);
+
+                    Notification.show("Textfeld hinzugefügt!");
+                    break;
+                case "Abbildung":
+                    //tempLayout.add(new CustomPicUpload());TODO wurde durch neue abgeleitete Klasse verwendet
+                    tempLayout.add(new CustomPicUploadWithCaptionAndScaling());
+                    tempLayout.add(buttonLayout);
+                    Notification.show("Abbildung hinzugefügt!");
+
+                    break;
+                case "Tabelle":
+                    Notification.show("Tabelle hinzugefügt!");
+                    //TODO AUSLAGERN
+                    //DynamicGrid2 grid = new DynamicGrid2();
+                    //        CustomGrid grid = new CustomGrid();FIXME
+                    //        this.components.add(new VerticalLayout(grid));FIXME
+                    break;
+            }
+            this.components.add(tempLayout);
             updateComponentView();
         });
+
         toolbar.add(addBtn, cb);
         Button speichernBtn = new Button("Speichern");
+
         speichernBtn.addClickListener(click -> {
             Notification.show("Speichern");
             Set<InhaltEntity> inhalte = new HashSet<>();
@@ -130,7 +167,7 @@ public class EditorBar extends HorizontalLayout {
                         //inhalt.setKapitel();
                         inhalt.setBildInhalt(((CustomPicUpload) c2).getBytes());
                         inhalte.add(inhalt);
-                    }else if(c2 instanceof CustomGrid) {
+                    //}else if(c2 instanceof CustomGrid) {FIXME
                         //TODO
                     }
 
@@ -139,11 +176,12 @@ public class EditorBar extends HorizontalLayout {
             kapitel.setInhalte(inhalte);
             //Speichern
         });
+
         toolbar.add(speichernBtn);
         return toolbar;
     }
 
-    EditorBar() {
+    public EditorBar() {
         components = new ArrayList<>();
         updateComponentView();
     }

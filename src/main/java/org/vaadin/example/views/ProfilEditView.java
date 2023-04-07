@@ -2,6 +2,7 @@ package org.vaadin.example.views;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -49,16 +50,23 @@ public class ProfilEditView extends VerticalLayout {
         benutzername.setEnabled(false);
 
         add("Profil bearbeiten");
+
+        FormLayout form = new FormLayout();
+        form.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("0", 1)
+        );
+        form.addFormItem(benutzername, "Benutzernamen");
+        form.addFormItem(passwort1, "Passwort");
+        form.addFormItem(passwort2, "Passwort wiederholen");
+        form.addFormItem(mail, "E-Mail");
+        form.addFormItem(vorname, "Vorname");
+        form.addFormItem(nachname, "Nachname");
+        form.addFormItem(abteilung, "Abteilung");
+        form.addFormItem(profilbild, "Profilbild");
+        form.addFormItem(save, "");
+
         add(
-                new HorizontalLayout(new Text("Benutzername"), benutzername),
-                new HorizontalLayout(new Text("Passwort"), passwort1),
-                new HorizontalLayout(new Text("Passwort wiederholen"), passwort2),
-                new HorizontalLayout(new Text("E-Mail"), mail),
-                new HorizontalLayout(new Text("Vorname"), vorname),
-                new HorizontalLayout(new Text("Nachname"), nachname),
-                new HorizontalLayout(new Text("Abteilung"), abteilung),
-                new HorizontalLayout(new Text("Profilbild"), profilbild),
-                save
+            form
         );
         getChildren().forEach(item -> {
             if (item instanceof HorizontalLayout) {
