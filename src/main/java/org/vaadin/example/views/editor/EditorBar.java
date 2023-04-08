@@ -1,9 +1,11 @@
 package org.vaadin.example.views.editor;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -14,6 +16,7 @@ import org.vaadin.example.components.CustomPicUpload;
 import org.vaadin.example.components.CustomPicUploadWithCaptionAndScaling;
 import org.vaadin.example.entity.InhaltEntity;
 import org.vaadin.example.entity.KapitelEntity;
+import org.vaadin.example.components.CustomGrid;
 
 
 import java.util.*;
@@ -132,10 +135,30 @@ public class EditorBar extends HorizontalLayout {
                     break;
                 case "Tabelle":
                     Notification.show("Tabelle hinzugefügt!");
-                    //TODO AUSLAGERN
-                    //DynamicGrid2 grid = new DynamicGrid2();
-                    //        CustomGrid grid = new CustomGrid();FIXME
-                    //        this.components.add(new VerticalLayout(grid));FIXME
+
+                    //Zeige Dialog mit
+                    ArrayList<String> columnNames = new ArrayList<>();
+                    Dialog dialog = new Dialog();
+                    dialog.add(new TabelleErstellenView(spaltenNamenList -> {
+                        columnNames.addAll(spaltenNamenList);
+                        System.out.println("Spaltennamen: " + spaltenNamenList);
+                        UI.getCurrent().getPage().executeJs("document.querySelector('vaadin-dialog-overlay').close()");
+
+                        CustomGrid grid = new CustomGrid(columnNames);
+                        tempLayout.add(grid);
+                        tempLayout.add(buttonLayout);
+                    }));
+                    dialog.setHeight("90%");
+                    dialog.setWidth("80%");
+                    dialog.open();
+
+                    //wait for dialog to close
+
+
+                    //CustomGrid grid = new CustomGrid(columnNames);
+                    //CustomGrid grid = new CustomGrid();
+                    //tempLayout.add(grid);
+                    //tempLayout.add(buttonLayout);
                     break;
             }
             this.components.add(tempLayout);

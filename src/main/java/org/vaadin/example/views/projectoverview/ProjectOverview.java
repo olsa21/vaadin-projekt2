@@ -20,15 +20,13 @@ import org.vaadin.example.model.PflichtenheftZeile;
 import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
 import org.vaadin.example.views.ProjektDetailView;
+import org.vaadin.example.views.editor.TabelleErstellenView;
 
 import javax.annotation.security.PermitAll;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 
 @PermitAll
 @PageTitle("Projektübersicht")
@@ -117,6 +115,7 @@ public class ProjectOverview extends VerticalLayout
                 //So dann auch in OpenProjectOverview
                 Dialog dialog = new Dialog();
                 dialog.add(new ProjektDetailView(service, spec.getPflichtenheftEntity()));
+
                 dialog.setHeight("90%");
                 dialog.setWidth("80%");
                 dialog.open();
