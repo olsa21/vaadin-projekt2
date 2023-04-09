@@ -43,4 +43,10 @@ public class CustomPicUpload extends HorizontalLayout {
         }
         return new byte[0];
     }
+
+    public void setBytes(byte[] bytes) {
+        image.setSrc("data:image/png;base64," + DatatypeConverter.printBase64Binary(bytes));
+        image.setHeight("100px");
+        image.setWidth("100px");
+    }
 }

@@ -85,7 +85,7 @@ public class ProjectOverview extends VerticalLayout
     }
 
     private Component getToolbar() {
-        filterText.setPlaceholder("Filter by name");
+        filterText.setPlaceholder("Filter by Titel");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e->updateList());
@@ -96,7 +96,7 @@ public class ProjectOverview extends VerticalLayout
     private void configureGrid() {
         grid.addClassName("contact-grid");
         grid.setSizeFull();
-        grid.addColumn(spec -> spec.getPflichtenheftEntity().getTitel()).setHeader("titel");
+        grid.addColumn(spec -> spec.getPflichtenheftEntity().getTitel()).setHeader("Titel");
         grid.addColumn(spec -> spec.anzahlMitarbeiter()).setHeader("Mitarbeiteranzahl");
 
         SimpleDateFormat dfInput = new SimpleDateFormat("yyyy-mm-dd");

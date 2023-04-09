@@ -14,7 +14,7 @@ import org.vaadin.example.components.CustomPicUpload;
 import org.vaadin.example.components.CustomPicUploadWithCaptionAndScaling;
 import org.vaadin.example.entity.InhaltEntity;
 import org.vaadin.example.entity.KapitelEntity;
-
+import org.vaadin.example.entity.PflichtenheftEntity;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,7 +22,17 @@ import java.util.stream.Collectors;
 public class EditorBar extends HorizontalLayout {
 
     private ComboBox<String> cb;
-    ArrayList<Component> components;
+    private ArrayList<Component> components;
+
+    private PflichtenheftEntity pflichtenheftEntity;
+
+    private int currentChapter;
+
+    public EditorBar(PflichtenheftEntity pflichtenheft) {
+        components = new ArrayList<>();
+        this.pflichtenheftEntity = pflichtenheft;
+        updateComponentView();
+    }
 
     private void updateComponentView() {
         this.getStyle().set("background-color", "#f5f5f5");
@@ -66,6 +76,38 @@ public class EditorBar extends HorizontalLayout {
     }
 
     /**
+     * Die Methode soll zu einem bestimmten Kaptitel, die Inhaltskomponenten laden und
+     * diese im Editor anzeigen.
+     */
+    private void loadChapterComponents() {
+        for (KapitelEntity kapitelEntity : pflichtenheftEntity.getKapitel()) {
+            if (kapitelEntity.getKapitelVordefiniertOid() == currentChapter){
+                Set<InhaltEntity> inhalte = kapitelEntity.getInhalte();
+
+                for (InhaltEntity inhaltEntity: inhalte.stream().sorted(Comparator.comparing(InhaltEntity::getAnordnungIndex)).collect(Collectors.toList())) {
+                    if (inhaltEntity.getBildInhalt() == null){
+                        components.add( addComponent("Textfeld", inhaltEntity.getTextInhalt(), null ));
+                    }else{
+                        components.add( addComponent("Abbildung", inhaltEntity.getTextInhalt(), inhaltEntity.getBildInhalt() ));
+                    }
+                }
+                updateComponentView();
+                return;
+            }
+        }
+    }
+
+    /**
+     * Die öffentliche Methode, soll aus der PflichtenheftEditor Klasse bedient werden, und bei Umselektierung
+     * eines Kapitels, diese hier in der laufenden Instanz ändern.
+     */
+    public void setChapter(int kapitel){
+        this.currentChapter = kapitel;
+        this.resetComponents();
+        this.loadChapterComponents();
+    }
+
+    /**
      * Die Methode ermöglicht es, bei der Erstellung einer Komponente (Textfeld, Abbildung, ...), dass zugehörige Buttons
      * zur Verschiebung der Komponente nach oben oder unten zu erstellen, oder zur Löschung erstellt werden und neben der
      * Komponente angezeigt werden
@@ -91,6 +133,49 @@ public class EditorBar extends HorizontalLayout {
     }
 
     /**
+     * Die Methode erstellt eine Komponente (Text, Abbildung, Tabelle) mit der dazugehörigen Toolbar.
+     * @return Component
+     */
+    private HorizontalLayout addComponent(String component, String textInhalt, byte [] bytes){
+        HorizontalLayout tempLayout = new HorizontalLayout();
+        tempLayout.setWidth("100%");
+
+        VerticalLayout buttonLayout = getComponentToolbar(tempLayout);
+
+        if (component == null) {
+            Notification.show("Bitte wählen Sie eine Komponente aus!");
+            throw new IllegalArgumentException("Bitte wählen Sie eine Komponente aus!");
+        }
+
+        switch (component){
+            case "Textfeld":
+                TextArea textArea = new TextArea();
+                textArea.setValue(textInhalt);
+                textArea.setWidth("160%");
+                tempLayout.add(textArea);
+                tempLayout.add(buttonLayout);
+
+                break;
+            case "Abbildung":
+                //tempLayout.add(new CustomPicUpload());TODO wurde durch neue abgeleitete Klasse verwendet
+                CustomPicUploadWithCaptionAndScaling pic = new CustomPicUploadWithCaptionAndScaling();
+                if (bytes != null) {
+                    pic.setBytes(bytes);
+                    pic.setCaptionText(textInhalt);
+                }
+                //tempLayout.add(new CustomPicUploadWithCaptionAndScaling());
+                tempLayout.add( pic );
+                tempLayout.add(buttonLayout);
+                break;
+            case "Tabelle":
+                Notification.show("Tabelle hinzugefügt!");
+                //TODO AUSLAGERN
+                break;
+        }
+        return tempLayout;
+    }
+
+    /**
      * Ermöglicht es eine Komponente hinzuzufügen und stellt die Toolbar dar, um das Erstellen der Komponente
      * zu ermöglichen
      * @return Toolbar bestehend aus einem Hinzufügen-Button, ComboBox und einem Speichern-Button
@@ -104,40 +189,8 @@ public class EditorBar extends HorizontalLayout {
         cb.setValue("Textfeld");
 
         addBtn.addClickListener(click -> {
-            HorizontalLayout tempLayout = new HorizontalLayout();
-            tempLayout.setWidth("100%");
+            HorizontalLayout tempLayout = this.addComponent(cb.getValue(), "", null);
 
-            VerticalLayout buttonLayout = getComponentToolbar(tempLayout);
-
-            if (cb.getValue() == null) {
-                Notification.show("Bitte wählen Sie eine Komponente aus!");
-                return;
-            }
-
-            switch (cb.getValue()){
-                case "Textfeld":
-                    TextArea textArea = new TextArea();
-                    textArea.setWidth("160%");
-                    tempLayout.add(textArea);
-                    tempLayout.add(buttonLayout);
-
-                    Notification.show("Textfeld hinzugefügt!");
-                    break;
-                case "Abbildung":
-                    //tempLayout.add(new CustomPicUpload());TODO wurde durch neue abgeleitete Klasse verwendet
-                    tempLayout.add(new CustomPicUploadWithCaptionAndScaling());
-                    tempLayout.add(buttonLayout);
-                    Notification.show("Abbildung hinzugefügt!");
-
-                    break;
-                case "Tabelle":
-                    Notification.show("Tabelle hinzugefügt!");
-                    //TODO AUSLAGERN
-                    //DynamicGrid2 grid = new DynamicGrid2();
-                    //        CustomGrid grid = new CustomGrid();FIXME
-                    //        this.components.add(new VerticalLayout(grid));FIXME
-                    break;
-            }
             this.components.add(tempLayout);
             updateComponentView();
         });
@@ -146,7 +199,6 @@ public class EditorBar extends HorizontalLayout {
         Button speichernBtn = new Button("Speichern");
 
         speichernBtn.addClickListener(click -> {
-            Notification.show("Speichern");
             Set<InhaltEntity> inhalte = new HashSet<>();
             KapitelEntity kapitel = new KapitelEntity();
 
@@ -156,10 +208,12 @@ public class EditorBar extends HorizontalLayout {
                 List<Component> children = c.getChildren().collect(Collectors.toList());
                 for(Component c2 : children) {//HorizontalLayout
                     if(c2 instanceof TextArea) {
+                        //TODO Abfrage ob Entity bzgl. Anordnung existiert
                         InhaltEntity inhalt = new InhaltEntity();
                         inhalt.setAnordnungIndex(anordnung);
-                        //inhalt.setKapitel();
+                        //inhalt.setKapitel(kapitel);
                         inhalt.setTextInhalt(((TextArea) c2).getValue());
+
                         inhalte.add(inhalt);
                     }else if(c2 instanceof CustomPicUpload) {
                         InhaltEntity inhalt = new InhaltEntity();
@@ -179,11 +233,6 @@ public class EditorBar extends HorizontalLayout {
 
         toolbar.add(speichernBtn);
         return toolbar;
-    }
-
-    public EditorBar() {
-        components = new ArrayList<>();
-        updateComponentView();
     }
 
 }

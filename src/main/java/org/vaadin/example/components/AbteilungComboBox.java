@@ -1,13 +1,14 @@
 package org.vaadin.example.components;
 
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.vaadin.example.entity.AbteilungEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AbteilungComboBox extends VerticalLayout {
+public class AbteilungComboBox extends HorizontalLayout {
     private MultiSelectComboBox comboBox = new MultiSelectComboBox();
 
     private List<AbteilungEntity> abteilungen = new ArrayList<>();

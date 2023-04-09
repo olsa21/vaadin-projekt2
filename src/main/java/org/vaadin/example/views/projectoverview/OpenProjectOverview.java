@@ -109,7 +109,7 @@ public class OpenProjectOverview extends VerticalLayout {
 
 
     private Component getToolbar() {
-        filterText.setPlaceholder("Filter by name");
+        filterText.setPlaceholder("Filter by Titel");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateList());
@@ -120,7 +120,7 @@ public class OpenProjectOverview extends VerticalLayout {
     private void configureGrid() {
         grid.addClassName("contact-grid");
         grid.setSizeFull();
-        grid.addColumn(spec -> spec.getPflichtenheftEntity().getTitel()).setHeader("titel");
+        grid.addColumn(spec -> spec.getPflichtenheftEntity().getTitel()).setHeader("Titel");
         grid.addColumn(spec -> spec.anzahlMitarbeiter()).setHeader("Mitarbeiteranzahl");
         grid.addColumn(spec -> spec.verantwortlicher().getVorname() + " " + spec.verantwortlicher().getNachname()).setHeader("Verantwortlicher");
         grid.addComponentColumn(spec -> {
