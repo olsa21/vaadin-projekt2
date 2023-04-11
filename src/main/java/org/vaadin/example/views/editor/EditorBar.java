@@ -1,16 +1,18 @@
 package org.vaadin.example.views.editor;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
-import org.aspectj.weaver.ast.Not;
+import org.vaadin.example.components.CustomGrid;
 import org.vaadin.example.components.CustomPicUploadWithCaptionAndScaling;
 import org.vaadin.example.entity.InhaltEntity;
 import org.vaadin.example.entity.KapitelEntity;
@@ -185,6 +187,23 @@ public class EditorBar extends HorizontalLayout {
             case "Tabelle":
                 Notification.show("Tabelle hinzugefügt!");
                 //TODO AUSLAGERN
+                Notification.show("Tabelle hinzugefügt!");
+
+                //Zeige Dialog mit
+                ArrayList<String> columnNames = new ArrayList<>();
+                Dialog dialog = new Dialog();
+                dialog.add(new TabelleErstellenView(spaltenNamenList -> {
+                    columnNames.addAll(spaltenNamenList);
+                    System.out.println("Spaltennamen: " + spaltenNamenList);
+                    UI.getCurrent().getPage().executeJs("document.querySelector('vaadin-dialog-overlay').close()");
+
+                    CustomGrid grid = new CustomGrid(columnNames);
+                    tempLayout.add(grid);
+                    tempLayout.add(buttonLayout);
+                }));
+                dialog.setHeight("90%");
+                dialog.setWidth("80%");
+                dialog.open();
                 break;
         }
         return tempLayout;
@@ -205,6 +224,7 @@ public class EditorBar extends HorizontalLayout {
 
         addBtn.addClickListener(click -> {
             HorizontalLayout tempLayout = this.addComponent(cb.getValue(), "", null);
+
 
             this.components.add( new ComponentModel(null, tempLayout) );
             updateComponentView();
