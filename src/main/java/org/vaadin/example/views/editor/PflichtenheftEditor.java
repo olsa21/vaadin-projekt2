@@ -87,7 +87,7 @@ public class PflichtenheftEditor extends HorizontalLayout implements HasUrlParam
     public void setParameter(BeforeEvent beforeEvent, String s) {
         pflichtenheftOid = Integer.parseInt(s);
         pflichtenheftEntity = service.readPflichtenheft(pflichtenheftOid);
-        editBar = new EditorBar(pflichtenheftEntity);
+        editBar = new EditorBar(service, pflichtenheftEntity);
         Notification.show(pflichtenheftEntity.getTitel());
         Notification.show("Parameter: " + s);
         System.out.println("=>1");

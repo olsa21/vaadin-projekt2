@@ -24,13 +24,18 @@ public class SpecificationsService {
     private final PflichtenheftRepository pflichtenheftRepository;
     private final KapitelvordefiniertRepository kapitelvordefiniertRepository;
 
+    private final KapitelRepository kapitelRepository;
+    private final InhaltRepository inhaltRepository;
 
-    public SpecificationsService(MitarbeiterRepository benutzerRepository, AbteilungzuweisungRepository abteilungzuweisungRepository, ProjektZuweisungRepository projektZuweisungRepository, PflichtenheftRepository pflichtenheftRepository, KapitelvordefiniertRepository kapitelvordefiniertRepository){
+
+    public SpecificationsService(MitarbeiterRepository benutzerRepository, AbteilungzuweisungRepository abteilungzuweisungRepository, ProjektZuweisungRepository projektZuweisungRepository, PflichtenheftRepository pflichtenheftRepository, KapitelvordefiniertRepository kapitelvordefiniertRepository, KapitelRepository kapitelRepository, InhaltRepository inhaltRepository){
         this.benutzerRepository = benutzerRepository;
         this.abteilungzuweisungRepository = abteilungzuweisungRepository;
         this.projektZuweisungRepository = projektZuweisungRepository;
         this.pflichtenheftRepository = pflichtenheftRepository;
         this.kapitelvordefiniertRepository = kapitelvordefiniertRepository;
+        this.kapitelRepository = kapitelRepository;
+        this.inhaltRepository = inhaltRepository;
     }
 
     public List<MitarbeiterEntity> findAllUser(String filterText){
@@ -80,6 +85,13 @@ public class SpecificationsService {
 
     public ArrayList<PflichtenheftEntity> getPflichtenheftListWhere(int mitarbeiterOID){
         return pflichtenheftRepository.readPflichtenheftWhere(mitarbeiterOID);
+    }
+
+    public void saveKapitel(KapitelEntity kapitel){
+        if (kapitel == null){
+            System.err.println("Kapitel darf nicht null sein!");
+        }
+        kapitelRepository.save(kapitel);
     }
 
     public long countBenutzer(){
@@ -182,6 +194,14 @@ public class SpecificationsService {
 
     public void savePflichtenheft(PflichtenheftEntity pflichtenheft) {
         pflichtenheftRepository.save(pflichtenheft);
+    }
+
+    public void saveInhalt(InhaltEntity inhalt) {
+        inhaltRepository.save(inhalt);
+    }
+
+    public void deleteInhalt(InhaltEntity inhalt) {
+        inhaltRepository.delete(inhalt);
     }
 
     public PflichtenheftEntity readPflichtenheft(int projektOid) {

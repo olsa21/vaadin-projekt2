@@ -10,25 +10,29 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
-import org.vaadin.example.components.CustomPicUpload;
+import org.aspectj.weaver.ast.Not;
 import org.vaadin.example.components.CustomPicUploadWithCaptionAndScaling;
 import org.vaadin.example.entity.InhaltEntity;
 import org.vaadin.example.entity.KapitelEntity;
 import org.vaadin.example.entity.PflichtenheftEntity;
+import org.vaadin.example.model.ComponentModel;
+import org.vaadin.example.service.SpecificationsService;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class EditorBar extends HorizontalLayout {
 
+    private final SpecificationsService service;
     private ComboBox<String> cb;
-    private ArrayList<Component> components;
+    private ArrayList<ComponentModel> components;
 
     private PflichtenheftEntity pflichtenheftEntity;
 
     private int currentChapter;
 
-    public EditorBar(PflichtenheftEntity pflichtenheft) {
+    public EditorBar(SpecificationsService service, PflichtenheftEntity pflichtenheft) {
+        this.service = service;
         components = new ArrayList<>();
         this.pflichtenheftEntity = pflichtenheft;
         updateComponentView();
@@ -39,14 +43,18 @@ public class EditorBar extends HorizontalLayout {
         removeAll();
         VerticalLayout tempLayout = new VerticalLayout();
         tempLayout.add(getToolbar());
-        for (Component c : components) {
-            tempLayout.add(c);
+        for (ComponentModel c : components) {
+            tempLayout.add(c.getComponent());
         }
         add(tempLayout);
     }
 
     private void moveComponentUp(Component c) {
-        int index = components.indexOf(c);
+        ComponentModel swapModel = components.stream().filter(
+                cmp -> cmp.getComponent().equals(c)).findFirst().get();
+
+        int index = components.indexOf(swapModel);
+        //int index = components.indexOf(c);
         if (index == 0) {
             Notification.show("Komponente kann nicht nach oben verschoben werden!");
             return;
@@ -56,7 +64,10 @@ public class EditorBar extends HorizontalLayout {
     }
 
     private void moveComponentDown(Component c) {
-        int index = components.indexOf(c);
+        ComponentModel swapModel = components.stream().filter(
+                cmp -> cmp.getComponent().equals(c)).findFirst().get();
+
+        int index = components.indexOf(swapModel);
         if (index == components.size() - 1) {
             Notification.show("Komponente kann nicht nach unten verschoben werden!");
             return;
@@ -66,7 +77,11 @@ public class EditorBar extends HorizontalLayout {
     }
 
     private void removeComponent(Component c) {
-        components.remove(c);
+        ComponentModel swapModel = components.stream().filter(
+                cmp -> cmp.getComponent().equals(c)).findFirst().get();
+
+        int index = components.indexOf(swapModel);
+        components.remove(swapModel);
         updateComponentView();
     }
 
@@ -86,9 +101,9 @@ public class EditorBar extends HorizontalLayout {
 
                 for (InhaltEntity inhaltEntity: inhalte.stream().sorted(Comparator.comparing(InhaltEntity::getAnordnungIndex)).collect(Collectors.toList())) {
                     if (inhaltEntity.getBildInhalt() == null){
-                        components.add( addComponent("Textfeld", inhaltEntity.getTextInhalt(), null ));
+                        components.add( new ComponentModel( inhaltEntity.getInhaltOid(), addComponent("Textfeld", inhaltEntity.getTextInhalt(), null )));
                     }else{
-                        components.add( addComponent("Abbildung", inhaltEntity.getTextInhalt(), inhaltEntity.getBildInhalt() ));
+                        components.add( new ComponentModel(inhaltEntity.getInhaltOid(), addComponent("Abbildung", inhaltEntity.getTextInhalt(), inhaltEntity.getBildInhalt() )));
                     }
                 }
                 updateComponentView();
@@ -191,7 +206,7 @@ public class EditorBar extends HorizontalLayout {
         addBtn.addClickListener(click -> {
             HorizontalLayout tempLayout = this.addComponent(cb.getValue(), "", null);
 
-            this.components.add(tempLayout);
+            this.components.add( new ComponentModel(null, tempLayout) );
             updateComponentView();
         });
 
@@ -199,36 +214,53 @@ public class EditorBar extends HorizontalLayout {
         Button speichernBtn = new Button("Speichern");
 
         speichernBtn.addClickListener(click -> {
-            Set<InhaltEntity> inhalte = new HashSet<>();
-            KapitelEntity kapitel = new KapitelEntity();
-
             int anordnung = 0;
-            for(Component c : components) {//Layout
-                anordnung++;
-                List<Component> children = c.getChildren().collect(Collectors.toList());
-                for(Component c2 : children) {//HorizontalLayout
-                    if(c2 instanceof TextArea) {
-                        //TODO Abfrage ob Entity bzgl. Anordnung existiert
-                        InhaltEntity inhalt = new InhaltEntity();
-                        inhalt.setAnordnungIndex(anordnung);
-                        //inhalt.setKapitel(kapitel);
-                        inhalt.setTextInhalt(((TextArea) c2).getValue());
+            KapitelEntity kapitel = null;
 
-                        inhalte.add(inhalt);
-                    }else if(c2 instanceof CustomPicUpload) {
-                        InhaltEntity inhalt = new InhaltEntity();
-                        inhalt.setAnordnungIndex(anordnung);
-                        //inhalt.setKapitel();
-                        inhalt.setBildInhalt(((CustomPicUpload) c2).getBytes());
-                        inhalte.add(inhalt);
-                    //}else if(c2 instanceof CustomGrid) {FIXME
-                        //TODO
-                    }
-
-                }
+            if (pflichtenheftEntity.getKapitel().stream().filter(k -> k.getKapitelVordefiniertOid() == currentChapter).findFirst().isPresent()){
+                kapitel = pflichtenheftEntity.getKapitel().stream().filter(k -> k.getKapitelVordefiniertOid() == currentChapter).
+                        findFirst().
+                        get();
+            }else{
+                kapitel = new KapitelEntity();
+                kapitel.setKapitelVordefiniertOid(currentChapter);
+                kapitel.setProjekt(pflichtenheftEntity);
+                pflichtenheftEntity.getKapitel().add(kapitel);
+                service.saveKapitel(kapitel);
             }
-            kapitel.setInhalte(inhalte);
-            //Speichern
+
+            Set<InhaltEntity> deleteList = new HashSet<>(kapitel.getInhalte());
+
+            for (ComponentModel component : components) {
+                InhaltEntity inhalt = null;
+                if (component.getComponentOid() != null) {
+                    // ÄNDERUNG
+                    inhalt = kapitel.getInhalte().stream().filter(i -> i.getInhaltOid() == component.getComponentOid()).findFirst().get();
+                    deleteList.remove(inhalt);
+                } else {
+                    // NEU ERSTELLUNG
+                    inhalt = new InhaltEntity();
+                    kapitel.getInhalte().add(inhalt);
+                }
+
+                inhalt.setKapitelOid(kapitel.getKapitelOid());
+
+                if (component.getComponent().getChildren().findFirst().get() instanceof TextArea){
+                    inhalt.setTextInhalt(((TextArea) component.getComponent().getChildren().collect(Collectors.toList()).get(0)).getValue());
+                }else if(component.getComponent().getChildren().findFirst().get() instanceof CustomPicUploadWithCaptionAndScaling){
+                    if (inhalt.getBildInhalt() == null)
+                        inhalt.setBildInhalt(((CustomPicUploadWithCaptionAndScaling) component.getComponent().getChildren().collect(Collectors.toList()).get(0)).getBytes());
+                    inhalt.setTextInhalt(((CustomPicUploadWithCaptionAndScaling) component.getComponent().getChildren().collect(Collectors.toList()).get(0)).getCaptionText());
+                }
+                inhalt.setAnordnungIndex(anordnung);
+                service.saveInhalt(inhalt);
+                ++anordnung;
+            }
+            for(InhaltEntity inhalt : deleteList) {
+                kapitel.getInhalte().remove(inhalt);
+                service.deleteInhalt(inhalt);
+            }
+
         });
 
         toolbar.add(speichernBtn);

@@ -18,7 +18,7 @@ public class KapitelEntity {
     @Column(name = "kapitelVordefiniertOID")
     private int kapitelVordefiniertOid;
 
-    @OneToMany(mappedBy = "kapitel", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "kapitelOid", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<InhaltEntity> inhalte = new HashSet<>();
 
     @ManyToOne

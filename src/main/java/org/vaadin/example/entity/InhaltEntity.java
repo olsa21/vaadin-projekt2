@@ -10,9 +10,9 @@ public class InhaltEntity {
     @Id
     @Column(name = "inhaltOID")
     private int inhaltOid;
-    /*@Basic
+    @Basic
      @Column(name = "kapitelOID")
-     private int kapitelOid;*/
+     private int kapitelOid;
     @Basic
     @Column(name = "anordnungIndex")
     private Integer anordnungIndex;
@@ -23,16 +23,24 @@ public class InhaltEntity {
     @Column(name = "bildInhalt")
     private byte[] bildInhalt;
 
-    @ManyToOne
+    /*@ManyToOne
     @JoinColumn(name="kapitelOID", nullable = false)
-    private KapitelEntity kapitel;
+    private KapitelEntity kapitel;*/
 
-    public KapitelEntity getKapitel() {
+    /*public KapitelEntity getKapitel() {
         return kapitel;
     }
 
     public void setKapitel(KapitelEntity kapitel) {
         this.kapitel = kapitel;
+    }*/
+
+    public int getKapitelOid() {
+        return kapitelOid;
+    }
+
+    public void setKapitelOid(int kapitelOid) {
+        this.kapitelOid = kapitelOid;
     }
 
     public int getInhaltOid() {
@@ -42,15 +50,6 @@ public class InhaltEntity {
     public void setInhaltOid(int inhaltOid) {
         this.inhaltOid = inhaltOid;
     }
-
-    /*public int getKapitelOid() {
-        return kapitelOid;
-    }*/
-
-    /*public void setKapitelOid(int kapitelOid) {
-        this.kapitelOid = kapitelOid;
-    }*/
-
 
     public Integer getAnordnungIndex() {
         return anordnungIndex;
