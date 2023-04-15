@@ -2,6 +2,8 @@ package org.vaadin.example.components;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 
@@ -10,11 +12,13 @@ import java.util.Collections;
 
 public class CustomGrid extends VerticalLayout {
     private Grid<GridRow> grid = new Grid<>();
+    private ArrayList<String> columnNames = new ArrayList<>();
     Button neueZeileBtn = new Button("Neue Zeile");
     ArrayList<GridRow> data = new ArrayList<>();
     private Button print = new Button("Print");
 
     public CustomGrid(ArrayList<String> columnNames) {
+        this.columnNames = columnNames;
         for(int i = 0; i < columnNames.size(); i++) {
             int finalI = i;
             grid.addComponentColumn(item -> {
@@ -27,17 +31,17 @@ public class CustomGrid extends VerticalLayout {
             }).setHeader(columnNames.get(i));
         }
         grid.addComponentColumn(item -> {
-            Button button = new Button("Entfernen");
+            Button button = new Button(new Icon(VaadinIcon.TRASH));
             button.addClickListener(e -> {
                 System.out.println("Entferne Eintrag mir Index " + data.indexOf(item));
                 data.remove(item);
                 grid.getDataProvider().refreshAll();
             });
             return button;
-        }).setHeader("Button");
+        }).setHeader("Optionen");
 
         //Leere Zeile einfügen
-        data.add(new GridRow(new ArrayList<>(Collections.nCopies(columnNames.size(), ""))));
+        //data.add(new GridRow(new ArrayList<>(Collections.nCopies(columnNames.size(), ""))));TODO weggemacht
         grid.setItems(data);
 
         print.addClickListener(e -> {
@@ -60,16 +64,15 @@ public class CustomGrid extends VerticalLayout {
     public ArrayList<GridRow> getData() {
         return data;
     }
-}
 
-class GridRow {
-    private ArrayList<String> content = new ArrayList<>();
-
-    public GridRow(ArrayList<String> content) {
-        this.content = content;
+    //Getter for caption
+    public ArrayList<String> getColumnNames() {
+        return columnNames;
     }
 
-    public ArrayList<String> getContent() {
-        return content;
+    public void setData(ArrayList<GridRow> data) {
+        this.data = data;
+        grid.setItems(data);
     }
 }
+

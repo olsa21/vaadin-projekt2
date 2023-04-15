@@ -23,6 +23,10 @@ public class InhaltEntity {
     @Column(name = "bildInhalt")
     private byte[] bildInhalt;
 
+    @OneToOne
+    @JoinColumn(name="tabellenOID", nullable = true)
+    private TabellenEntity tabelle;
+
     /*@ManyToOne
     @JoinColumn(name="kapitelOID", nullable = false)
     private KapitelEntity kapitel;*/
@@ -34,6 +38,14 @@ public class InhaltEntity {
     public void setKapitel(KapitelEntity kapitel) {
         this.kapitel = kapitel;
     }*/
+
+    public TabellenEntity getTabelle() {
+        return tabelle;
+    }
+
+    public void setTabelle(TabellenEntity tabelle) {
+        this.tabelle = tabelle;
+    }
 
     public int getKapitelOid() {
         return kapitelOid;

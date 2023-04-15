@@ -23,12 +23,12 @@ public class SpecificationsService {
     private final ProjektZuweisungRepository projektZuweisungRepository;
     private final PflichtenheftRepository pflichtenheftRepository;
     private final KapitelvordefiniertRepository kapitelvordefiniertRepository;
-
     private final KapitelRepository kapitelRepository;
     private final InhaltRepository inhaltRepository;
+    private final TabellenRepository tabellenRepository;
+    private final TabellenzellenRepository tabellenzellenRepository;
 
-
-    public SpecificationsService(MitarbeiterRepository benutzerRepository, AbteilungzuweisungRepository abteilungzuweisungRepository, ProjektZuweisungRepository projektZuweisungRepository, PflichtenheftRepository pflichtenheftRepository, KapitelvordefiniertRepository kapitelvordefiniertRepository, KapitelRepository kapitelRepository, InhaltRepository inhaltRepository){
+    public SpecificationsService(MitarbeiterRepository benutzerRepository, AbteilungzuweisungRepository abteilungzuweisungRepository, ProjektZuweisungRepository projektZuweisungRepository, PflichtenheftRepository pflichtenheftRepository, KapitelvordefiniertRepository kapitelvordefiniertRepository, KapitelRepository kapitelRepository, InhaltRepository inhaltRepository, TabellenRepository tabellenRepository, TabellenzellenRepository tabellenzellenRepository){
         this.benutzerRepository = benutzerRepository;
         this.abteilungzuweisungRepository = abteilungzuweisungRepository;
         this.projektZuweisungRepository = projektZuweisungRepository;
@@ -36,6 +36,8 @@ public class SpecificationsService {
         this.kapitelvordefiniertRepository = kapitelvordefiniertRepository;
         this.kapitelRepository = kapitelRepository;
         this.inhaltRepository = inhaltRepository;
+        this.tabellenRepository = tabellenRepository;
+        this.tabellenzellenRepository = tabellenzellenRepository;
     }
 
     public List<MitarbeiterEntity> findAllUser(String filterText){
@@ -200,6 +202,10 @@ public class SpecificationsService {
         inhaltRepository.save(inhalt);
     }
 
+    public void saveTable(TabellenEntity table) {
+        tabellenRepository.save(table);
+    }
+
     public void deleteInhalt(InhaltEntity inhalt) {
         inhaltRepository.delete(inhalt);
     }
@@ -223,5 +229,17 @@ public class SpecificationsService {
 
     public List<KapitelvordefiniertEntity> readAllKapitelvordefiniert() {
         return kapitelvordefiniertRepository.findAll();
+    }
+
+    public void deleteTable(TabellenEntity tabelle) {
+        tabellenRepository.delete(tabelle);
+    }
+
+    public void saveTabellenzeile(TabellenzeileEntity tabellenzeile) {
+        tabellenzellenRepository.save(tabellenzeile);
+    }
+
+    public void deleteTabellenzeile(TabellenzeileEntity tabellenzeileEntity) {
+        tabellenzellenRepository.delete(tabellenzeileEntity);
     }
 }
