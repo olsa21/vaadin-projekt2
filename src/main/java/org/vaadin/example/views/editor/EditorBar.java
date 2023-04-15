@@ -295,33 +295,45 @@ public class EditorBar extends HorizontalLayout {
                         inhalt.setBildInhalt(((CustomPicUploadWithCaptionAndScaling) component.getComponent().getChildren().collect(Collectors.toList()).get(0)).getBytes());
                     inhalt.setTextInhalt(((CustomPicUploadWithCaptionAndScaling) component.getComponent().getChildren().collect(Collectors.toList()).get(0)).getCaptionText());
                 }else if(component.getComponent().getChildren().findFirst().get() instanceof CustomGrid){
-        System.err.println("Tabelle: " + inhalt.getTabelle());
+
                     if (inhalt.getTabelle() == null) {
                         TabellenEntity newTable = new TabellenEntity();
                         service.saveTable(newTable);
                         inhalt.setTabelle(newTable);
                     }
 
-    System.err.println("Tabelle: " + inhalt.getTabelle());
                     ArrayList<String> captions = ((CustomGrid) component.getComponent().getChildren().collect(Collectors.toList()).get(0)).getColumnNames();
                     inhalt.getTabelle().setSpaltenCaption1(captions.size() >=1? captions.get(0):null);
                     inhalt.getTabelle().setSpaltenCaption2(captions.size() >=2? captions.get(1):null);
                     inhalt.getTabelle().setSpaltenCaption3(captions.size() >=3? captions.get(2):null);
                     inhalt.getTabelle().setSpaltenCaption4(captions.size() >=4? captions.get(3):null);
                     inhalt.getTabelle().setSpaltenCaption5(captions.size() >=5? captions.get(4):null);
-    System.err.println("1");
+
+                    System.err.println(inhalt.getTabelle());
+
                     service.saveTable(inhalt.getTabelle());
 
-    System.err.println("2");
 
-
-                    //create like deletelist
                     Set<TabellenzeileEntity> deleteList2 = new HashSet<>(inhalt.getTabelle().getZellen());
+                    for ( GridRow row : ((CustomGrid) component.getComponent().getChildren().collect(Collectors.toList()).get(0)).getData() ) {
+                        for ( String test : row.getContent() ) {
+                            System.err.print(test+"  ");
+                        }
+                        System.err.println();
+                    }
 
                     int index = 0;
+                    // FIXME SEHR UNOPTIMIERT. ERST ALLES LÖSCHEN UND DANN HINZUFÜGEN, damit bei Löscheung und Hinzufügen die gleiche ID verwendet wird
+                    // TODO Mapping der einzelnen Zeilen mit der DB-OID, damit man Löschung und Hinzufügen vermeiden kann
+                    for ( TabellenzeileEntity tabellenzeileEntity: deleteList2 ) {
+                        inhalt.getTabelle().getZellen().remove(tabellenzeileEntity);
+                        try{service.deleteTabellenzeile(tabellenzeileEntity);}catch(Exception e){}
+                    }
+                    inhalt.getTabelle().setZellen(new HashSet<>());
+
+
                     for (GridRow row : ((CustomGrid) component.getComponent().getChildren().collect(Collectors.toList()).get(0)).getData()) {
                         int finalIndex2 = index;
-                        deleteList2.removeIf(z -> z.getAnordnungsIndex() == finalIndex2);
                         TabellenzeileEntity tabellenzeile = null;
                         int finalIndex = index;
                         if (inhalt.getTabelle().getZellen().stream().filter(z -> z.getAnordnungsIndex() == finalIndex).findFirst().isPresent()){
@@ -343,32 +355,10 @@ public class EditorBar extends HorizontalLayout {
                         tabellenzeile.setZellenWert5(rows.size() >=5? rows.get(4):"");
 
                         service.saveTabellenzeile(tabellenzeile);
-                        service.saveTable(inhalt.getTabelle());
+                        //service.saveTable(inhalt.getTabelle());
 
-/*
-                        service.saveTabellenzeile(tabellenzeile);
-                        inhalt.getTabelle().getZellen().add(tabellenzeile);
-                        //tabellenzeile.setZellenWert1(row.getValues().get(0));
-                        //tabellenzeile.setZellenWert2(row.getValues().get(1));
-                        //tabellenzeile.setZellenWert3(row.getValues().get(2));
-                        //tabellenzeile.setZellenWert4(row.getValues().get(3));
-                        //tabellenzeile.setZellenWert5(row.getValues().get(4));
-                        ++index;
-                        //service.saveTabellenzeile(tabellenzeile);
-
-                        service.saveTable(inhalt.getTabelle());*/
                         index++;
                     }
-
-                    for ( TabellenzeileEntity tabellenzeileEntity: deleteList2) {
-
-                        inhalt.getTabelle().getZellen().remove(tabellenzeileEntity);
-                        service.deleteTabellenzeile(tabellenzeileEntity);
-
-
-                    }
-
-
 
                 }
                 inhalt.setAnordnungIndex(anordnung);
