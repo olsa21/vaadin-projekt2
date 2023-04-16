@@ -266,6 +266,7 @@ public class EditorBar extends HorizontalLayout {
                 System.err.println(kapitel);
             }else{
                 kapitel = new KapitelEntity();
+                kapitel.setKapitelVordefiniert(new KapitelvordefiniertEntity());
                 kapitel.getKapitelVordefiniert().setKapitelVordefiniertOid(currentChapter);
                 kapitel.setProjekt(pflichtenheftEntity);
                 pflichtenheftEntity.getKapitel().add(kapitel);

@@ -14,7 +14,7 @@ public class KapitelEntity {
     //@Basic
     //@Column(name = "projektOID")
     //private int projektOid;
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "kapitelVordefiniertOID", referencedColumnName = "kapitelVordefiniertOID")
     private KapitelvordefiniertEntity kapitelVordefiniert;
 
