@@ -6,6 +6,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -166,28 +167,45 @@ public class EditorBar extends HorizontalLayout {
             throw new IllegalArgumentException("Bitte wählen Sie eine Komponente aus!");
         }
 
+        Div div = new Div();
+        div.setWidth("180%");
         switch (component){
             case "Textfeld":
+
+
                 TextArea textArea = new TextArea();
                 textArea.setValue(textInhalt);
-                textArea.setWidth("160%");
-                tempLayout.add(textArea);
+                div.add(textArea);
+                textArea.setHeightFull();
+                textArea.setWidthFull();
+                //textArea.setWidth("160%");
+                //tempLayout.add(textArea);
+                tempLayout.add(div);
                 tempLayout.add(buttonLayout);
+
 
                 break;
             case "Abbildung":
+
                 CustomPicUploadWithCaptionAndScaling pic = new CustomPicUploadWithCaptionAndScaling();
                 if (bytes != null) {
                     pic.setBytes(bytes);
                     pic.setCaptionText(textInhalt);
                 }
-                tempLayout.add( pic );
+                div.add(pic);
+
+                tempLayout.add(div);
+                pic.setWidth("100%");
+                //pic.setWidth("160%");
+                //tempLayout.add( pic );
                 tempLayout.add(buttonLayout);
                 break;
             case "Tabelle":
+
                 ArrayList<String> columnNames = new ArrayList<>();
 
                 if (tabelle != null){
+
                     // Tabelle wird aus der DB geladen und angezeigt
                     ArrayList<String> captions = new ArrayList<>();
                     captions.addAll(Arrays.asList(tabelle.getSpaltenCaption1(), tabelle.getSpaltenCaption2(),
@@ -198,6 +216,9 @@ public class EditorBar extends HorizontalLayout {
                     }
 
                     CustomGrid grid = new CustomGrid(columnNames);
+                    if (textInhalt != null)
+                        grid.setCaptionText(textInhalt);
+                    grid.setWidth("160%");
                     ArrayList <GridRow> rows = new ArrayList<>();
 
                     tabelle.getZellen().stream().sorted(Comparator.comparing(TabellenzeileEntity::getAnordnungsIndex)).collect(Collectors.toList()).forEach(zelle -> {
@@ -208,7 +229,10 @@ public class EditorBar extends HorizontalLayout {
                     });
                     grid.setData(rows);
 
-                    tempLayout.add(grid);
+                    div.add(grid);
+                    grid.setWidth("100%");
+                    tempLayout.add(div);
+                    //tempLayout.add(grid);
                     tempLayout.add(buttonLayout);
                 }else{
                     // leere Tabelle wird erzeugt
@@ -219,8 +243,11 @@ public class EditorBar extends HorizontalLayout {
                         UI.getCurrent().getPage().executeJs("document.querySelector('vaadin-dialog-overlay').close()");
 
                         CustomGrid grid = new CustomGrid(columnNames);
-                        tempLayout.add(grid);
+                        div.add(grid);
+                        tempLayout.add(div);
+                        //tempLayout.add(grid);
                         tempLayout.add(buttonLayout);
+
                     }));
                     dialog.setHeight("90%");
                     dialog.setWidth("80%");
@@ -288,21 +315,23 @@ public class EditorBar extends HorizontalLayout {
 
                 inhalt.setKapitelOid(kapitel.getKapitelOid());
 
-                if (component.getComponent().getChildren().findFirst().get() instanceof TextArea){
-                    inhalt.setTextInhalt(((TextArea) component.getComponent().getChildren().collect(Collectors.toList()).get(0)).getValue());
-                }else if(component.getComponent().getChildren().findFirst().get() instanceof CustomPicUploadWithCaptionAndScaling){
+                Component temp = component.getComponent().getChildren().findFirst().get().getChildren().findFirst().get();
+                if (temp instanceof TextArea){
+                    inhalt.setTextInhalt(((TextArea) temp).getValue());
+                }else if(temp instanceof CustomPicUploadWithCaptionAndScaling){
                     if (inhalt.getBildInhalt() == null)
-                        inhalt.setBildInhalt(((CustomPicUploadWithCaptionAndScaling) component.getComponent().getChildren().collect(Collectors.toList()).get(0)).getBytes());
-                    inhalt.setTextInhalt(((CustomPicUploadWithCaptionAndScaling) component.getComponent().getChildren().collect(Collectors.toList()).get(0)).getCaptionText());
-                }else if(component.getComponent().getChildren().findFirst().get() instanceof CustomGrid){
+                        inhalt.setBildInhalt(((CustomPicUploadWithCaptionAndScaling) temp).getBytes());
+                    inhalt.setTextInhalt(((CustomPicUploadWithCaptionAndScaling) temp).getCaptionText());
+                }else if(temp instanceof CustomGrid){
 
                     if (inhalt.getTabelle() == null) {
                         TabellenEntity newTable = new TabellenEntity();
                         service.saveTable(newTable);
                         inhalt.setTabelle(newTable);
                     }
+                    inhalt.setTextInhalt(((CustomGrid) temp).getCaptionText());
 
-                    ArrayList<String> captions = ((CustomGrid) component.getComponent().getChildren().collect(Collectors.toList()).get(0)).getColumnNames();
+                    ArrayList<String> captions = ((CustomGrid) temp).getColumnNames();
                     inhalt.getTabelle().setSpaltenCaption1(captions.size() >=1? captions.get(0):null);
                     inhalt.getTabelle().setSpaltenCaption2(captions.size() >=2? captions.get(1):null);
                     inhalt.getTabelle().setSpaltenCaption3(captions.size() >=3? captions.get(2):null);
@@ -315,7 +344,7 @@ public class EditorBar extends HorizontalLayout {
 
 
                     Set<TabellenzeileEntity> deleteList2 = new HashSet<>(inhalt.getTabelle().getZellen());
-                    for ( GridRow row : ((CustomGrid) component.getComponent().getChildren().collect(Collectors.toList()).get(0)).getData() ) {
+                    for ( GridRow row : ((CustomGrid) temp).getData() ) {
                         for ( String test : row.getContent() ) {
                             System.err.print(test+"  ");
                         }
@@ -332,7 +361,7 @@ public class EditorBar extends HorizontalLayout {
                     inhalt.getTabelle().setZellen(new HashSet<>());
 
 
-                    for (GridRow row : ((CustomGrid) component.getComponent().getChildren().collect(Collectors.toList()).get(0)).getData()) {
+                    for (GridRow row : ((CustomGrid) temp).getData()) {
                         int finalIndex2 = index;
                         TabellenzeileEntity tabellenzeile = null;
                         int finalIndex = index;
