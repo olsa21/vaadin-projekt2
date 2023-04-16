@@ -47,6 +47,11 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+        <repository>
+            <id>clojars</id>
+            <name>Clojars</name>
+            <url>https://repo.clojars.org/</url>
+        </repository>
     </repositories>
 
     <pluginRepositories>
@@ -147,6 +152,18 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.27</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>4.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.luhuiguo</groupId>
+            <artifactId>aspose-words</artifactId>
+            <version>23.1</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>

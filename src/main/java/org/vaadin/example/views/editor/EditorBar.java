@@ -97,7 +97,7 @@ public class EditorBar extends HorizontalLayout {
      */
     private void loadChapterComponents() {
         for (KapitelEntity kapitelEntity : pflichtenheftEntity.getKapitel()) {
-            if (kapitelEntity.getKapitelVordefiniertOid() == currentChapter){
+            if (kapitelEntity.getKapitelVordefiniert().getKapitelVordefiniertOid() == currentChapter){
                 Set<InhaltEntity> inhalte = kapitelEntity.getInhalte();
 
                 for (InhaltEntity inhaltEntity: inhalte.stream().sorted(Comparator.comparing(InhaltEntity::getAnordnungIndex)).collect(Collectors.toList())) {
@@ -259,14 +259,14 @@ public class EditorBar extends HorizontalLayout {
             int anordnung = 0;
             KapitelEntity kapitel = null;
 
-            if (pflichtenheftEntity.getKapitel().stream().filter(k -> k.getKapitelVordefiniertOid() == currentChapter).findFirst().isPresent()){
-                kapitel = pflichtenheftEntity.getKapitel().stream().filter(k -> k.getKapitelVordefiniertOid() == currentChapter).
+            if (pflichtenheftEntity.getKapitel().stream().filter(k -> k.getKapitelVordefiniert().getKapitelVordefiniertOid() == currentChapter).findFirst().isPresent()){
+                kapitel = pflichtenheftEntity.getKapitel().stream().filter(k -> k.getKapitelVordefiniert().getKapitelVordefiniertOid() == currentChapter).
                         findFirst().
                         get();
                 System.err.println(kapitel);
             }else{
                 kapitel = new KapitelEntity();
-                kapitel.setKapitelVordefiniertOid(currentChapter);
+                kapitel.getKapitelVordefiniert().setKapitelVordefiniertOid(currentChapter);
                 kapitel.setProjekt(pflichtenheftEntity);
                 pflichtenheftEntity.getKapitel().add(kapitel);
                 service.saveKapitel(kapitel);
