@@ -1,20 +1,12 @@
 package org.vaadin.example.views;
 
-import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextArea;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import org.vaadin.example.components.ExportComponent;
 import org.vaadin.example.components.ProjectForm;
-import org.vaadin.example.entity.MitarbeiterEntity;
 import org.vaadin.example.entity.PflichtenheftEntity;
-import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
 
 import javax.annotation.security.PermitAll;
@@ -64,6 +56,14 @@ public class ProjektDetailMitExport extends VerticalLayout {
         });
         export.exportButton.addClickListener(event -> {
             Notification.show("Exportiere als " + export.exportCombo.getValue());
+
+
+            //Hinweis muss mit Enter ausgeführt werden
+            if (export.exportCombo.getValue().equals("PDF")) {
+                UI.getCurrent().getPage().open("/pdf/" + projektOid, "_blank");
+            } else {
+                UI.getCurrent().getPage().open("/docx/" + projektOid, "_blank");
+            }
         });
 
     }

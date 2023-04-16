@@ -14,9 +14,9 @@ public class KapitelEntity {
     //@Basic
     //@Column(name = "projektOID")
     //private int projektOid;
-    @Basic
-    @Column(name = "kapitelVordefiniertOID")
-    private int kapitelVordefiniertOid;
+    @ManyToOne
+    @JoinColumn(name = "kapitelVordefiniertOID", referencedColumnName = "kapitelVordefiniertOID")
+    private KapitelvordefiniertEntity kapitelVordefiniert;
 
     @OneToMany(mappedBy = "kapitelOid", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<InhaltEntity> inhalte = new HashSet<>();
@@ -68,12 +68,12 @@ public class KapitelEntity {
      this.projektOid = projektOid;
      }*/
 
-    public int getKapitelVordefiniertOid() {
-        return kapitelVordefiniertOid;
+    public KapitelvordefiniertEntity getKapitelVordefiniert() {
+        return kapitelVordefiniert;
     }
 
-    public void setKapitelVordefiniertOid(int kapitelVordefiniertOid) {
-        this.kapitelVordefiniertOid = kapitelVordefiniertOid;
+    public void setKapitelVordefiniert(KapitelvordefiniertEntity kapitelVordefiniert) {
+        this.kapitelVordefiniert = kapitelVordefiniert;
     }
 
     @Override
@@ -85,7 +85,7 @@ public class KapitelEntity {
 
         if (kapitelOid != that.kapitelOid) return false;
         //if (projektOid != that.projektOid) return false;
-        if (kapitelVordefiniertOid != that.kapitelVordefiniertOid) return false;
+        if (kapitelVordefiniert != that.kapitelVordefiniert) return false;
 
         return true;
     }
@@ -94,7 +94,7 @@ public class KapitelEntity {
     public int hashCode() {
         int result = kapitelOid;
         //result = 31 * result + projektOid;
-        result = 31 * result + kapitelVordefiniertOid;
+        result = 31 * result + kapitelVordefiniert.hashCode();
         return result;
     }
 }
