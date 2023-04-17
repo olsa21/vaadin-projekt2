@@ -163,7 +163,7 @@ public class SpecificationsService {
         pflichtenheftEntity.setFrist(frist.toString());
         pflichtenheftEntity.setRepositoryLink(repoLink);
         pflichtenheftEntity.setOeffentlich((byte) oeffentlich);
-        pflichtenheftEntity.setVerantwortlicher(mitarbeiter.getMitarbeiterOid());
+        pflichtenheftEntity.setVerantwortlicher(mitarbeiter);
 
         PflichtenheftEntity test =pflichtenheftRepository.save(pflichtenheftEntity);
         test.addMitarbeiter(mitarbeiter);

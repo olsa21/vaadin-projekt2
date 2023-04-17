@@ -29,9 +29,25 @@ public class PflichtenheftEntity {
     @Basic
     @Column(name = "repositoryLink")
     private String repositoryLink;
-    @Basic
+
+    //create verantwortlicher as object
+    @ManyToOne
+    @JoinColumn(name = "verantwortlicher")
+    private MitarbeiterEntity verantwortlicher;
+
+    public MitarbeiterEntity getVerantwortlicher() {
+        return verantwortlicher;
+    }
+
+    public void setVerantwortlicher(MitarbeiterEntity verantwortlicher) {
+        this.verantwortlicher = verantwortlicher;
+    }
+
+    /*@Basic
     @Column(name = "verantwortlicher")
-    private int verantwortlicher;
+    private int verantwortlicher;*/
+
+
 
     @OneToMany(mappedBy = "projekt", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<KapitelEntity> kapitel = new HashSet<>();
@@ -112,13 +128,13 @@ public class PflichtenheftEntity {
         this.repositoryLink = repositoryLink;
     }
 
-    public int getVerantwortlicher() {
+    /*public int getVerantwortlicher() {
         return verantwortlicher;
     }
 
     public void setVerantwortlicher(int verantwortlicher) {
         this.verantwortlicher = verantwortlicher;
-    }
+    }*/
 
 
 
@@ -130,7 +146,7 @@ public class PflichtenheftEntity {
         PflichtenheftEntity that = (PflichtenheftEntity) o;
 
         if (projektOid != that.projektOid) return false;
-        if (verantwortlicher != that.verantwortlicher) return false;
+        //if (verantwortlicher != that.verantwortlicher) return false;
         if (titel != null ? !titel.equals(that.titel) : that.titel != null) return false;
         if (beschreibung != null ? !beschreibung.equals(that.beschreibung) : that.beschreibung != null) return false;
         if (oeffentlich != null ? !oeffentlich.equals(that.oeffentlich) : that.oeffentlich != null) return false;
@@ -149,7 +165,7 @@ public class PflichtenheftEntity {
         result = 31 * result + (oeffentlich != null ? oeffentlich.hashCode() : 0);
         result = 31 * result + (frist != null ? frist.hashCode() : 0);
         result = 31 * result + (repositoryLink != null ? repositoryLink.hashCode() : 0);
-        result = 31 * result + verantwortlicher;
+        //result = 31 * result + verantwortlicher;
         return result;
     }
 }
