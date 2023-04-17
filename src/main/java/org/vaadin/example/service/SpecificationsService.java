@@ -165,9 +165,17 @@ public class SpecificationsService {
         pflichtenheftEntity.setOeffentlich((byte) oeffentlich);
         pflichtenheftEntity.setVerantwortlicher(mitarbeiter.getMitarbeiterOid());
 
-        PflichtenheftEntity test =pflichtenheftRepository.save(pflichtenheftEntity);
-        test.addMitarbeiter(mitarbeiter);
-        pflichtenheftRepository.save(test);
+        PflichtenheftEntity result = pflichtenheftRepository.save(pflichtenheftEntity);
+
+        for(KapitelvordefiniertEntity kv : kapitelvordefiniertRepository.findAll()){
+            KapitelEntity kapitelEntity = new KapitelEntity();
+            kapitelEntity.setProjekt(result);
+            kapitelEntity.setKapitelVordefiniert(kv);
+            kapitelRepository.save(kapitelEntity);
+        }
+
+        result.addMitarbeiter(mitarbeiter);
+        pflichtenheftRepository.save(result);
     }
 
     //In Zukunft entfernen
