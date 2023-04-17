@@ -2,9 +2,11 @@ package org.vaadin.example.exporttest;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.util.Units;
+import org.apache.poi.xwpf.model.XWPFHeaderFooterPolicy;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTP;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSimpleField;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STFldCharType;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STOnOff;
 import com.aspose.words.Document;
 import com.aspose.words.SaveFormat;
@@ -18,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ExportTestMain {
     private static String path = System.getProperty("user.dir") + "\\src\\main\\java\\org\\vaadin\\example\\exporttest\\";
@@ -121,7 +125,6 @@ public class ExportTestMain {
     }
 
 
-
     private static void createOdt() {
         //create simple odt file
         try {
@@ -171,6 +174,7 @@ public class ExportTestMain {
 
     // Pflichtenheft Teil; Wird verändert in das Projekt übernommen     -------------------------------------------------------
     private static void writePflichtenheft(String docxTemplate, String docxDest) throws IOException, InvalidFormatException {
+        //  ---------------- Konfiguration ---------------- //
         // Dokument wird erstellt und Styles werden geladen
         XWPFDocument document = new XWPFDocument();
         XWPFDocument template = new XWPFDocument(new FileInputStream(path + docxTemplate));
@@ -188,6 +192,7 @@ public class ExportTestMain {
         for (XWPFStyle style : styles.values()) {
             newStyles.addStyle(style);
         }
+        //  ---------------- Konfiguration ENDE ---------------- //
 
         //Hier wird Inhalt eingefügt
         //TODO Style als Klassenattribut definieren
@@ -203,17 +208,15 @@ public class ExportTestMain {
         newpage(document);
         insertUeberschrift(document, styles, 1, "Ueberschrift 2");
         insertUeberschrift(document, styles, 1, "Ueberschrift 3");
-        insertText(document);
+        insertText(document, "Dies ist ein \\b{fetter} \\b{Te}xt. Dies ist eine \\n{}neue Zeile");
         insertTable(document);
 
         //load file save as byte array
-        byte [] bytes = Files.readAllBytes(Paths.get(path + "testimage.png"));
+        byte[] bytes = Files.readAllBytes(Paths.get(path + "testimage.png"));
 
         insertImage(document, bytes);
         insertImage(document, bytes);
         insertAbbVerz(document, styles);
-
-        //new para
 
 
         //Speichern
@@ -255,9 +258,9 @@ public class ExportTestMain {
         rowX.addNewTableCell().setText(data.get(0).get(1));
         rowX.addNewTableCell().setText(data.get(0).get(2));
 
-        for(ArrayList<String> row : data.subList(1, data.size())) {
+        for (ArrayList<String> row : data.subList(1, data.size())) {
             XWPFTableRow roww = table.createRow();
-            for(int i = 0; i < row.size(); i++) {
+            for (int i = 0; i < row.size(); i++) {
                 roww.getCell(i).setText(row.get(i));
             }
         }
@@ -281,6 +284,7 @@ public class ExportTestMain {
     private static void newpage(XWPFDocument doc) {
         doc.createParagraph().setPageBreak(true);
     }
+
     private static void insertDeckblatt(XWPFDocument document, Map<String, XWPFStyle> styles) {
         document.createParagraph().setPageBreak(true);
 
@@ -323,15 +327,54 @@ public class ExportTestMain {
 
     }
 
-    private static void insertText(XWPFDocument document) {
-        XWPFParagraph p = document.createParagraph();
-        XWPFRun run1 = p.createRun();
+    private static void insertText(XWPFDocument doc, String text) {
+        XWPFParagraph p = doc.createParagraph();
+        XWPFRun run;
 
-        /* Ohne STYLE
-        p.setStyle(style.get("Heading1").getStyleId());
-        run1.setStyle(style.get("Heading1").getStyleId());
-         */
-        run1.setText("TEXT");
+        Pattern pattern = Pattern.compile("(\\\\[a-z])\\{([^}]*)\\}");
+        Matcher matcher = pattern.matcher(text);
+
+        int position = 0;
+        while (matcher.find()) {
+            String steuerzeichen = matcher.group(1);
+            String body = matcher.group(2);
+
+            // Füge den Text vor dem Steuerzeichen hinzu
+            if (position < matcher.start()) {
+                run = p.createRun();
+                run.setText(text.substring(position, matcher.start()));
+            }
+
+            // Füge den formatierten Text hinzu
+            run = p.createRun();
+            System.out.println(steuerzeichen);
+            switch (steuerzeichen) {
+                case "\\b":
+                    run.setBold(true);
+                    break;
+                case "\\i":
+                    run.setItalic(true);
+                    break;
+                case "\\u":
+                    run.setUnderline(UnderlinePatterns.SINGLE);
+                    break;
+                case "\\n":
+                    run.addBreak();
+                    break;
+                //Hier ggf weitere Formatierungen einfügen
+                default:
+                    System.out.println("Ungültiges Steuerzeichen: " + steuerzeichen);
+            }
+            run.setText(body);
+
+            position = matcher.end();
+        }
+
+        // Füge den restlichen Text nach dem letzten Steuerzeichen hinzu
+        if (position < text.length()) {
+            run = p.createRun();
+            run.setText(text.substring(position));
+        }
     }
 
     private static void insertAbbVerz(XWPFDocument document, Map<String, XWPFStyle> styles) {

@@ -5,6 +5,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class CustomGrid extends VerticalLayout {
             int finalI = i;
             grid.addComponentColumn(item -> {
                 if (item != data.get(data.size() - 1)) {
-                    TextField textField = new TextField();
+                    TextArea textField = new TextArea();
                     textField.setValue(String.valueOf(item.getContent().get(finalI)));
                     textField.addValueChangeListener(e -> {
                         item.getContent().set(finalI, e.getValue());
