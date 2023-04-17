@@ -45,7 +45,7 @@ public class ProjektDetailMitExport extends VerticalLayout {
                 pflichtenheftEntity.setBeschreibung(projectForm.beschreibung.getValue());
                 pflichtenheftEntity.setFrist(projectForm.frist.getValue().toString());
                 pflichtenheftEntity.setRepositoryLink(projectForm.repo.getValue());
-                service.addPflichtenheft(pflichtenheftEntity);
+                service.updatePflichtenheft(pflichtenheftEntity);
             } else {
                 if (projectForm.titel.getValue().isBlank())
                     projectForm.titel.setInvalid(true);

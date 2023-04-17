@@ -152,11 +152,11 @@ public class SpecificationsService {
         });
     }
 
-    public void addPflichtenheft(PflichtenheftEntity pflichtenheftEntity) {
+    public void updatePflichtenheft(PflichtenheftEntity pflichtenheftEntity) {
         pflichtenheftRepository.save(pflichtenheftEntity);
     }
 
-    public void addPflichtenheft(MitarbeiterEntity mitarbeiter, String titel, String beschreibung, LocalDate frist, String repoLink, int oeffentlich) {
+    public void createPflichtenheft(MitarbeiterEntity mitarbeiter, String titel, String beschreibung, LocalDate frist, String repoLink, int oeffentlich) {
         PflichtenheftEntity pflichtenheftEntity = new PflichtenheftEntity();
         pflichtenheftEntity.setTitel(titel);
         pflichtenheftEntity.setBeschreibung(beschreibung);
