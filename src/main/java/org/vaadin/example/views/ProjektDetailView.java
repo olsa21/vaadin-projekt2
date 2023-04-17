@@ -42,8 +42,8 @@ public class ProjektDetailView extends VerticalLayout {
         beschreibung.setText(pflichtenheft.getBeschreibung());
         frist.setText(pflichtenheft.getFrist());
 
-        verantwortlicher.setText(createVerantwortlicherString());
-
+        //verantwortlicher.setText(createVerantwortlicherString());
+        verantwortlicher.setText(pflichtenheft.getVerantwortlicher().getVorname() + " " + pflichtenheft.getVerantwortlicher().getNachname());
         mitglieder.setText(createMitgliederString());
         repo.setText(pflichtenheft.getRepositoryLink());
 
@@ -125,7 +125,7 @@ public class ProjektDetailView extends VerticalLayout {
 
     private String createVerantwortlicherString(){
         for(MitarbeiterEntity mitarbeiterEntity : pflichtenheft.getMitarbeiter()) {
-            if(mitarbeiterEntity.getMitarbeiterOid() == pflichtenheft.getVerantwortlicher()){
+            if(mitarbeiterEntity.getMitarbeiterOid() == pflichtenheft.getVerantwortlicher().getMitarbeiterOid()){
                 return mitarbeiterEntity.getVorname() + " " + mitarbeiterEntity.getNachname();
             }
         }

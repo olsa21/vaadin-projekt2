@@ -16,7 +16,7 @@ public class PflichtenheftZeile {
 
     public MitarbeiterEntity verantwortlicher(){
         for(MitarbeiterEntity mitarbeiterEntity : pflichtenheftEntity.getMitarbeiter()) {
-            if(mitarbeiterEntity.getMitarbeiterOid() == pflichtenheftEntity.getVerantwortlicher()){
+            if(mitarbeiterEntity.getMitarbeiterOid() == pflichtenheftEntity.getVerantwortlicher().getMitarbeiterOid()){
                 return mitarbeiterEntity;
             }
         }
