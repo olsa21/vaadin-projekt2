@@ -4,24 +4,20 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.model.XWPFHeaderFooterPolicy;
 import org.apache.poi.xwpf.usermodel.*;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTP;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSimpleField;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.STFldCharType;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.STOnOff;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import com.aspose.words.Document;
 import com.aspose.words.SaveFormat;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class ExportTestMain {
     private static String path = System.getProperty("user.dir") + "\\src\\main\\java\\org\\vaadin\\example\\exporttest\\";
@@ -208,7 +204,11 @@ public class ExportTestMain {
         newpage(document);
         insertUeberschrift(document, styles, 1, "Ueberschrift 2");
         insertUeberschrift(document, styles, 1, "Ueberschrift 3");
-        insertText(document, "Dies ist ein \\b{fetter} \\b{Te}xt. Dies ist eine \\n{}neue Zeile");
+        insertText(document, "Dies ist ein \\b{fetter} \\b{Te}xt. Dies ist eine \\n{}neue Zeile\\begin{enumerate}" +
+                "\\item Erstellen des Spiels mit Berücksichtigung auf die gesetzten Ziele\n" +
+                "\\item Erstellen eines Hauptmenüs\n" +
+                "\\item Testen der Fortschritte\n" +
+                "\\end{enumerate}\\b{abc} ge erg er \\u{agege}");
         insertTable(document);
 
         //load file save as byte array
@@ -329,9 +329,9 @@ public class ExportTestMain {
 
     private static void insertText(XWPFDocument doc, String text) {
         XWPFParagraph p = doc.createParagraph();
-        XWPFRun run;
+        XWPFRun run = null;
 
-        Pattern pattern = Pattern.compile("(\\\\[a-z])\\{([^}]*)\\}");
+        Pattern pattern = Pattern.compile("(\\\\[a-z])\\{([^}]*)\\}|\\\\begin\\{([^}]+)}([\\s\\S]*?)\\\\end\\{\\3}");
         Matcher matcher = pattern.matcher(text);
 
         int position = 0;
@@ -345,29 +345,69 @@ public class ExportTestMain {
                 run.setText(text.substring(position, matcher.start()));
             }
 
-            // Füge den formatierten Text hinzu
-            run = p.createRun();
-            System.out.println(steuerzeichen);
-            switch (steuerzeichen) {
-                case "\\b":
-                    run.setBold(true);
-                    break;
-                case "\\i":
-                    run.setItalic(true);
-                    break;
-                case "\\u":
-                    run.setUnderline(UnderlinePatterns.SINGLE);
-                    break;
-                case "\\n":
-                    run.addBreak();
-                    break;
-                //Hier ggf weitere Formatierungen einfügen
-                default:
-                    System.out.println("Ungültiges Steuerzeichen: " + steuerzeichen);
-            }
-            run.setText(body);
+            if (steuerzeichen != null && body != null) {
+                // Füge den formatierten Text hinzu
+                run = p.createRun();
+                System.out.println(steuerzeichen);
+                switch (steuerzeichen) {
+                    case "\\b":
+                        run.setBold(true);
+                        break;
+                    case "\\i":
+                        run.setItalic(true);
+                        break;
+                    case "\\u":
+                        run.setUnderline(UnderlinePatterns.SINGLE);
+                        break;
+                    case "\\n":
+                        run.addBreak();
+                        break;
+                    //Hier ggf weitere Formatierungen einfügen
+                    default:
+                        System.out.println("Ungültiges Steuerzeichen: " + steuerzeichen);
+                }
+                run.setText(body);
+                position = matcher.end();
+            } else {
+                String operation = matcher.group(3);
+                String listBody = matcher.group(4);
 
-            position = matcher.end();
+                String[] splitted = listBody.split("\\\\item ");
+                List<String> items = Arrays.stream(splitted)
+                        .filter(s -> !s.trim().isEmpty())
+                        .collect(Collectors.toList());
+
+                CTAbstractNum cTAbstractNum = CTAbstractNum.Factory.newInstance();
+                cTAbstractNum.setAbstractNumId(BigInteger.valueOf(0));
+
+                if (operation.equals("itemize")) {
+                    CTLvl cTLvl = cTAbstractNum.addNewLvl();
+                    cTLvl.setIlvl(BigInteger.valueOf(0)); // set indent level 0
+                    cTLvl.addNewNumFmt().setVal(STNumberFormat.BULLET);
+                    cTLvl.addNewLvlText().setVal("•");
+                } else if (operation.equals("enumerate")) {
+                    CTLvl cTLvl = cTAbstractNum.addNewLvl();
+                    cTLvl.setIlvl(BigInteger.valueOf(0)); // set indent level 0
+                    cTLvl.addNewNumFmt().setVal(STNumberFormat.DECIMAL);
+                    cTLvl.addNewLvlText().setVal("%1.");
+                    cTLvl.addNewStart().setVal(BigInteger.valueOf(1));
+                }
+
+                if (operation.equals("itemize") || operation.equals("enumerate")) {
+                    XWPFAbstractNum abstractNum = new XWPFAbstractNum(cTAbstractNum);
+                    XWPFNumbering numbering = doc.createNumbering();
+                    BigInteger abstractNumID = numbering.addAbstractNum(abstractNum);
+                    BigInteger numID = numbering.addNum(abstractNumID);
+
+                    for (String string : items) {
+                        p = doc.createParagraph();
+                        p.setNumID(numID);
+                        run = p.createRun();
+                        run.setText(string);
+                    }
+                }
+                position = matcher.end();
+            }
         }
 
         // Füge den restlichen Text nach dem letzten Steuerzeichen hinzu
@@ -376,6 +416,9 @@ public class ExportTestMain {
             run.setText(text.substring(position));
         }
     }
+
+
+
 
     private static void insertAbbVerz(XWPFDocument document, Map<String, XWPFStyle> styles) {
         insertUeberschrift(document, styles, 1, "Abbildungsverzeichnis");
