@@ -307,13 +307,13 @@ public class EditorBar extends HorizontalLayout {
                 if (component.getComponentOid() != null) {
                     // ÄNDERUNG
                     inhalt = kapitel.getInhalte().stream().filter(i -> i.getInhaltOid() == component.getComponentOid()).findFirst().get();
-                    deleteList.remove(inhalt);
+                    //deleteList.remove(inhalt);
                 } else {
                     // NEU ERSTELLUNG
                     inhalt = new InhaltEntity();
                     kapitel.getInhalte().add(inhalt);
                 }
-
+                deleteList.remove(inhalt);
                 inhalt.setKapitelOid(kapitel.getKapitelOid());
 
                 Component temp = component.getComponent().getChildren().findFirst().get().getChildren().findFirst().get();
@@ -396,7 +396,8 @@ public class EditorBar extends HorizontalLayout {
                 ++anordnung;
             }
             for(InhaltEntity inhalt : deleteList) {
-                kapitel.getInhalte().remove(inhalt);
+                //kapitel.getInhalte().remove(inhalt);
+                kapitel.getInhalte().removeIf(i -> i.getInhaltOid() == inhalt.getInhaltOid());
                 if (inhalt.getTabelle() != null)
                     service.deleteTable(inhalt.getTabelle());
                 service.deleteInhalt(inhalt);
