@@ -5,14 +5,12 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.model.XWPFHeaderFooterPolicy;
 import org.apache.poi.xwpf.usermodel.*;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTP;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSimpleField;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.STFldCharType;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.STOnOff;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import org.vaadin.example.entity.*;
 import org.vaadin.example.model.KapitelModel;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -63,18 +61,16 @@ public class WordGenerator {
 
     private static void insertContent(XWPFDocument doc, PflichtenheftEntity pflichtenheftEntity, Map<String, XWPFStyle> styles) {
         ArrayList<KapitelEntity> kapitelList = new ArrayList<>(pflichtenheftEntity.getKapitel());
-        List<KapitelModel> s = SortKapitel.sortKapitelList(kapitelList);
+        List<KapitelModel> s = sortKapitelList(kapitelList);
 
         for (KapitelModel k : s) {
             insertUeberschrift(doc, styles, k.getLevel(), k.getKapitelEntity().getKapitelVordefiniert().getName());
 
             //Sortierung nach Anordnungsindex
-            Map<Integer, InhaltEntity> inhalte = new HashMap();
-            for (InhaltEntity i : k.getKapitelEntity().getInhalte()) {
-                inhalte.put(i.getAnordnungIndex(), i);
-            }
+            ArrayList<InhaltEntity> inhalte = new ArrayList<>(k.getKapitelEntity().getInhalte());
+            inhalte.sort(Comparator.comparing(InhaltEntity::getAnordnungIndex));
 
-            for (InhaltEntity i : inhalte.values()) {
+            for (InhaltEntity i : inhalte) {
                 //Differenzieren zwischen Text/Bild/Tabelle
                 if (!i.getTextInhalt().isBlank() && i.getBildInhalt() == null && i.getTabelle() == null) {
                     //i.getTextInhalt() kann ein leerer String sein
@@ -84,21 +80,20 @@ public class WordGenerator {
                 } else if (i.getTabelle() != null) {
                     insertTable(doc, i.getTabelle(), i.getTextInhalt());
                 }
-
             }
         }
     }
 
     private static void insertText(XWPFDocument doc, String text) {
         XWPFParagraph p = doc.createParagraph();
-        XWPFRun run;
+        XWPFRun run = null;
 
-        Pattern pattern = Pattern.compile("(\\\\[a-z])\\{([^}]*)\\}");
+        Pattern pattern = Pattern.compile("(\\\\[a-z])\\{([^}]*)\\}|\\\\begin\\{([^}]+)}([\\s\\S]*?)\\\\end\\{\\3}");
         Matcher matcher = pattern.matcher(text);
 
         int position = 0;
         while (matcher.find()) {
-            String steuerzeichen = matcher.group(1);
+            String operation = matcher.group(1);
             String body = matcher.group(2);
 
             // Füge den Text vor dem Steuerzeichen hinzu
@@ -107,29 +102,70 @@ public class WordGenerator {
                 run.setText(text.substring(position, matcher.start()));
             }
 
-            // Füge den formatierten Text hinzu
-            run = p.createRun();
-            System.out.println(steuerzeichen);
-            switch (steuerzeichen) {
-                case "\\b":
-                    run.setBold(true);
-                    break;
-                case "\\i":
-                    run.setItalic(true);
-                    break;
-                case "\\u":
-                    run.setUnderline(UnderlinePatterns.SINGLE);
-                    break;
-                case "\\n":
-                    run.addBreak();
-                    break;
-                //Hier ggf weitere Formatierungen einfügen
-                default:
-                    System.out.println("Ungültiges Steuerzeichen: " + steuerzeichen);
-            }
-            run.setText(body);
+            if (operation != null && body != null) {
+                // Füge den formatierten Text hinzu
+                run = p.createRun();
+                System.out.println(operation);
+                switch (operation) {
+                    case "\\b":
+                        run.setBold(true);
+                        break;
+                    case "\\i":
+                        run.setItalic(true);
+                        break;
+                    case "\\u":
+                        run.setUnderline(UnderlinePatterns.SINGLE);
+                        break;
+                    case "\\n":
+                        run.addBreak();
+                        break;
+                    //Hier ggf weitere Formatierungen einfügen
+                    default:
+                        System.out.println("Ungültiges Steuerzeichen: " + operation);
+                }
+                run.setText(body);
+                position = matcher.end();
+            } else {
+                operation = matcher.group(3);
+                String listBody = matcher.group(4);
 
-            position = matcher.end();
+                String[] splitted = listBody.split("\\\\item ");
+                List<String> items = Arrays.stream(splitted)
+                        .filter(s -> !s.trim().isEmpty())
+                        .collect(Collectors.toList());
+
+                CTAbstractNum cTAbstractNum = CTAbstractNum.Factory.newInstance();
+                cTAbstractNum.setAbstractNumId(BigInteger.valueOf(0));
+
+                if (operation.equals("itemize")) {
+                    CTLvl cTLvl = cTAbstractNum.addNewLvl();
+                    cTLvl.setIlvl(BigInteger.valueOf(0)); // set indent level 0
+                    cTLvl.addNewNumFmt().setVal(STNumberFormat.BULLET);
+                    cTLvl.addNewLvlText().setVal("•");
+                } else if (operation.equals("enumerate")) {
+                    CTLvl cTLvl = cTAbstractNum.addNewLvl();
+                    cTLvl.setIlvl(BigInteger.valueOf(0)); // set indent level 0
+                    cTLvl.addNewNumFmt().setVal(STNumberFormat.DECIMAL);
+                    cTLvl.addNewLvlText().setVal("%1.");
+                    cTLvl.addNewStart().setVal(BigInteger.valueOf(1));
+                }
+
+                if (operation.equals("itemize") || operation.equals("enumerate")) {
+                    XWPFAbstractNum abstractNum = new XWPFAbstractNum(cTAbstractNum);
+                    XWPFNumbering numbering = doc.createNumbering();
+                    BigInteger abstractNumID = numbering.addAbstractNum(abstractNum);
+                    BigInteger numID = numbering.addNum(abstractNumID);
+
+                    for (String string : items) {
+                        p = doc.createParagraph();
+                        p.setNumID(numID);
+                        run = p.createRun();
+                        run.setText(string);
+                    }
+                    run.addBreak();
+                }
+                position = matcher.end();
+            }
         }
 
         // Füge den restlichen Text nach dem letzten Steuerzeichen hinzu
@@ -284,14 +320,12 @@ public class WordGenerator {
         run1.setText(text);
 
     }
-}
 
-class SortKapitel {
-
-    public static List<KapitelModel> sortKapitelList(List<KapitelEntity> kapitelList) {
+    private static List<KapitelModel> sortKapitelList(List<KapitelEntity> kapitelList) {
         List<KapitelModel> sortedList = new ArrayList<>();
+        //Kapitel ohne Kinder werden rausgefiltert und nach kapitelVordefiniertOID sortiert
         List<KapitelEntity> topLevelKapitel = kapitelList.stream()
-                .filter(kapitel -> kapitel.getKapitelVordefiniert().getParent() == null || kapitel.getKapitelVordefiniert().getParent() == 0)
+                .filter(kapitel -> kapitel.getKapitelVordefiniert().getParent() == null)
                 .sorted(Comparator.comparingInt(k -> k.getKapitelVordefiniert().getKapitelVordefiniertOid()))
                 .collect(Collectors.toList());
 
@@ -304,6 +338,7 @@ class SortKapitel {
 
     private static void sortKapitelHierarchy(KapitelEntity parent, List<KapitelEntity> kapitelList, List<KapitelModel> sortedList, int level) {
         sortedList.add(new KapitelModel(parent, level));
+        //Untergeordnete Kapitel des mitgegebenen parent Filtern
         List<KapitelEntity> childKapitel = kapitelList.stream()
                 .filter(kapitel -> parent.getKapitelVordefiniert().getKapitelVordefiniertOid() == (kapitel.getKapitelVordefiniert().getParent() == null ? 0 : kapitel.getKapitelVordefiniert().getParent()))
                 .sorted(Comparator.comparingInt(k -> k.getKapitelVordefiniert().getKapitelVordefiniertOid()))
@@ -313,4 +348,9 @@ class SortKapitel {
             sortKapitelHierarchy(kapitel, kapitelList, sortedList, level + 1);
         }
     }
+}
+
+class SortKapitel {
+
+
 }
