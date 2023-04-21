@@ -40,6 +40,21 @@ public class WordGenerator {
             newStyles.addStyle(style);
         }
 
+        //Seitenzahlen
+        XWPFHeaderFooterPolicy headerFooterPolicy = document.getHeaderFooterPolicy();
+        if (headerFooterPolicy == null) {
+            headerFooterPolicy = document.createHeaderFooterPolicy();
+        }
+
+        XWPFFooter footer = headerFooterPolicy.createFooter(XWPFHeaderFooterPolicy.DEFAULT);
+        XWPFParagraph pageNumberParagraph = footer.createParagraph();
+        pageNumberParagraph.setAlignment(ParagraphAlignment.RIGHT);
+
+        XWPFRun pageNumberRun = pageNumberParagraph.createRun();
+        pageNumberRun.getCTR().addNewFldChar().setFldCharType(STFldCharType.BEGIN);
+        pageNumberRun.getCTR().addNewInstrText().setStringValue("PAGE");
+        pageNumberRun.getCTR().addNewFldChar().setFldCharType(STFldCharType.END);
+
         //  ---------------- Konfiguration ENDE ---------------- //
 
         //Hier wird Inhalt eingefügt
@@ -86,14 +101,14 @@ public class WordGenerator {
 
     private static void insertText(XWPFDocument doc, String text) {
         XWPFParagraph p = doc.createParagraph();
-        XWPFRun run = null;
+        XWPFRun run;
 
-        Pattern pattern = Pattern.compile("(\\\\[a-z])\\{([^}]*)\\}|\\\\begin\\{([^}]+)}([\\s\\S]*?)\\\\end\\{\\3}");
+        Pattern pattern = Pattern.compile("(\\\\[a-z])\\{([^}]*)\\}");
         Matcher matcher = pattern.matcher(text);
 
         int position = 0;
         while (matcher.find()) {
-            String operation = matcher.group(1);
+            String steuerzeichen = matcher.group(1);
             String body = matcher.group(2);
 
             // Füge den Text vor dem Steuerzeichen hinzu
@@ -102,70 +117,29 @@ public class WordGenerator {
                 run.setText(text.substring(position, matcher.start()));
             }
 
-            if (operation != null && body != null) {
-                // Füge den formatierten Text hinzu
-                run = p.createRun();
-                System.out.println(operation);
-                switch (operation) {
-                    case "\\b":
-                        run.setBold(true);
-                        break;
-                    case "\\i":
-                        run.setItalic(true);
-                        break;
-                    case "\\u":
-                        run.setUnderline(UnderlinePatterns.SINGLE);
-                        break;
-                    case "\\n":
-                        run.addBreak();
-                        break;
-                    //Hier ggf weitere Formatierungen einfügen
-                    default:
-                        System.out.println("Ungültiges Steuerzeichen: " + operation);
-                }
-                run.setText(body);
-                position = matcher.end();
-            } else {
-                operation = matcher.group(3);
-                String listBody = matcher.group(4);
-
-                String[] splitted = listBody.split("\\\\item ");
-                List<String> items = Arrays.stream(splitted)
-                        .filter(s -> !s.trim().isEmpty())
-                        .collect(Collectors.toList());
-
-                CTAbstractNum cTAbstractNum = CTAbstractNum.Factory.newInstance();
-                cTAbstractNum.setAbstractNumId(BigInteger.valueOf(0));
-
-                if (operation.equals("itemize")) {
-                    CTLvl cTLvl = cTAbstractNum.addNewLvl();
-                    cTLvl.setIlvl(BigInteger.valueOf(0)); // set indent level 0
-                    cTLvl.addNewNumFmt().setVal(STNumberFormat.BULLET);
-                    cTLvl.addNewLvlText().setVal("•");
-                } else if (operation.equals("enumerate")) {
-                    CTLvl cTLvl = cTAbstractNum.addNewLvl();
-                    cTLvl.setIlvl(BigInteger.valueOf(0)); // set indent level 0
-                    cTLvl.addNewNumFmt().setVal(STNumberFormat.DECIMAL);
-                    cTLvl.addNewLvlText().setVal("%1.");
-                    cTLvl.addNewStart().setVal(BigInteger.valueOf(1));
-                }
-
-                if (operation.equals("itemize") || operation.equals("enumerate")) {
-                    XWPFAbstractNum abstractNum = new XWPFAbstractNum(cTAbstractNum);
-                    XWPFNumbering numbering = doc.createNumbering();
-                    BigInteger abstractNumID = numbering.addAbstractNum(abstractNum);
-                    BigInteger numID = numbering.addNum(abstractNumID);
-
-                    for (String string : items) {
-                        p = doc.createParagraph();
-                        p.setNumID(numID);
-                        run = p.createRun();
-                        run.setText(string);
-                    }
+            // Füge den formatierten Text hinzu
+            run = p.createRun();
+            System.out.println(steuerzeichen);
+            switch (steuerzeichen) {
+                case "\\b":
+                    run.setBold(true);
+                    break;
+                case "\\i":
+                    run.setItalic(true);
+                    break;
+                case "\\u":
+                    run.setUnderline(UnderlinePatterns.SINGLE);
+                    break;
+                case "\\n":
                     run.addBreak();
-                }
-                position = matcher.end();
+                    break;
+                //Hier ggf weitere Formatierungen einfügen
+                default:
+                    System.out.println("Ungültiges Steuerzeichen: " + steuerzeichen);
             }
+            run.setText(body);
+
+            position = matcher.end();
         }
 
         // Füge den restlichen Text nach dem letzten Steuerzeichen hinzu
@@ -348,9 +322,4 @@ public class WordGenerator {
             sortKapitelHierarchy(kapitel, kapitelList, sortedList, level + 1);
         }
     }
-}
-
-class SortKapitel {
-
-
 }
