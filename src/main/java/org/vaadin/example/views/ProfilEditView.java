@@ -1,15 +1,16 @@
 package org.vaadin.example.views;
 
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import org.vaadin.example.MainLayout;
 import org.vaadin.example.components.AbteilungComboBox;
+import org.vaadin.example.components.CustomPasswordField;
 import org.vaadin.example.components.CustomPicUpload;
 import org.vaadin.example.entity.AbteilungEntity;
 import org.vaadin.example.entity.MitarbeiterEntity;
@@ -23,16 +24,19 @@ import java.util.List;
 @Route(value = "/profil-edit", layout = MainLayout.class)
 public class ProfilEditView extends VerticalLayout {
     private TextField benutzername = new TextField();
-    private TextField passwort1 = new TextField();
-    private TextField passwort2 = new TextField();
+    private PasswordField passwort1 = new CustomPasswordField();
+    private PasswordField passwort2 = new PasswordField();
     private TextField mail = new TextField();
     private TextField vorname = new TextField();
     private TextField nachname = new TextField();
     private AbteilungComboBox abteilung;
     private CustomPicUpload profilbild = new CustomPicUpload();
+    //private CustomPicUploadWithCaptionAndScaling profilbild = new CustomPicUploadWithCaptionAndScaling();
     private Button save = new Button("Speichern");
+    private Button clearProfilbild = new Button("Profilbild löschen");
     private MitarbeiterEntity mitarbeiter;
     private final SpecificationsService service;
+
     public ProfilEditView(SpecificationsService service) {
         this.service = service;
         mitarbeiter = service.findSpecificUser(SecurityService.getLoggedInUsername());
@@ -49,6 +53,10 @@ public class ProfilEditView extends VerticalLayout {
         //erstmal
         benutzername.setEnabled(false);
 
+        if (mitarbeiter.getProfilbild() != null) {
+            profilbild.setBytes(mitarbeiter.getProfilbild());
+        }
+
         add("Profil bearbeiten");
 
         FormLayout form = new FormLayout();
@@ -63,11 +71,13 @@ public class ProfilEditView extends VerticalLayout {
         form.addFormItem(nachname, "Nachname");
         form.addFormItem(abteilung, "Abteilung");
         form.addFormItem(profilbild, "Profilbild");
-        form.addFormItem(save, "");
 
         add(
-            form
+                form
         );
+
+        form.addFormItem(new HorizontalLayout(save, clearProfilbild), "");
+
         getChildren().forEach(item -> {
             if (item instanceof HorizontalLayout) {
                 ((HorizontalLayout) item).setAlignItems(Alignment.BASELINE);
@@ -81,16 +91,34 @@ public class ProfilEditView extends VerticalLayout {
             mitarbeiter.setVorname(vorname.getValue());
             mitarbeiter.setNachname(nachname.getValue());
 
-            mitarbeiter.setProfilbild(profilbild.getBytes());
 
-            if (!passwort1.getValue().isEmpty() && passwort1.getValue().equals(passwort2.getValue()))
-                mitarbeiter.setPasswort(SecurityService.hash(passwort1.getValue()));
+            if (mitarbeiter.getProfilbild() != profilbild.getBytes()) {
+                mitarbeiter.setProfilbild(profilbild.getBytes());
+            }
+
+            if (!passwort1.getValue().isEmpty()) {
+                if (passwort1.isInvalid()) {
+                    return;
+                }
+                if (passwort1.getValue().equals(passwort2.getValue())) {
+                    mitarbeiter.setPasswort(SecurityService.hash(passwort1.getValue()));
+
+                } else {
+                    passwort2.setInvalid(true);
+                    return;
+                }
+            }
+
 
             service.saveBenutzer(mitarbeiter);
 
             service.saveAbteilungZuweisungen(mitarbeiter.getMitarbeiterOid(), abteilung.ausgewaehlteAbteilungen());
 
             Notification.show("Profil erfolgreich bearbeitet");
+        });
+
+        clearProfilbild.addClickListener(event -> {
+            profilbild.clear();
         });
     }
 }

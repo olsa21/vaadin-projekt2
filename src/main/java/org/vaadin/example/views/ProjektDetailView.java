@@ -3,6 +3,7 @@ package org.vaadin.example.views;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -18,7 +19,7 @@ import java.util.Set;
 
 @PermitAll
 @Route(value = "/projekt-details", layout = MainLayout.class)
-public class ProjektDetailView extends VerticalLayout {
+public class ProjektDetailView extends FormLayout {
     private final SpecificationsService service;
     private Text titel = new Text("");
     private Text beschreibung = new Text("");
@@ -41,6 +42,10 @@ public class ProjektDetailView extends VerticalLayout {
         titel.setText(pflichtenheft.getTitel());
         beschreibung.setText(pflichtenheft.getBeschreibung());
         frist.setText(pflichtenheft.getFrist());
+
+        setResponsiveSteps(
+                new FormLayout.ResponsiveStep("0", 1)
+        );
 
         //verantwortlicher.setText(createVerantwortlicherString());
         verantwortlicher.setText(pflichtenheft.getVerantwortlicher().getVorname() + " " + pflichtenheft.getVerantwortlicher().getNachname());
@@ -70,21 +75,20 @@ public class ProjektDetailView extends VerticalLayout {
 
         //add(NavigationBar.getInstance());
         add("Projekt Details");
-        add(
-                new HorizontalLayout(new Text("Titel "), titel),
-                new HorizontalLayout(new Text("Beschreibung"), beschreibung),
-                new HorizontalLayout(new Text("Frist "), frist),
-                new HorizontalLayout(new Text("Verantwortlicher "), verantwortlicher),
-                new HorizontalLayout(new Text("Mitglieder "), mitglieder),
-                new HorizontalLayout(new Text("Repository "), repo),
-                new HorizontalLayout(beitretenBtn, editBtn, freischaltenBtn, schliessenBtn)
-        );
+        addFormItem(titel, "Titel");
+        addFormItem(beschreibung, "Beschreibung");
+        addFormItem(frist, "Frist");
+        addFormItem(verantwortlicher, "Verantwortlicher");
+        addFormItem(mitglieder, "Mitglieder");
+        addFormItem(repo, "Repository");
+        add(new HorizontalLayout(beitretenBtn, editBtn, freischaltenBtn, schliessenBtn));
 
-        getChildren().forEach(item -> {
-            if (item instanceof HorizontalLayout) {
-                ((HorizontalLayout) item).setAlignItems(Alignment.BASELINE);
-            }
-        });
+
+        //getChildren().forEach(item -> {
+        //    if (item instanceof HorizontalLayout) {
+        //        ((HorizontalLayout) item).setAlignItems(Alignment.BASELINE);
+        //    }
+        //});
     }
 
     private boolean isMember() {

@@ -35,9 +35,20 @@ public class CustomPicUpload extends HorizontalLayout {
         add(upload, image);
     }
 
+    public void clear(){
+        buffer = new MemoryBuffer();
+        upload.setReceiver(buffer);
+        upload.clearFileList();
+        image.setSrc("");
+    }
     public byte[] getBytes() {
         try {
-            return buffer.getInputStream().readAllBytes();
+            byte[] bytes = buffer.getInputStream().readAllBytes();
+            if (bytes.length == 0) {
+                return null;
+            }else{
+                return bytes;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

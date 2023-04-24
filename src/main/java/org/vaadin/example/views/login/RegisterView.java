@@ -18,14 +18,11 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import org.vaadin.example.components.CustomPasswordField;
 import org.vaadin.example.entity.MitarbeiterEntity;
+import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
 
-import javax.annotation.security.PermitAll;
-import javax.xml.bind.DatatypeConverter;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 
@@ -36,7 +33,7 @@ import static com.vaadin.flow.component.button.ButtonVariant.LUMO_TERTIARY_INLIN
 public class RegisterView extends VerticalLayout {
 
     private TextField username;
-    private PasswordField password;
+    private CustomPasswordField password;
     private PasswordField passwordRepeat;
     private EmailField email;
     private TextField firstName;
@@ -59,7 +56,7 @@ public class RegisterView extends VerticalLayout {
 
     private void init(){
         username = new TextField("Benutzername");
-        password = new PasswordField("Passwort");
+        password = new CustomPasswordField("Passwort");
         passwordRepeat = new PasswordField("Passwort wiederholen");
         email = new EmailField("E-Mail");
         firstName = new TextField("Vorname");
@@ -97,22 +94,12 @@ public class RegisterView extends VerticalLayout {
                 return;
             }
         }
-        if (password.getValue().equals(passwordRepeat.getValue()) &&
-                password.getValue().length() >= 8 &&
-                password.getValue().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$")){
+        //!password.isInvalid() && password.equals(passwordRepeat)
+        if (!password.isInvalid() && password.getValue().equals(passwordRepeat.getValue())){
             //TODO schöner machen
             MitarbeiterEntity mitarbeiter = new MitarbeiterEntity();
             mitarbeiter.setBenutzername(username.getValue());
-            String hashedPassword;
-
-            MessageDigest md = null;
-            try {
-                md = MessageDigest.getInstance("SHA-256");
-                byte[] digest = md.digest(password.getValue().getBytes(StandardCharsets.UTF_8));
-                hashedPassword = DatatypeConverter.printHexBinary(digest).toLowerCase();
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            }
+            String hashedPassword = SecurityService.hash(password.getValue());
 
             mitarbeiter.setPasswort(hashedPassword);
 
@@ -131,6 +118,7 @@ public class RegisterView extends VerticalLayout {
             }
             createSubmitSuccess().open();
         }else{
+            passwordRepeat.setInvalid(true);
             createSubmitError().open();
         }
 
