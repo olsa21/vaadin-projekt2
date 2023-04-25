@@ -273,7 +273,7 @@ public class EditorBar extends HorizontalLayout {
         tempLayout.setWidth("100%");
         VerticalLayout buttonLayout = getComponentToolbar(tempLayout);
         Div div = new Div();
-        div.setWidth("180%");
+        div.setWidth("200%");
 
         switch (component){
             case "Textfeld":

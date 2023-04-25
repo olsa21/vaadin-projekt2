@@ -87,20 +87,17 @@ public class WordGenerator {
 
             for (InhaltEntity i : inhalte) {
                 //Differenzieren zwischen Text/Bild/Tabelle
-                if (!i.getTextInhalt().isBlank() && i.getBildInhalt() == null && i.getTabelle() == null) {
+                //if (!i.getTextInhalt().isBlank() && i.getBildInhalt() == null && i.getTabelle() == null) {
+                if (i.getTextinhalt() != null) {
                     //i.getTextInhalt() kann ein leerer String sein
-                    //insertText(doc, i.getTextInhalt());
                     insertText(doc, i.getTextinhalt().getTextInhalt());
-                } else if (i.getBildInhalt() != null) {
-                    //insertImage(doc, i.getBildInhalt(), i.getTextInhalt());
+                } else if (i.getAbbildungsinhalt() != null) {
                     insertImage(doc, i.getAbbildungsinhalt().getBildInhalt(), i.getAbbildungsinhalt().getBildUnterschrift());
                 } else if (i.getTabelle() != null) {
-                    //insertTable(doc, i.getTabelle(), i.getTextInhalt());
                     insertTable(doc, i.getTabelle(), i.getTabelle().getTabellenUnterschrift());
                 }
             }
         }
-
     }
 
     private static void insertText(XWPFDocument doc, String text) {
@@ -326,9 +323,4 @@ public class WordGenerator {
             sortKapitelHierarchy(kapitel, kapitelList, sortedList, level + 1);
         }
     }
-}
-
-class SortKapitel {
-
-
 }

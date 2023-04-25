@@ -16,12 +16,12 @@ public class InhaltEntity {
     @Basic
     @Column(name = "anordnungIndex")
     private Integer anordnungIndex;
-    @Basic
+    /*@Basic
     @Column(name = "textInhalt")
     private String textInhalt;
     @Basic
     @Column(name = "bildInhalt")
-    private byte[] bildInhalt;
+    private byte[] bildInhalt;*/
 
     @OneToOne
     @JoinColumn(name="tabellenOID", nullable = true)
@@ -95,22 +95,6 @@ public class InhaltEntity {
         this.anordnungIndex = anordnungIndex;
     }
 
-    public String getTextInhalt() {
-        return textInhalt;
-    }
-
-    public void setTextInhalt(String textInhalt) {
-        this.textInhalt = textInhalt;
-    }
-
-    public byte[] getBildInhalt() {
-        return bildInhalt;
-    }
-
-    public void setBildInhalt(byte[] bildInhalt) {
-        this.bildInhalt = bildInhalt;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -122,8 +106,8 @@ public class InhaltEntity {
         //if (kapitelOid != that.kapitelOid) return false;
         if (anordnungIndex != null ? !anordnungIndex.equals(that.anordnungIndex) : that.anordnungIndex != null)
             return false;
-        if (textInhalt != null ? !textInhalt.equals(that.textInhalt) : that.textInhalt != null) return false;
-        if (!Arrays.equals(bildInhalt, that.bildInhalt)) return false;
+        //if (textInhalt != null ? !textInhalt.equals(that.textInhalt) : that.textInhalt != null) return false;
+        //if (!Arrays.equals(bildInhalt, that.bildInhalt)) return false;
 
         return true;
     }
@@ -133,8 +117,8 @@ public class InhaltEntity {
         int result = inhaltOid;
         //result = 31 * result + kapitelOid;
         result = 31 * result + (anordnungIndex != null ? anordnungIndex.hashCode() : 0);
-        result = 31 * result + (textInhalt != null ? textInhalt.hashCode() : 0);
-        result = 31 * result + Arrays.hashCode(bildInhalt);
+        //result = 31 * result + (textInhalt != null ? textInhalt.hashCode() : 0);
+        //result = 31 * result + Arrays.hashCode(bildInhalt);
         return result;
     }
 }
