@@ -27,6 +27,18 @@ public class TabellenEntity {
     @Column(name = "spaltenCaption5")
     private String spaltenCaption5;
 
+    @Basic
+    @Column(name = "tabellenUnterschrift")
+    private String tabellenUnterschrift;
+
+    public String getTabellenUnterschrift() {
+        return tabellenUnterschrift;
+    }
+
+    public void setTabellenUnterschrift(String tabellenUnterschrift) {
+        this.tabellenUnterschrift = tabellenUnterschrift;
+    }
+
     @OneToMany(mappedBy = "tabellenOid", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<TabellenzeileEntity> zellen = new HashSet<>();
 

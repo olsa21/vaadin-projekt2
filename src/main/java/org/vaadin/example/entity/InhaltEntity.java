@@ -27,6 +27,30 @@ public class InhaltEntity {
     @JoinColumn(name="tabellenOID", nullable = true)
     private TabellenEntity tabelle;
 
+    @OneToOne
+    @JoinColumn(name="textOID", nullable = true)
+    private TextinhaltEntity textinhalt;
+
+    @OneToOne
+    @JoinColumn(name="abbildungOID", nullable = true)
+    private AbbildungsinhaltEntity abbildungsinhalt;
+
+    public AbbildungsinhaltEntity getAbbildungsinhalt() {
+        return abbildungsinhalt;
+    }
+
+    public void setAbbildungsinhalt(AbbildungsinhaltEntity abbildungsinhalt) {
+        this.abbildungsinhalt = abbildungsinhalt;
+    }
+
+    public TextinhaltEntity getTextinhalt() {
+        return textinhalt;
+    }
+
+    public void setTextinhalt(TextinhaltEntity textinhalt) {
+        this.textinhalt = textinhalt;
+    }
+
     /*@ManyToOne
     @JoinColumn(name="kapitelOID", nullable = false)
     private KapitelEntity kapitel;*/

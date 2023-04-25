@@ -1,12 +1,16 @@
 package org.vaadin.example.components;
 
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.SucceededEvent;
+import com.vaadin.flow.data.value.ValueChangeMode;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,7 +23,7 @@ public class CustomGrid extends VerticalLayout {
     private Button print = new Button("Print");
     private TextField caption;
 
-    public CustomGrid(ArrayList<String> columnNames) {
+    public CustomGrid(ArrayList<String> columnNames, ComponentEventListener<SucceededEvent> listener) {
         this.columnNames = columnNames;
         caption = new TextField("Tabellenbezeichnung");
         for(int i = 0; i < columnNames.size(); i++) {
@@ -28,8 +32,11 @@ public class CustomGrid extends VerticalLayout {
                 if (item != data.get(data.size() - 1)) {
                     TextArea textField = new TextArea();
                     textField.setValue(String.valueOf(item.getContent().get(finalI)));
+                    textField.setValueChangeMode(ValueChangeMode.LAZY);
                     textField.addValueChangeListener(e -> {
                         item.getContent().set(finalI, e.getValue());
+
+                        listener.onComponentEvent(null);
                     });
                     return textField;
                 }else {
@@ -47,6 +54,7 @@ public class CustomGrid extends VerticalLayout {
                     System.out.println("Entferne Eintrag mir Index " + data.indexOf(item));
                     data.remove(item);
                     grid.getDataProvider().refreshAll();
+                    listener.onComponentEvent(null);
                 });
                 return button;
             }
@@ -65,12 +73,28 @@ public class CustomGrid extends VerticalLayout {
         neueZeileBtn.addClickListener(e -> {
             data.add(new GridRow(new ArrayList<>(Collections.nCopies(columnNames.size(), ""))));
             grid.setItems(data);
+            listener.onComponentEvent(null);
         });
+
+        /*caption.setValueChangeMode(ValueChangeMode.LAZY);
+        caption.addValueChangeListener(event -> {
+            if (event.getValue() != null && !event.getValue().isEmpty()){
+                listener.onComponentEvent(null);
+            }
+        });*/
 
         add(grid);
         add(caption);
         //add(print);
         //add(neueZeileBtn);
+
+    }
+
+    public void addCaptionChangeListener(ComponentEventListener<SucceededEvent> listener) {
+        caption.setValueChangeMode(ValueChangeMode.LAZY);
+        caption.addValueChangeListener(evt -> {
+            listener.onComponentEvent(null);
+        });
     }
 
     //Rückgabe: Liste von Listen; siehe Print

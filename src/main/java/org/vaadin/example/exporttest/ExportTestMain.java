@@ -5,8 +5,10 @@ import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.model.XWPFHeaderFooterPolicy;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
+
 import com.aspose.words.Document;
 import com.aspose.words.SaveFormat;
+
 
 import java.io.*;
 import java.math.BigInteger;
@@ -38,13 +40,7 @@ public class ExportTestMain {
 
     private static void convertAspa(String docxSrc, String pdfDest) throws Exception {
         // Load the Word document
-        Document doc = new Document(path + docxSrc);
 
-        // Update fields
-        doc.updateFields();
-
-        // Save the Word document as a PDF
-        doc.save(path + pdfDest, SaveFormat.PDF);
     }
 
     private static void writeASmallStory(String docxTemplate, String docxDest) throws IOException {

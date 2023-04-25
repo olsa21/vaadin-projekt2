@@ -27,8 +27,10 @@ public class SpecificationsService {
     private final InhaltRepository inhaltRepository;
     private final TabellenRepository tabellenRepository;
     private final TabellenzellenRepository tabellenzellenRepository;
+    private final TextInhaltRepository textInhaltRepository;
+    private final AbbildungInhaltRepository abbildungInhaltRepository;
 
-    public SpecificationsService(MitarbeiterRepository benutzerRepository, AbteilungzuweisungRepository abteilungzuweisungRepository, ProjektZuweisungRepository projektZuweisungRepository, PflichtenheftRepository pflichtenheftRepository, KapitelvordefiniertRepository kapitelvordefiniertRepository, KapitelRepository kapitelRepository, InhaltRepository inhaltRepository, TabellenRepository tabellenRepository, TabellenzellenRepository tabellenzellenRepository){
+    public SpecificationsService(MitarbeiterRepository benutzerRepository, AbteilungzuweisungRepository abteilungzuweisungRepository, ProjektZuweisungRepository projektZuweisungRepository, PflichtenheftRepository pflichtenheftRepository, KapitelvordefiniertRepository kapitelvordefiniertRepository, KapitelRepository kapitelRepository, InhaltRepository inhaltRepository, TabellenRepository tabellenRepository, TabellenzellenRepository tabellenzellenRepository, TextInhaltRepository textInhaltRepository, AbbildungInhaltRepository abbildungInhaltRepository){
         this.benutzerRepository = benutzerRepository;
         this.abteilungzuweisungRepository = abteilungzuweisungRepository;
         this.projektZuweisungRepository = projektZuweisungRepository;
@@ -38,6 +40,8 @@ public class SpecificationsService {
         this.inhaltRepository = inhaltRepository;
         this.tabellenRepository = tabellenRepository;
         this.tabellenzellenRepository = tabellenzellenRepository;
+        this.textInhaltRepository = textInhaltRepository;
+        this.abbildungInhaltRepository = abbildungInhaltRepository;
     }
 
     public List<MitarbeiterEntity> findAllUser(String filterText){
@@ -206,8 +210,8 @@ public class SpecificationsService {
         pflichtenheftRepository.save(pflichtenheft);
     }
 
-    public void saveInhalt(InhaltEntity inhalt) {
-        inhaltRepository.save(inhalt);
+    public InhaltEntity saveInhalt(InhaltEntity inhalt) {
+        return inhaltRepository.save(inhalt);
     }
 
     public void saveTable(TabellenEntity table) {
@@ -249,5 +253,26 @@ public class SpecificationsService {
 
     public void deleteTabellenzeile(TabellenzeileEntity tabellenzeileEntity) {
         tabellenzellenRepository.delete(tabellenzeileEntity);
+    }
+
+    public void saveTextinhalt(TextinhaltEntity textinhalt) {
+        textInhaltRepository.save(textinhalt);
+    }
+
+    public void deleteTextinhalt(TextinhaltEntity textinhalt) {
+        textInhaltRepository.delete(textinhalt);
+    }
+
+    public void saveAbbildungsinhalt(AbbildungsinhaltEntity abbildungsinhalt) {
+        abbildungInhaltRepository.save(abbildungsinhalt);
+    }
+
+    public void deleteAbbildungsinhalt(AbbildungsinhaltEntity abbildungsinhalt) {
+        abbildungInhaltRepository.delete(abbildungsinhalt);
+    }
+
+    public InhaltEntity readInhalt(int inhaltOid) {
+        Optional<InhaltEntity> result = inhaltRepository.findById(inhaltOid);
+        return result.orElse(null);
     }
 }
