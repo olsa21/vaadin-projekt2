@@ -14,15 +14,6 @@ public class PflichtenheftZeile {
         return pflichtenheftEntity;
     }
 
-    public MitarbeiterEntity verantwortlicher(){
-        for(MitarbeiterEntity mitarbeiterEntity : pflichtenheftEntity.getMitarbeiter()) {
-            if(mitarbeiterEntity.getMitarbeiterOid() == pflichtenheftEntity.getVerantwortlicher().getMitarbeiterOid()){
-                return mitarbeiterEntity;
-            }
-        }
-        return null;
-    }
-
     public int anzahlMitarbeiter(){
         return pflichtenheftEntity.getMitarbeiter().size();
     }

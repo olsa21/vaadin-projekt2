@@ -38,7 +38,7 @@ public class ProjektDetailView extends FormLayout {
     public ProjektDetailView(SpecificationsService service, PflichtenheftEntity pflichtenheft) {
         this.service = service;
         this.pflichtenheft = pflichtenheft;
-        boolean isMember = isMember();
+        boolean isMember = SecurityService.userIsMemberOf(pflichtenheft);
         titel.setText(pflichtenheft.getTitel());
         beschreibung.setText(pflichtenheft.getBeschreibung());
         frist.setText(pflichtenheft.getFrist());
@@ -91,15 +91,6 @@ public class ProjektDetailView extends FormLayout {
         //});
     }
 
-    private boolean isMember() {
-        //SecurityService.getLoggedInUsername(), pflichtenheft
-        for(MitarbeiterEntity mitarbeiterEntity : pflichtenheft.getMitarbeiter()) {
-            if(mitarbeiterEntity.getBenutzername().equals(SecurityService.getLoggedInUsername())) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     private void setButtonVisibility(boolean isMember) {
         if (isMember) {

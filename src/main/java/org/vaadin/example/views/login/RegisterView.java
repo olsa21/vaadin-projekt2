@@ -22,6 +22,7 @@ import org.vaadin.example.components.CustomPasswordField;
 import org.vaadin.example.entity.MitarbeiterEntity;
 import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
+import org.vaadin.example.utility.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.stream.Stream;
@@ -96,18 +97,19 @@ public class RegisterView extends VerticalLayout {
         }
         //!password.isInvalid() && password.equals(passwordRepeat)
         if (!password.isInvalid() && password.getValue().equals(passwordRepeat.getValue())){
-            //TODO schöner machen
-            MitarbeiterEntity mitarbeiter = new MitarbeiterEntity();
-            mitarbeiter.setBenutzername(username.getValue());
-            String hashedPassword = SecurityService.hash(password.getValue());
-
-            mitarbeiter.setPasswort(hashedPassword);
-
-            //mitarbeiter.setPasswort(password.getValue());
-            mitarbeiter.setMail(email.getValue());
-            mitarbeiter.setVorname(firstName.getValue());
-            mitarbeiter.setNachname(lastName.getValue());
             try{
+                //TODO schöner machen
+                MitarbeiterEntity mitarbeiter = new MitarbeiterEntity();
+                mitarbeiter.setBenutzername(username.getValue());
+                String hashedPassword = PasswordEncoder.hashPassword((password.getValue()));
+
+                mitarbeiter.setPasswort(hashedPassword);
+
+                //mitarbeiter.setPasswort(password.getValue());
+                mitarbeiter.setMail(email.getValue());
+                mitarbeiter.setVorname(firstName.getValue());
+                mitarbeiter.setNachname(lastName.getValue());
+
                 service.addMitarbeiter(mitarbeiter);
             }catch(Exception e){
                 System.err.println(e);

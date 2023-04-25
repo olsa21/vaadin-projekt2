@@ -122,7 +122,7 @@ public class OpenProjectOverview extends VerticalLayout {
         grid.setSizeFull();
         grid.addColumn(spec -> spec.getPflichtenheftEntity().getTitel()).setHeader("Titel");
         grid.addColumn(spec -> spec.anzahlMitarbeiter()).setHeader("Mitarbeiteranzahl");
-        grid.addColumn(spec -> spec.verantwortlicher().getVorname() + " " + spec.verantwortlicher().getNachname()).setHeader("Verantwortlicher");
+        grid.addColumn(spec -> spec.getPflichtenheftEntity().getVerantwortlicher().getVorname() + " " + spec.getPflichtenheftEntity().getVerantwortlicher().getNachname()).setHeader("Verantwortlicher");
         grid.addComponentColumn(spec -> {
             Button btn1 = new Button("Details", new Icon(VaadinIcon.INFO_CIRCLE_O));
             btn1.addClickListener(e -> {

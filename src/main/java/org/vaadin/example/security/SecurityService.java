@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Component;
+import org.vaadin.example.entity.PflichtenheftEntity;
 
 import javax.xml.bind.DatatypeConverter;
 import java.nio.charset.StandardCharsets;
@@ -46,18 +47,10 @@ public class SecurityService {
         return username;
     }
 
-    public static String hash(String text){
-        MessageDigest md = null;
-        String hashedPassword = null;
-        try {
-            md = MessageDigest.getInstance("SHA-256");
-            byte[] digest = md.digest(text.getBytes(StandardCharsets.UTF_8));
-            hashedPassword = DatatypeConverter.printHexBinary(digest).toLowerCase();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        return hashedPassword;
+    public static boolean userIsMemberOf(PflichtenheftEntity pflichtenheftEntity){
+        return pflichtenheftEntity.getMitarbeiter().stream()
+                .filter(m -> m.getBenutzername().equals(SecurityService.getLoggedInUsername()))
+                .findFirst()
+                .orElse(null) != null;
     }
 }

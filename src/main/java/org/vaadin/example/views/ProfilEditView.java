@@ -16,8 +16,10 @@ import org.vaadin.example.entity.AbteilungEntity;
 import org.vaadin.example.entity.MitarbeiterEntity;
 import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
+import org.vaadin.example.utility.PasswordEncoder;
 
 import javax.annotation.security.PermitAll;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @PermitAll
@@ -85,36 +87,40 @@ public class ProfilEditView extends VerticalLayout {
         });
 
         save.addClickListener(event -> {
-            //Mitarbeiter Tabelle bearbeiten
-            mitarbeiter.setBenutzername(benutzername.getValue());
-            mitarbeiter.setMail(mail.getValue());
-            mitarbeiter.setVorname(vorname.getValue());
-            mitarbeiter.setNachname(nachname.getValue());
+            try {
+                //Mitarbeiter Tabelle bearbeiten
+                mitarbeiter.setBenutzername(benutzername.getValue());
+                mitarbeiter.setMail(mail.getValue());
+                mitarbeiter.setVorname(vorname.getValue());
+                mitarbeiter.setNachname(nachname.getValue());
 
 
-            if (mitarbeiter.getProfilbild() != profilbild.getBytes()) {
-                mitarbeiter.setProfilbild(profilbild.getBytes());
-            }
-
-            if (!passwort1.getValue().isEmpty()) {
-                if (passwort1.isInvalid()) {
-                    return;
+                if (mitarbeiter.getProfilbild() != profilbild.getBytes()) {
+                    mitarbeiter.setProfilbild(profilbild.getBytes());
                 }
-                if (passwort1.getValue().equals(passwort2.getValue())) {
-                    mitarbeiter.setPasswort(SecurityService.hash(passwort1.getValue()));
 
-                } else {
-                    passwort2.setInvalid(true);
-                    return;
+                if (!passwort1.getValue().isEmpty()) {
+                    if (passwort1.isInvalid()) {
+                        return;
+                    }
+                    if (passwort1.getValue().equals(passwort2.getValue())) {
+                        mitarbeiter.setPasswort(PasswordEncoder.hashPassword((passwort1.getValue())));
+
+                    } else {
+                        passwort2.setInvalid(true);
+                        return;
+                    }
                 }
+
+
+                service.saveBenutzer(mitarbeiter);
+
+                service.saveAbteilungZuweisungen(mitarbeiter.getMitarbeiterOid(), abteilung.ausgewaehlteAbteilungen());
+
+                Notification.show("Profil erfolgreich bearbeitet");
+            } catch (NoSuchAlgorithmException e) {
+                System.err.println(e.getMessage());
             }
-
-
-            service.saveBenutzer(mitarbeiter);
-
-            service.saveAbteilungZuweisungen(mitarbeiter.getMitarbeiterOid(), abteilung.ausgewaehlteAbteilungen());
-
-            Notification.show("Profil erfolgreich bearbeitet");
         });
 
         clearProfilbild.addClickListener(event -> {
