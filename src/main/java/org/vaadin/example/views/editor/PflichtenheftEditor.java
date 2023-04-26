@@ -1,6 +1,7 @@
 package org.vaadin.example.views.editor;
 
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -13,6 +14,7 @@ import com.vaadin.flow.router.Route;
 import org.vaadin.example.MainLayout;
 import org.vaadin.example.entity.PflichtenheftEntity;
 import org.vaadin.example.model.ChapterModel;
+import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
 import org.vaadin.example.views.ProjektDetailMitExport;
 
@@ -85,14 +87,27 @@ public class PflichtenheftEditor extends HorizontalLayout implements HasUrlParam
 
     @Override
     public void setParameter(BeforeEvent beforeEvent, String s) {
-        pflichtenheftOid = Integer.parseInt(s);
-        pflichtenheftEntity = service.readPflichtenheft(pflichtenheftOid);
-        editBar = new EditorBar(service, pflichtenheftEntity);
-        Notification.show(pflichtenheftEntity.getTitel());
-        Notification.show("Parameter: " + s);
-        System.out.println("=>1");
-        add(createChapterOverview());
-        projektDetailMitExport = new ProjektDetailMitExport(this.service, pflichtenheftOid);
+        try {
+            pflichtenheftOid = Integer.parseInt(s);
+            pflichtenheftEntity = service.readPflichtenheft(pflichtenheftOid);
+
+            if(!SecurityService.userIsMemberOf(pflichtenheftEntity)){
+                UI.getCurrent().navigate("open-project-overview");
+                return;
+            }
+
+            editBar = new EditorBar(service, pflichtenheftEntity);
+            Notification.show(pflichtenheftEntity.getTitel());
+            Notification.show("Parameter: " + s);
+            System.out.println("=>1");
+            add(createChapterOverview());
+            projektDetailMitExport = new ProjektDetailMitExport(this.service, pflichtenheftOid);
+        } catch (NumberFormatException e) {
+            System.err.println(e.getMessage());
+            UI.getCurrent().navigate("open-project-overview");
+        }
+
+
     }
 }
 
