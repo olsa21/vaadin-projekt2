@@ -95,13 +95,7 @@ public class ProfilEditView extends VerticalLayout {
                 mitarbeiter.setVorname(vorname.getValue());
                 mitarbeiter.setNachname(nachname.getValue());
 
-                if(profilbild.getBufferBytes() == null && profilbild.getImageBytes() != null) {
-                    mitarbeiter.setProfilbild(profilbild.getImageBytes());
-                }else if(profilbild.getBufferBytes() != null){
-                    mitarbeiter.setProfilbild(profilbild.getDownScaledBytesBuffer());
-                }else{
-                    mitarbeiter.setProfilbild(null);
-                }
+                mitarbeiter.setProfilbild(profilbild.getImgBytesDownscaled());
 
                 if (!passwort1.getValue().isEmpty()) {
                     if (passwort1.isInvalid()) {

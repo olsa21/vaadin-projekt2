@@ -443,7 +443,7 @@ public class EditorBar extends HorizontalLayout {
                         service.saveAbbildungsinhalt(abbildungsinhalt);
                         inhalt.setAbbildungsinhalt(abbildungsinhalt);
                     }
-                    inhalt.getAbbildungsinhalt().setBildInhalt(((CustomPicUploadWithCaption) temp).getBytes());
+                    inhalt.getAbbildungsinhalt().setBildInhalt(((CustomPicUploadWithCaption) temp).getImgBytes());
                     inhalt.getAbbildungsinhalt().setBildUnterschrift(((CustomPicUploadWithCaption) temp).getCaptionText());
                     service.saveAbbildungsinhalt(inhalt.getAbbildungsinhalt());
                 }else if(temp instanceof CustomGrid){

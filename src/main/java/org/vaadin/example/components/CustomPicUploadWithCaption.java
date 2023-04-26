@@ -38,6 +38,10 @@ public class CustomPicUploadWithCaption extends VerticalLayout {
         picUpload.setImage(bytes);
     }
 
+    public byte[] getImgBytes(){
+        return picUpload.getImageBytes();
+    }
+
     public void setCaptionText(String text){
         caption.setValue(text);
     }
