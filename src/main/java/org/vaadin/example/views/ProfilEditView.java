@@ -19,6 +19,7 @@ import org.vaadin.example.service.SpecificationsService;
 import org.vaadin.example.utility.PasswordEncoder;
 
 import javax.annotation.security.PermitAll;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class ProfilEditView extends VerticalLayout {
         benutzername.setEnabled(false);
 
         if (mitarbeiter.getProfilbild() != null) {
-            profilbild.setBytes(mitarbeiter.getProfilbild());
+            profilbild.setImage(mitarbeiter.getProfilbild());
         }
 
         add("Profil bearbeiten");
@@ -94,9 +95,12 @@ public class ProfilEditView extends VerticalLayout {
                 mitarbeiter.setVorname(vorname.getValue());
                 mitarbeiter.setNachname(nachname.getValue());
 
-
-                if (mitarbeiter.getProfilbild() != profilbild.getBytes()) {
-                    mitarbeiter.setProfilbild(profilbild.getBytes());
+                if(profilbild.getBufferBytes() == null && profilbild.getImageBytes() != null) {
+                    mitarbeiter.setProfilbild(profilbild.getImageBytes());
+                }else if(profilbild.getBufferBytes() != null){
+                    mitarbeiter.setProfilbild(profilbild.getDownScaledBytesBuffer());
+                }else{
+                    mitarbeiter.setProfilbild(null);
                 }
 
                 if (!passwort1.getValue().isEmpty()) {
@@ -118,7 +122,7 @@ public class ProfilEditView extends VerticalLayout {
                 service.saveAbteilungZuweisungen(mitarbeiter.getMitarbeiterOid(), abteilung.ausgewaehlteAbteilungen());
 
                 Notification.show("Profil erfolgreich bearbeitet");
-            } catch (NoSuchAlgorithmException e) {
+            } catch (NoSuchAlgorithmException | IOException e) {
                 System.err.println(e.getMessage());
             }
         });

@@ -27,7 +27,7 @@ public class CustomPicUploadWithCaption extends VerticalLayout {
         });
     }
     public byte[] getBytes() {
-        return picUpload.getBytes();
+        return picUpload.getBytesBuffer();
     }
 
     public String getCaptionText(){
@@ -35,7 +35,7 @@ public class CustomPicUploadWithCaption extends VerticalLayout {
     }
 
     public void setBytes(byte[] bytes) {
-        picUpload.setBytes(bytes);
+        picUpload.setImage(bytes);
     }
 
     public void setCaptionText(String text){
