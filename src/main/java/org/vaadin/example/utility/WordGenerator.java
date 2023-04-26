@@ -220,9 +220,11 @@ public class WordGenerator {
         }
 
         for (ArrayList<String> row : data.subList(1, data.size())) {
-            XWPFTableRow roww = table.createRow();
-            for (int i = 0; i < row.size(); i++) {
-                roww.getCell(i).setText(row.get(i));
+            if (!isRowEmpty(row)) {
+                XWPFTableRow roww = table.createRow();
+                for (int i = 0; i < row.size(); i++) {
+                    roww.getCell(i).setText(row.get(i));
+                }
             }
         }
 
@@ -234,6 +236,15 @@ public class WordGenerator {
         seq.setInstr("SEQ table \\* ARABIC");
         run = paragraph.createRun();
         run.setText(": " + ((tabellenbeschriftung.isBlank()) ? "Kein Titel" : tabellenbeschriftung));
+    }
+
+    private static boolean isRowEmpty(ArrayList<String> row) {
+        for (String cell : row) {
+            if (!cell.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static void insertInhaltsverzeichnis(XWPFDocument document, Map<String, XWPFStyle> styles) {

@@ -243,7 +243,7 @@ public class ExportTestMain {
 
         ArrayList<ArrayList<String>> data = new ArrayList<>();
         data.add(new ArrayList<>(Arrays.asList("Java, Scala", "PHP, Flask", "Ruby, Rails")));
-        data.add(new ArrayList<>(Arrays.asList("C, C ++", "Python, Kotlin", "Android, React")));
+        data.add(new ArrayList<>(Arrays.asList("", "", "")));
         data.add(new ArrayList<>(Arrays.asList("C, C ++", "Python, Kotlin", "Android, React")));
         data.add(new ArrayList<>(Arrays.asList("C, C ++", "Python, Kotlin", "Android, React")));
         data.add(new ArrayList<>(Arrays.asList("C, C ++", "Python, Kotlin", "Android, React")));
@@ -255,13 +255,25 @@ public class ExportTestMain {
         rowX.addNewTableCell().setText(data.get(0).get(2));
 
         for (ArrayList<String> row : data.subList(1, data.size())) {
-            XWPFTableRow roww = table.createRow();
-            for (int i = 0; i < row.size(); i++) {
-                roww.getCell(i).setText(row.get(i));
+            if (!isRowEmpty(row)) {
+                XWPFTableRow roww = table.createRow();
+                for (int i = 0; i < row.size(); i++) {
+                    roww.getCell(i).setText(row.get(i));
+                }
             }
         }
         //Content
     }
+
+    private static boolean isRowEmpty(ArrayList<String> row) {
+        for (String cell : row) {
+            if (!cell.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     private static void insertInhaltsverzeichnis(XWPFDocument document, Map<String, XWPFStyle> styles) {
         XWPFParagraph paragraph = document.createParagraph();
