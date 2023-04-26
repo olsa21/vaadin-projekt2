@@ -25,6 +25,7 @@ import org.vaadin.example.model.ComponentModel;
 import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -443,7 +444,11 @@ public class EditorBar extends HorizontalLayout {
                         service.saveAbbildungsinhalt(abbildungsinhalt);
                         inhalt.setAbbildungsinhalt(abbildungsinhalt);
                     }
-                    inhalt.getAbbildungsinhalt().setBildInhalt(((CustomPicUploadWithCaption) temp).getImgBytes());
+                    try {
+                        inhalt.getAbbildungsinhalt().setBildInhalt(((CustomPicUploadWithCaption) temp).getImgBytes());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                     inhalt.getAbbildungsinhalt().setBildUnterschrift(((CustomPicUploadWithCaption) temp).getCaptionText());
                     service.saveAbbildungsinhalt(inhalt.getAbbildungsinhalt());
                 }else if(temp instanceof CustomGrid){

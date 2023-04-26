@@ -6,6 +6,8 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.SucceededEvent;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
+import java.io.IOException;
+
 public class CustomPicUploadWithCaption extends VerticalLayout {
     private CustomPicUpload picUpload;
     private TextField caption;
@@ -38,8 +40,8 @@ public class CustomPicUploadWithCaption extends VerticalLayout {
         picUpload.setImage(bytes);
     }
 
-    public byte[] getImgBytes(){
-        return picUpload.getImageBytes();
+    public byte[] getImgBytes() throws IOException {
+        return picUpload.getImgBytes();
     }
 
     public void setCaptionText(String text){
