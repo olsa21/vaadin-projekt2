@@ -36,7 +36,11 @@ public class ClickableAvatar extends HorizontalLayout {
 
     //erstmal so hinzugefügt, ansonsten über den Konstruktor
     public void setPicture(byte[] imageData){
-        if(imageData != null)
+        if(imageData != null) {
             avatar.setImageResource(new StreamResource("image.png", () -> new ByteArrayInputStream(imageData)));
+        }
+        else {
+            avatar.setImage(null);
+        }
     }
 }
