@@ -12,7 +12,7 @@ public class ResourceLoader {
     public static FileInputStream readFile(String filename){
         FileInputStream in = null;
         try {
-            File file = ResourceUtils.getFile("classpath:styles.docx");
+            File file = ResourceUtils.getFile("classpath:" + filename);
             in = new FileInputStream(file);
         } catch (IOException e) {
             throw new RuntimeException(e);

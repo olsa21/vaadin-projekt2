@@ -10,6 +10,8 @@ import com.aspose.words.Document;
 import com.aspose.words.SaveFormat;
 
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -223,10 +225,20 @@ public class ExportTestMain {
         // Ein neuer Absatz erstellen
         XWPFParagraph paragraph = doc.createParagraph();
 
-        //Bild einfügen
+        // Bild einfügen
         XWPFRun run = paragraph.createRun();
         int pictureType = XWPFDocument.PICTURE_TYPE_PNG; // Der Typ des Bilds
-        run.addPicture(new ByteArrayInputStream(image), pictureType, "image.png", Units.toEMU(200), Units.toEMU(200)); // Das Bild einfügen
+
+        // Das Bild laden und die Breite und Höhe abrufen
+        BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(image));
+        int width = bufferedImage.getWidth();
+        int height = bufferedImage.getHeight();
+
+        // Die Höhe proportional zur Breite setzen
+        int newWidth = Units.toEMU(150);
+        int newHeight = (int) Math.round(((double) newWidth / (double) width) * height);
+
+        run.addPicture(new ByteArrayInputStream(image), pictureType, "image.png", newWidth, newHeight); // Das Bild einfügen
 
         paragraph = doc.createParagraph(); //caption for figure
         run = paragraph.createRun();
@@ -236,6 +248,7 @@ public class ExportTestMain {
         run = paragraph.createRun();
         run.setText(": Description of sample picture 1");
     }
+
 
     private static void insertTable(XWPFDocument doc) {
         XWPFTable table = doc.createTable();
