@@ -58,7 +58,9 @@ public class CustomGrid extends VerticalLayout {
                 });
                 return button;
             }
-        }).setHeader("Optionen");
+        }).setHeader("Optionen").setFlexGrow(0).setWidth("100px");
+
+
 
         //Leere Zeile einfügen
         data.add(new GridRow(new ArrayList<>(Collections.nCopies(columnNames.size(), ""))));

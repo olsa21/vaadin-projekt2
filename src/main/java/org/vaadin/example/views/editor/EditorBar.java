@@ -45,6 +45,8 @@ public class EditorBar extends HorizontalLayout {
 
     Registration broadcasterRegistration;
 
+    Component currentFocusedComponent;
+
     @Override
     protected void onDetach(DetachEvent detachEvent) {
         super.onDetach(detachEvent);
@@ -77,9 +79,82 @@ public class EditorBar extends HorizontalLayout {
                 !user.equals(currentUser)) { //NUTZER ID
                 System.out.println("NEU LADEN");
                 Integer finalComponentOID = componentOID;
-                ui.access(() -> {
 
-                    /*if (finalComponentOID != null) {
+
+                for (  ComponentModel c : components){
+                    Component cm = c.getComponent().getChildren().findFirst().get().getChildren().findFirst().get();
+                    if (cm.getClass() == TextArea.class){
+                        TextArea temp = (TextArea) cm;
+                        System.err.println("FOKUS?: " +temp  );
+                    }
+                    System.err.println(c.getComponent().getChildren().findFirst().get().getChildren().findFirst().get().getClass().toString());
+                }
+
+                if (finalComponentOID != null){
+
+                    int i = 0;
+                    for (  ComponentModel c : components){
+                        Component cm = c.getComponent().getChildren().findFirst().get().getChildren().findFirst().get();
+                        if (c.getComponentOid() == finalComponentOID && cm.getClass() == TextArea.class){
+                            // aus components-Liste die richtige Stelle finden, die aktualisiert worden ist
+                            // den INhalt an der Stelle ersetzen mit dem neuen Inhalt
+                            //System.err.println(components.indexOf(components.stream().filter(cmp->cmp.getComponentOid()==finalComponentOID).findFirst()));
+                            System.err.println("UNTEN!");
+                            System.err.println("i: " + i);
+                            System.err.println(components.indexOf(c));
+
+                            components.remove(i);
+                            InhaltEntity testTemp = service.readInhalt(finalComponentOID);
+
+                            HorizontalLayout tempLayout = addComponent("Textfeld", testTemp.getTextinhalt().getTextInhalt(), null,null,testTemp.getInhaltOid());
+                            this.components.add(i, new ComponentModel( testTemp.getInhaltOid(), tempLayout) );
+                            //TODO Einfach los programmiert
+                            //TODO die Tage mal anschauen ob der Ansatz überhaupt funktionieren kann
+                            //TODO ansonsten einfach lassen yolo
+
+                            //TODO ANSATZ NICHT MÖGLICH WEIL MAN ENTWEDER PER SETVALUE DEN LISTENER ANTREIBT SPRICH ENDLOSSCHLEIFE
+
+                            //TODO IRGENWIE MUSS DAS ÜBER FOCUSLISTENER GEMERKT WERDEN, WAS ICH ANGEKLICKT HATTE
+                            //
+                        }
+                        i++;
+                    }
+
+                    /*TextArea temp123 = (TextArea) components.stream().filter(cmp->cmp.getComponentOid()==inhaltOid).findFirst().get().getComponent().getChildren().findFirst().get()
+                            .getChildren().findFirst().get();  //component.getComponent().getChildren().findFirst().get().getChildren().findFirst().get();
+                    boolean focused = temp123.isAutofocus();
+                    System.err.println(temp123.getClass());
+                    temp123.setValue(service.readInhalt(inhaltOid).getTextinhalt().getTextInhalt());
+*/
+
+
+
+                    ui.access(() -> {
+                        //reloadSpecificContent(finalComponentOID);
+                        //Notification.show(finalComponentOID.toString());
+                        //updateComponentView();
+                        updateComponentViewOptimized(finalComponentOID);
+                        //pflichtenheftEntity = service.readPflichtenheft(pflichtenheftEntity.getProjektOid());
+                        //reloadContent();
+                        if (this.currentFocusedComponent != null){
+                            TextArea temp = (TextArea) this.currentFocusedComponent;
+                            ui.access(() -> {
+                                temp.focus();
+                                System.err.println("focus");
+                            });
+
+                        }
+        //                Notification.show("Erhalt!");
+                    });
+                }else{
+                    ui.access(() -> {
+                        pflichtenheftEntity = service.readPflichtenheft(pflichtenheftEntity.getProjektOid());
+                        reloadContent();
+                    });
+                }
+                /*ui.access(() -> {
+                    // TODO: fehlerhafte Stelle!!!
+                    if (finalComponentOID != null) {
                         //ComponentModel componentModel = components.stream().filter(c -> c.getComponentOID() == componentOID).findFirst().get();
                         //componentModel.reloadContent();
                         reloadSpecificContent(finalComponentOID);
@@ -90,10 +165,11 @@ public class EditorBar extends HorizontalLayout {
                         pflichtenheftEntity = service.readPflichtenheft(pflichtenheftEntity.getProjektOid());
                         //Notification.show("ALLES NEU LADEN");
                         reloadContent();
-                    }*/pflichtenheftEntity = service.readPflichtenheft(pflichtenheftEntity.getProjektOid());
-                    System.err.println("!!!");
-                    reloadContent();
-                });
+                    }
+                    //pflichtenheftEntity = service.readPflichtenheft(pflichtenheftEntity.getProjektOid());
+                    //System.err.println("!!!");
+                    //reloadContent();
+                });*/
             }else if(currentChapter != currentchapterMitgabe && pflichtenheftEntity.getProjektOid() == projektOid && !user.equals(currentUser)){
                 //"Es wurde ein Kapitel geändert (von jmd anderen) zu dem der Nutzer gehört aber dessen Kapitel nicht geöffnet ist"
                 //=> Änderung muss in internen pflichtenheftEntity übernommen werden
@@ -107,6 +183,20 @@ public class EditorBar extends HorizontalLayout {
                 //pflichtenheftEntity.getKapitel().get(...).set(Geänderte Kapitel)
             }
         });
+    }
+
+    private void updateComponentViewOptimized(Integer finalComponentOID) {
+        pflichtenheftEntity = service.readPflichtenheft(pflichtenheftEntity.getProjektOid());
+        //ermitteln welche Komponente einen Fokus hatte
+        //ComponentModel componentModel = components.stream().filter(c -> c.getComponentOid() == finalComponentOID).findFirst().get();
+
+        //for ( ComponentModel c : components) {
+        //    System.err.println(c.getComponent().getChildren().findFirst().get().getChildren().findFirst().get().getChildren().findFirst().get().getClass().toString());
+        //}
+
+
+        this.resetComponents();
+        this.loadChapterComponents();
     }
 
     public EditorBar(SpecificationsService service, PflichtenheftEntity pflichtenheft) {
@@ -123,12 +213,20 @@ public class EditorBar extends HorizontalLayout {
      */
     private void updateComponentView() {
         removeAll();
+        Div tempDiv = new Div();
+        tempDiv.setSizeFull();
+        tempDiv.getStyle().set("overflow-y", "auto");
         VerticalLayout tempLayout = new VerticalLayout();
+        //tempLayout should be scrollable
+
         tempLayout.add(getToolbar());
         for (ComponentModel c : components) {
             tempLayout.add(c.getComponent());
         }
-        add(tempLayout);
+        tempDiv.add(tempLayout);
+        //add(tempLayout);
+        add(tempDiv);
+
     }
 
     private void moveComponentUp(Component c) {
@@ -231,8 +329,11 @@ public class EditorBar extends HorizontalLayout {
 
         TextArea temp123 = (TextArea) components.stream().filter(cmp->cmp.getComponentOid()==inhaltOid).findFirst().get().getComponent().getChildren().findFirst().get()
                 .getChildren().findFirst().get();  //component.getComponent().getChildren().findFirst().get().getChildren().findFirst().get();
+        boolean focused = temp123.isAutofocus();
         System.err.println(temp123.getClass());
         temp123.setValue(service.readInhalt(inhaltOid).getTextinhalt().getTextInhalt());
+        if (focused)
+            temp123.focus();
     }
 
     /**
@@ -285,6 +386,11 @@ public class EditorBar extends HorizontalLayout {
                 textArea.setHeightFull();
                 textArea.setWidthFull();
                 textArea.setValueChangeMode(ValueChangeMode.LAZY);
+                textArea.addFocusListener(event -> {
+                    this.currentFocusedComponent = textArea;
+                    textArea.focus();
+
+                });
                 textArea.addValueChangeListener(event -> {
                     setChangesForBroadcast(componentOID);//TODO 1
                 });
