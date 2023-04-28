@@ -10,6 +10,8 @@ import com.aspose.words.Document;
 import com.aspose.words.SaveFormat;
 
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -223,10 +225,20 @@ public class ExportTestMain {
         // Ein neuer Absatz erstellen
         XWPFParagraph paragraph = doc.createParagraph();
 
-        //Bild einfügen
+        // Bild einfügen
         XWPFRun run = paragraph.createRun();
         int pictureType = XWPFDocument.PICTURE_TYPE_PNG; // Der Typ des Bilds
-        run.addPicture(new ByteArrayInputStream(image), pictureType, "image.png", Units.toEMU(200), Units.toEMU(200)); // Das Bild einfügen
+
+        // Das Bild laden und die Breite und Höhe abrufen
+        BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(image));
+        int width = bufferedImage.getWidth();
+        int height = bufferedImage.getHeight();
+
+        // Die Höhe proportional zur Breite setzen
+        int newWidth = Units.toEMU(150);
+        int newHeight = (int) Math.round(((double) newWidth / (double) width) * height);
+
+        run.addPicture(new ByteArrayInputStream(image), pictureType, "image.png", newWidth, newHeight); // Das Bild einfügen
 
         paragraph = doc.createParagraph(); //caption for figure
         run = paragraph.createRun();
@@ -237,13 +249,14 @@ public class ExportTestMain {
         run.setText(": Description of sample picture 1");
     }
 
+
     private static void insertTable(XWPFDocument doc) {
         XWPFTable table = doc.createTable();
         table.setTableAlignment(TableRowAlign.CENTER);
 
         ArrayList<ArrayList<String>> data = new ArrayList<>();
         data.add(new ArrayList<>(Arrays.asList("Java, Scala", "PHP, Flask", "Ruby, Rails")));
-        data.add(new ArrayList<>(Arrays.asList("C, C ++", "Python, Kotlin", "Android, React")));
+        data.add(new ArrayList<>(Arrays.asList("", "", "")));
         data.add(new ArrayList<>(Arrays.asList("C, C ++", "Python, Kotlin", "Android, React")));
         data.add(new ArrayList<>(Arrays.asList("C, C ++", "Python, Kotlin", "Android, React")));
         data.add(new ArrayList<>(Arrays.asList("C, C ++", "Python, Kotlin", "Android, React")));
@@ -255,13 +268,25 @@ public class ExportTestMain {
         rowX.addNewTableCell().setText(data.get(0).get(2));
 
         for (ArrayList<String> row : data.subList(1, data.size())) {
-            XWPFTableRow roww = table.createRow();
-            for (int i = 0; i < row.size(); i++) {
-                roww.getCell(i).setText(row.get(i));
+            if (!isRowEmpty(row)) {
+                XWPFTableRow roww = table.createRow();
+                for (int i = 0; i < row.size(); i++) {
+                    roww.getCell(i).setText(row.get(i));
+                }
             }
         }
         //Content
     }
+
+    private static boolean isRowEmpty(ArrayList<String> row) {
+        for (String cell : row) {
+            if (!cell.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     private static void insertInhaltsverzeichnis(XWPFDocument document, Map<String, XWPFStyle> styles) {
         XWPFParagraph paragraph = document.createParagraph();

@@ -48,6 +48,10 @@ public class SecurityService {
     }
 
     public static boolean userIsMemberOf(PflichtenheftEntity pflichtenheftEntity){
+        if(pflichtenheftEntity == null){
+            return false;
+        }
+
         return pflichtenheftEntity.getMitarbeiter().stream()
                 .filter(m -> m.getBenutzername().equals(SecurityService.getLoggedInUsername()))
                 .findFirst()

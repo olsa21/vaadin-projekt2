@@ -25,6 +25,7 @@ import org.vaadin.example.views.projectoverview.ProjectOverview;
 public class MainLayout extends AppLayout {
     private final SecurityService securityService;
     private final SpecificationsService service;
+    private ClickableAvatar clickableAvatar;
     MainLayout(SecurityService securityService, SpecificationsService service){
         this.securityService = securityService;
         this.service = service;
@@ -32,13 +33,16 @@ public class MainLayout extends AppLayout {
         createDrawer();
     }
 
+    public void setAvatarPicture(byte[] picture){
+        clickableAvatar.setPicture(picture);
+    }
     private void createHeader() {
         H1 logo = new H1("Pflichtenheft-Editor");
         //logo.addClassNames("text-l", "m-m");
         logo.getStyle().set("font-size", "var(--lumo-font-size-l)");
 
         MitarbeiterEntity mitarbeiter = service.findSpecificUser(SecurityService.getLoggedInUsername());
-        ClickableAvatar clickableAvatar = new ClickableAvatar(mitarbeiter.getVorname() + " " + mitarbeiter.getNachname());
+        clickableAvatar = new ClickableAvatar(mitarbeiter.getVorname() + " " + mitarbeiter.getNachname());
         clickableAvatar.setPicture(mitarbeiter.getProfilbild());
 
         Button logOut = new Button("Abmelden", e -> {

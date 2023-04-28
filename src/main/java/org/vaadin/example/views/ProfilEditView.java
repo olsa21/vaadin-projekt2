@@ -1,5 +1,6 @@
 package org.vaadin.example.views;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.notification.Notification;
@@ -22,6 +23,7 @@ import javax.annotation.security.PermitAll;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.stream.Stream;
 
 @PermitAll
 @Route(value = "/profil-edit", layout = MainLayout.class)
@@ -96,6 +98,10 @@ public class ProfilEditView extends VerticalLayout {
                 mitarbeiter.setNachname(nachname.getValue());
 
                 mitarbeiter.setProfilbild(profilbild.getImgBytesDownscaled());
+
+
+                MainLayout mainLayout = (MainLayout) getUI().get().getChildren().filter(item -> item instanceof MainLayout).findFirst().get();
+                mainLayout.setAvatarPicture(profilbild.getImgBytesDownscaled());
 
                 if (!passwort1.getValue().isEmpty()) {
                     if (passwort1.isInvalid()) {

@@ -9,8 +9,9 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import org.vaadin.example.entity.*;
 import org.vaadin.example.model.KapitelModel;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -18,9 +19,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * Die Klasse generiert ein Word-Dokument zu dem übergegeben Pflichtenhefts
+ */
 public class WordGenerator {
 
+    /**
+     * Generiert ein Word-Dokument zu dem übergegeben Pflichtenhefts
+     * @param pflichtenheftEntity
+     * @return Word Dokument als ByteArrayInputStream
+     * @throws IOException
+     */
     public static ByteArrayInputStream generateWord(PflichtenheftEntity pflichtenheftEntity) throws IOException {
+        if(pflichtenheftEntity == null) {
+            throw new IllegalArgumentException("Pflichtenheft darf nicht null sein!");
+        }
         //  ---------------- Konfiguration ---------------- //
         // Dokument wird erstellt und Styles werden geladen
         XWPFDocument document = new XWPFDocument();
@@ -34,11 +47,14 @@ public class WordGenerator {
         styles.put("Heading3", template.getStyles().getStyle("berschrift3"));
         styles.put("Title", template.getStyles().getStyle("Titel"));
 
-        XWPFStyles s = template.getStyles();
-
         for (XWPFStyle style : styles.values()) {
             newStyles.addStyle(style);
         }
+
+        CTFonts fonts = CTFonts.Factory.newInstance();
+        fonts.setAscii("Arial");
+
+        newStyles.setDefaultFonts(fonts);
 
         //Seitenzahlen
         XWPFHeaderFooterPolicy headerFooterPolicy = document.getHeaderFooterPolicy();
@@ -58,16 +74,16 @@ public class WordGenerator {
         //  ---------------- Konfiguration ENDE ---------------- //
 
         //Hier wird Inhalt eingefügt
-        //TODO Style als Klassenattribut definieren
-        insertDeckblatt(document, styles);
+        insertDeckblatt(document, styles, pflichtenheftEntity);
         newpage(document);
-        insertInhaltsverzeichnis(document, styles);
+        insertInhaltsverzeichnis(document);
         newpage(document);
         insertContent(document, pflichtenheftEntity, styles);
         newpage(document);
         insertAbbVerz(document, styles);
         insertTblVerz(document, styles);
 
+        //speichern und zurückgeben
         ByteArrayOutputStream b = new ByteArrayOutputStream();
         document.write(b);
         return new ByteArrayInputStream(b.toByteArray());
@@ -87,12 +103,11 @@ public class WordGenerator {
 
             for (InhaltEntity i : inhalte) {
                 //Differenzieren zwischen Text/Bild/Tabelle
-                //if (!i.getTextInhalt().isBlank() && i.getBildInhalt() == null && i.getTabelle() == null) {
                 if (i.getTextinhalt() != null) {
                     //i.getTextInhalt() kann ein leerer String sein
                     insertText(doc, i.getTextinhalt().getTextInhalt());
                 } else if (i.getAbbildungsinhalt() != null) {
-                    insertImage(doc, i.getAbbildungsinhalt().getBildInhalt(), i.getAbbildungsinhalt().getBildUnterschrift());
+                    insertImage(doc, i.getAbbildungsinhalt().getBildInhalt(), i.getAbbildungsinhalt().getBildUnterschrift(), 450);
                 } else if (i.getTabelle() != null) {
                     insertTable(doc, i.getTabelle(), i.getTabelle().getTabellenUnterschrift());
                 }
@@ -104,13 +119,14 @@ public class WordGenerator {
         XWPFParagraph p = doc.createParagraph();
         XWPFRun run;
 
-        Pattern pattern = Pattern.compile("(\\\\[a-z])\\{([^}]*)\\}");
+        Pattern pattern = Pattern.compile("(\\\\[a-z])\\{([^}]*)\\}|(\\n)");
         Matcher matcher = pattern.matcher(text);
 
         int position = 0;
         while (matcher.find()) {
             String steuerzeichen = matcher.group(1);
             String body = matcher.group(2);
+            String newLine = matcher.group(3);
 
             // Füge den Text vor dem Steuerzeichen hinzu
             if (position < matcher.start()) {
@@ -118,27 +134,30 @@ public class WordGenerator {
                 run.setText(text.substring(position, matcher.start()));
             }
 
-            // Füge den formatierten Text hinzu
-            run = p.createRun();
-            System.out.println(steuerzeichen);
-            switch (steuerzeichen) {
-                case "\\b":
-                    run.setBold(true);
-                    break;
-                case "\\i":
-                    run.setItalic(true);
-                    break;
-                case "\\u":
-                    run.setUnderline(UnderlinePatterns.SINGLE);
-                    break;
-                case "\\n":
-                    run.addBreak();
-                    break;
-                //Hier ggf weitere Formatierungen einfügen
-                default:
-                    System.out.println("Ungültiges Steuerzeichen: " + steuerzeichen);
+            if (newLine != null) {
+                // Füge einen Zeilenumbruch hinzu
+                run = p.createRun();
+                run.addBreak();
+            } else {
+                // Füge den formatierten Text hinzu
+                run = p.createRun();
+                System.out.println(steuerzeichen);
+                switch (steuerzeichen) {
+                    case "\\b":
+                        run.setBold(true);
+                        break;
+                    case "\\i":
+                        run.setItalic(true);
+                        break;
+                    case "\\u":
+                        run.setUnderline(UnderlinePatterns.SINGLE);
+                        break;
+                    //Hier ggf weitere Formatierungen einfügen
+                    default:
+                        System.out.println("Ungültiges Steuerzeichen: " + steuerzeichen);
+                }
+                run.setText(body);
             }
-            run.setText(body);
 
             position = matcher.end();
         }
@@ -152,7 +171,7 @@ public class WordGenerator {
 
     private static void insertAbbVerz(XWPFDocument document, Map<String, XWPFStyle> styles) {
         insertUeberschrift(document, styles, 1, "Abbildungsverzeichnis");
-        //Create table of figures field. Word will updating that field while opening the file.
+
         XWPFParagraph paragraph = document.createParagraph();
         CTSimpleField toc = paragraph.getCTP().addNewFldSimple();
         toc.setInstr("TOC \\c \"figure\" \\* MERGEFORMAT");
@@ -161,30 +180,44 @@ public class WordGenerator {
 
     private static void insertTblVerz(XWPFDocument document, Map<String, XWPFStyle> styles) {
         insertUeberschrift(document, styles, 1, "Tabellenverzeichnis");
-        //Create table of figures field. Word will updating that field while opening the file.
+
         XWPFParagraph paragraph = document.createParagraph();
         CTSimpleField toc = paragraph.getCTP().addNewFldSimple();
         toc.setInstr("TOC \\c \"table\" \\* MERGEFORMAT");
         toc.setDirty(STOnOff.TRUE); //set dirty to forcing update
     }
 
-    private static void insertImage(XWPFDocument doc, byte[] image, String bildbeschriftung) {
+    private static void insertImage(XWPFDocument doc, byte[] image, String bildbeschriftung, int width) {
         try {
             // Ein neuer Absatz erstellen
             XWPFParagraph paragraph = doc.createParagraph();
+            paragraph.setAlignment(ParagraphAlignment.CENTER);
+
+            // Das Bild laden und die Breite und Höhe abrufen
+            BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(image));
+            int imgWidth = bufferedImage.getWidth();
+            int imgHeight = bufferedImage.getHeight();
 
             //Bild einfügen
             XWPFRun run = paragraph.createRun();
             int pictureType = XWPFDocument.PICTURE_TYPE_PNG; // Der Typ des Bilds
-            run.addPicture(new ByteArrayInputStream(image), pictureType, "image.png", Units.toEMU(200), Units.toEMU(200)); // Das Bild einfügen
 
-            paragraph = doc.createParagraph(); //caption for figure
-            run = paragraph.createRun();
-            run.setText("Abbildung ");
-            CTSimpleField seq = paragraph.getCTP().addNewFldSimple();
-            seq.setInstr("SEQ figure \\* ARABIC"); //This field is important for creating the table of figures then.
-            run = paragraph.createRun();
-            run.setText(": " + ((bildbeschriftung.isBlank()) ? "Kein Titel" : bildbeschriftung));
+            // Maße nach Seitenverhältnis setzen
+            int newWidth = Units.toEMU(width);
+            int newHeight = (int) Math.round(((double) newWidth / (double) imgWidth) * imgHeight);
+
+            run.addPicture(new ByteArrayInputStream(image), pictureType, "image.png", newWidth, newHeight);
+
+            if (bildbeschriftung != null) {
+                paragraph = doc.createParagraph(); //caption for figure
+                paragraph.setAlignment(ParagraphAlignment.CENTER);
+                run = paragraph.createRun();
+                run.setText("Abbildung ");
+                CTSimpleField seq = paragraph.getCTP().addNewFldSimple();
+                seq.setInstr("SEQ figure \\* ARABIC"); //This field is important for creating the table of figures then.
+                run = paragraph.createRun();
+                run.setText(": " + ((bildbeschriftung.isBlank()) ? "Kein Titel" : bildbeschriftung));
+            }
         } catch (InvalidFormatException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -220,13 +253,15 @@ public class WordGenerator {
         }
 
         for (ArrayList<String> row : data.subList(1, data.size())) {
-            XWPFTableRow roww = table.createRow();
-            for (int i = 0; i < row.size(); i++) {
-                roww.getCell(i).setText(row.get(i));
+            if (!isRowEmpty(row)) {
+                XWPFTableRow roww = table.createRow();
+                for (int i = 0; i < row.size(); i++) {
+                    roww.getCell(i).setText(row.get(i));
+                }
             }
         }
 
-        XWPFParagraph paragraph = doc.createParagraph(); //caption for figure
+        XWPFParagraph paragraph = doc.createParagraph();
         paragraph.setAlignment(ParagraphAlignment.CENTER);
         XWPFRun run = paragraph.createRun();
         run.setText("Tabelle ");
@@ -236,11 +271,19 @@ public class WordGenerator {
         run.setText(": " + ((tabellenbeschriftung.isBlank()) ? "Kein Titel" : tabellenbeschriftung));
     }
 
-    private static void insertInhaltsverzeichnis(XWPFDocument document, Map<String, XWPFStyle> styles) {
+    private static boolean isRowEmpty(ArrayList<String> row) {
+        for (String cell : row) {
+            if (!cell.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static void insertInhaltsverzeichnis(XWPFDocument document) {
         XWPFParagraph paragraph = document.createParagraph();
         XWPFRun run = paragraph.createRun();
         run.setText("Inhaltsverzeichnis");
-        //set font size
         run.setFontSize(20);
 
         paragraph = document.createParagraph();
@@ -254,36 +297,59 @@ public class WordGenerator {
         doc.createParagraph().setPageBreak(true);
     }
 
-    private static void insertDeckblatt(XWPFDocument document, Map<String, XWPFStyle> styles) {
+    private static void insertDeckblatt(XWPFDocument document, Map<String, XWPFStyle> styles, PflichtenheftEntity pflichtenheft) {
         document.createParagraph().setPageBreak(true);
 
-        // Absatz für das Deckblatt erstellen
+        try {
+            byte[] logo = ResourceLoader.readFile("deckblatt_logo.png").readAllBytes();
+            insertImage(document, logo, null, 300);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         XWPFParagraph paragraph = document.createParagraph();
-        paragraph.setAlignment(ParagraphAlignment.CENTER);
-        paragraph.setVerticalAlignment(TextAlignment.CENTER); // Text vertikal zentrieren
 
         // Titel des Deckblatts
-        XWPFRun runTitle = paragraph.createRun();
-        runTitle.setText("Deckblatt");
+        paragraph.setAlignment(ParagraphAlignment.CENTER);
+        paragraph.setVerticalAlignment(TextAlignment.CENTER);
+        XWPFRun runPfl = paragraph.createRun();
+        runPfl.addBreak();
+        runPfl.setText("PFLICHTENHEFT");
         paragraph.setStyle(styles.get("Title").getStyleId());
-        runTitle.setStyle(styles.get("Title").getStyleId());
+        runPfl.setStyle(styles.get("Title").getStyleId());
+        runPfl.setItalic(true);
+        runPfl.setFontFamily("Arial");
+        runPfl.setColor("3399FF");
+        runPfl.addBreak();
 
-        // Autor des Deckblatts
         paragraph = document.createParagraph();
         paragraph.setAlignment(ParagraphAlignment.CENTER);
         paragraph.setVerticalAlignment(TextAlignment.CENTER);
-        XWPFRun runAuthor = paragraph.createRun();
-        runAuthor.setText("Autor: Max Mustermann");
-        runAuthor.setFontSize(14);
-        runAuthor.addBreak();
+        XWPFRun runTitle = paragraph.createRun();
+        runTitle.setText(pflichtenheft.getTitel());
+        runTitle.setFontSize(17);
 
-        // Datum des Deckblatts
-        XWPFRun runDate = paragraph.createRun();
-        runDate.setText("Datum: " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        runDate.setFontSize(14);
-        runDate.addBreak();
+        // Verantwortlicher
+        paragraph = document.createParagraph();
+        XWPFRun runZusatz = paragraph.createRun();
 
-        // Optional: Mail Adresse
+        for(int i = 0; i < 22; i++) {
+            runZusatz.addBreak();
+        }
+
+        runZusatz.setText("Anpsprechpartner: " + pflichtenheft.getVerantwortlicher().getVorname() + " " + pflichtenheft.getVerantwortlicher().getNachname());
+        runZusatz.setFontSize(14);
+        runZusatz.addBreak();
+
+        //Mail des Verantwortlichen
+        runZusatz.setText("E-Mail: " + pflichtenheft.getVerantwortlicher().getMail());
+        runZusatz.setFontSize(14);
+        runZusatz.addBreak();
+
+        // Datum
+        runZusatz.setText("Datum: " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        runZusatz.setFontSize(14);
+        runZusatz.addBreak();
     }
 
     private static void insertUeberschrift(XWPFDocument document, Map<String, XWPFStyle> styles, int level, String text) {
@@ -292,6 +358,7 @@ public class WordGenerator {
 
         pBody.setStyle(styles.get("Heading" + level).getStyleId());
         run1.setStyle(styles.get("Heading" + level).getStyleId());
+        run1.setFontFamily("Arial");
         run1.setText(text);
 
     }
