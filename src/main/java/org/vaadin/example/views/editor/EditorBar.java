@@ -57,19 +57,19 @@ public class EditorBar extends HorizontalLayout {
         super.onAttach(attachEvent);
         UI ui = attachEvent.getUI();
         broadcasterRegistration = EditorBroadcaster.register(newMessage -> {
-            String[] split = newMessage.split(",");
+            String[] values = newMessage;
 
-            int projektOid = Integer.parseInt(split[0]);
-            int currentchapterMitgabe = Integer.parseInt(split[1]);
-            String user = split[2];
+            int projektOid = Integer.parseInt(values[0]);
+            int currentchapterMitgabe = Integer.parseInt(values[1]);
+            String user = values[2];
             Integer componentOID = null;
-            if (split.length > 3) {
-                componentOID = Integer.parseInt(split[3]);
+            if (values[3] != null) {
+                componentOID = Integer.parseInt(values[3]);
             }
             System.err.println("HALLI HALLO");
             System.err.println(componentOID);
 
-            System.err.println("... hat eine Nachricht erhalten: " + split[0] + " " + split[1] + "bzgl. folgendem Component: " + (componentOID != null ? componentOID : "null"));
+            System.err.println("... hat eine Nachricht erhalten: " + values[0] + " " + values[1] + "bzgl. folgendem Component: " + (componentOID != null ? componentOID : "null"));
 
             //String currentUser = SecurityService.getLoggedInUsername();
             String currentUser = this.currentUsername;
@@ -364,10 +364,15 @@ public class EditorBar extends HorizontalLayout {
     private void setChangesForBroadcast(Integer componentOID ) {
         speichernBtn.click();
         String currentUser = this.currentUsername;
-        String mitgabe = pflichtenheftEntity.getProjektOid() + "," + currentChapter + "," + currentUser;
-        if (componentOID != null)
-            mitgabe += "," + componentOID;
-        EditorBroadcaster.broadcast(mitgabe);
+
+        String[] values = {
+                String.valueOf(pflichtenheftEntity.getProjektOid()),
+                String.valueOf(currentChapter),
+                currentUser,
+                (componentOID != null) ? String.valueOf(componentOID) : null
+        };
+
+        EditorBroadcaster.broadcast(values);
     }
 
     /**

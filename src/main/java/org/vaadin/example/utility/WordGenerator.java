@@ -119,13 +119,14 @@ public class WordGenerator {
         XWPFParagraph p = doc.createParagraph();
         XWPFRun run;
 
-        Pattern pattern = Pattern.compile("(\\\\[a-z])\\{([^}]*)\\}");
+        Pattern pattern = Pattern.compile("(\\\\[a-z])\\{([^}]*)\\}|(\\n)");
         Matcher matcher = pattern.matcher(text);
 
         int position = 0;
         while (matcher.find()) {
             String steuerzeichen = matcher.group(1);
             String body = matcher.group(2);
+            String newLine = matcher.group(3);
 
             // Füge den Text vor dem Steuerzeichen hinzu
             if (position < matcher.start()) {
@@ -133,27 +134,30 @@ public class WordGenerator {
                 run.setText(text.substring(position, matcher.start()));
             }
 
-            // Füge den formatierten Text hinzu
-            run = p.createRun();
-            System.out.println(steuerzeichen);
-            switch (steuerzeichen) {
-                case "\\b":
-                    run.setBold(true);
-                    break;
-                case "\\i":
-                    run.setItalic(true);
-                    break;
-                case "\\u":
-                    run.setUnderline(UnderlinePatterns.SINGLE);
-                    break;
-                case "\\n":
-                    run.addBreak();
-                    break;
-                //Hier ggf weitere Formatierungen einfügen
-                default:
-                    System.out.println("Ungültiges Steuerzeichen: " + steuerzeichen);
+            if (newLine != null) {
+                // Füge einen Zeilenumbruch hinzu
+                run = p.createRun();
+                run.addBreak();
+            } else {
+                // Füge den formatierten Text hinzu
+                run = p.createRun();
+                System.out.println(steuerzeichen);
+                switch (steuerzeichen) {
+                    case "\\b":
+                        run.setBold(true);
+                        break;
+                    case "\\i":
+                        run.setItalic(true);
+                        break;
+                    case "\\u":
+                        run.setUnderline(UnderlinePatterns.SINGLE);
+                        break;
+                    //Hier ggf weitere Formatierungen einfügen
+                    default:
+                        System.out.println("Ungültiges Steuerzeichen: " + steuerzeichen);
+                }
+                run.setText(body);
             }
-            run.setText(body);
 
             position = matcher.end();
         }
