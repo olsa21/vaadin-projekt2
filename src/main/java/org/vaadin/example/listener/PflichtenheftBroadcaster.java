@@ -30,10 +30,4 @@ public class PflichtenheftBroadcaster {
             executor.execute(() -> listener.accept(message));
         }
     }
-
-    @PostUpdate
-    public void onUpdate(PflichtenheftEntity pflichtenheftEntity) {
-        System.out.println("UPDATE " + pflichtenheftEntity.getProjektOid());
-        //PflichtenheftBroadcaster.broadcast("");
-    }
 }

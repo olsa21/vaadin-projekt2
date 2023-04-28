@@ -8,7 +8,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "pflichtenheft", schema = "pflichtenhefter", catalog = "")
-@EntityListeners(PflichtenheftBroadcaster.class)
 public class PflichtenheftEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
