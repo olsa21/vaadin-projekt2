@@ -45,7 +45,6 @@ public class EditorBar extends HorizontalLayout {
 
     Registration broadcasterRegistration;
 
-    Component currentFocusedComponent;
 
     @Override
     protected void onDetach(DetachEvent detachEvent) {
@@ -136,14 +135,6 @@ public class EditorBar extends HorizontalLayout {
                         updateComponentViewOptimized(finalComponentOID);
                         //pflichtenheftEntity = service.readPflichtenheft(pflichtenheftEntity.getProjektOid());
                         //reloadContent();
-                        if (this.currentFocusedComponent != null){
-                            TextArea temp = (TextArea) this.currentFocusedComponent;
-                            ui.access(() -> {
-                                temp.focus();
-                                System.err.println("focus");
-                            });
-
-                        }
         //                Notification.show("Erhalt!");
                     });
                 }else{
@@ -386,11 +377,6 @@ public class EditorBar extends HorizontalLayout {
                 textArea.setHeightFull();
                 textArea.setWidthFull();
                 textArea.setValueChangeMode(ValueChangeMode.LAZY);
-                textArea.addFocusListener(event -> {
-                    this.currentFocusedComponent = textArea;
-                    textArea.focus();
-
-                });
                 textArea.addValueChangeListener(event -> {
                     setChangesForBroadcast(componentOID);//TODO 1
                 });
