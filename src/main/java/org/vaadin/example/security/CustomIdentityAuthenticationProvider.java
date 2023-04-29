@@ -14,7 +14,6 @@ import org.vaadin.example.service.SpecificationsService;
 /**
  * Die Klasse ist dafür zuständig eine Authentifizierung zu überprüfen. Hierbei wird die Methode
  * isValidUser aufgerufen, welche die Anmeldedaten überprüft.
- * 
  */
 @Service
 public class CustomIdentityAuthenticationProvider implements AuthenticationProvider {

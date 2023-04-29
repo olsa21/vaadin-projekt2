@@ -29,6 +29,9 @@ import java.util.stream.Stream;
 
 import static com.vaadin.flow.component.button.ButtonVariant.LUMO_TERTIARY_INLINE;
 
+/**
+ * Die Klasse ist dafür zuständig, dass eine passende View für die Registrierung angezeigt wird.
+ */
 @AnonymousAllowed
 @Route("/register")
 public class RegisterView extends VerticalLayout {
@@ -42,9 +45,12 @@ public class RegisterView extends VerticalLayout {
     private Button submitButton;
     private Button backToLoginButton;
     private Upload profilePicture;
-
     private SpecificationsService service;
 
+    /**
+     * Konstruktor, welche die View initialisiert.
+     * @param service Service, welcher für die Kommunikation mit der Datenbank zuständig ist.
+     */
     public RegisterView(SpecificationsService service){
         this.service = service;
         setAlignItems(Alignment.CENTER);
@@ -55,6 +61,9 @@ public class RegisterView extends VerticalLayout {
         add(title, username, password, passwordRepeat, email, firstName, lastName, submitButton, backToLoginButton);
     }
 
+    /**
+     * Initialisiert die View.
+     */
     private void init(){
         username = new TextField("Benutzername");
         password = new CustomPasswordField("Passwort");
@@ -73,10 +82,17 @@ public class RegisterView extends VerticalLayout {
         backToLoginButton.addClickListener(e -> backToLogin());
     }
 
+    /**
+     * Erstellt eine Notification, welche bei einem erfolgreichen Registrieren angezeigt wird.
+     * @param components Die Komponenten, welche in der Notification angezeigt werden sollen.
+     */
     private void setRequiredIndicatorVisible(HasValueAndElement<?, ?>... components) {
         Stream.of(components).forEach(comp -> comp.setRequiredIndicatorVisible(true));
     }
 
+    /**
+     * Methode, welche eine Registrierung initiiert.
+     */
     private void submitRegister(){
         //FIXME auslagern
         //TODO bei EIngabe von Benutzername und E-Mail soll LAZY überprüft werden, ob diese schon vergeben sind
@@ -95,14 +111,11 @@ public class RegisterView extends VerticalLayout {
                 return;
             }
         }
-        //!password.isInvalid() && password.equals(passwordRepeat)
         if (!password.isInvalid() && password.getValue().equals(passwordRepeat.getValue())){
             try{
-                //TODO schöner machen
                 MitarbeiterEntity mitarbeiter = new MitarbeiterEntity();
                 mitarbeiter.setBenutzername(username.getValue());
                 String hashedPassword = PasswordEncoder.hashPassword((password.getValue()));
-
                 mitarbeiter.setPasswort(hashedPassword);
 
                 //mitarbeiter.setPasswort(password.getValue());
@@ -112,9 +125,6 @@ public class RegisterView extends VerticalLayout {
 
                 service.addMitarbeiter(mitarbeiter);
             }catch(Exception e){
-                System.err.println(e);
-                System.err.println(e.getCause());
-                System.err.println(e.getMessage());
                 createSubmitError().open();
                 return;
             }
@@ -123,13 +133,20 @@ public class RegisterView extends VerticalLayout {
             passwordRepeat.setInvalid(true);
             createSubmitError().open();
         }
-
     }
 
+    /**
+     * Methode, leitet den Benutzer zurück zum Login.
+     */
     private void backToLogin(){
         getUI().ifPresent(ui -> ui.navigate("login"));
     }
 
+    /**
+     * Methode, welche ein Button erstellt, welcher die Notification schließt.
+     * @param notification Die Notification, welche angezeigt werden soll.
+     * @return
+     */
     public static Button createCloseBtn(Notification notification) {
         Button closeBtn = new Button(
                 VaadinIcon.CLOSE_SMALL.create(),
@@ -138,6 +155,10 @@ public class RegisterView extends VerticalLayout {
         return closeBtn;
     }
 
+    /**
+     * Methode, welche eine Notification erstellt, welche bei einem erfolgreichen Registrieren angezeigt wird.
+     * @return Die Notification, welche angezeigt werden soll.
+     */
     public static Notification createSubmitSuccess() {
         Notification notification = new Notification();
         notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
@@ -155,6 +176,10 @@ public class RegisterView extends VerticalLayout {
         return notification;
     }
 
+    /**
+     * Methode, welche eine Notification erstellt, welche bei einem fehlgeschlagenen Registrieren angezeigt wird.
+     * @return Die Notification, welche angezeigt werden soll.
+     */
     public static Notification createSubmitError() {
         Notification notification = new Notification();
         notification.addThemeVariants(NotificationVariant.LUMO_ERROR);

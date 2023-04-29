@@ -17,19 +17,22 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.shared.Registration;
-import org.vaadin.example.MainLayout;
+import org.vaadin.example.views.MainLayout;
 import org.vaadin.example.entity.MitarbeiterEntity;
 import org.vaadin.example.entity.PflichtenheftEntity;
 import org.vaadin.example.listener.PflichtenheftBroadcaster;
 import org.vaadin.example.model.PflichtenheftZeile;
 import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
-import org.vaadin.example.views.ProjektDetailView;
+import org.vaadin.example.views.project.ProjektDetailView;
 
 import javax.annotation.security.PermitAll;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Die Klasse ist dafür zuständig, dass eine passende View für die Projektübersicht angezeigt wird.
+ */
 @PermitAll
 @PageTitle("Projektübersicht")
 @Route(value = "/open-project-overview", layout = MainLayout.class)
@@ -37,12 +40,8 @@ public class OpenProjectOverview extends VerticalLayout {
 
     Grid<PflichtenheftZeile> grid = new Grid<>();
     TextField filterText = new TextField();
-
-    //---------------------------------------------Ende
-
     private final SpecificationsService service;
     List<PflichtenheftZeile> pflichtenheftZeilen = new ArrayList<>();
-
     Registration broadcasterRegistration;
 
     @Override
@@ -63,34 +62,34 @@ public class OpenProjectOverview extends VerticalLayout {
         });
     }
 
+    /**
+     * Konstruktor der Klasse, welche die benötigten Services und Komponenten initialisiert.
+     * @param service
+     */
     public OpenProjectOverview(SpecificationsService service) {
         this.service = service;
-        //add(NavigationBar.getInstance());
         getData();
-
         addClassName("list-view");
         setSizeFull();
-
         configureGrid();
-
-
-        add(
-                getToolbar(),
-                getContent()
-        );
-        //Laden der Daten
+        add(getToolbar(), getContent());
         updateList();
     }
 
+    /**
+     * Methode, welche die anzuzeigenden Daten (Pflichtenhefte) aus der Datenbank holt.
+     */
     private void getData() {
-            pflichtenheftZeilen.clear();
-            List<PflichtenheftEntity> pflichtenheftEntities2 = service.findOpenProjects();
-            pflichtenheftEntities2.forEach(pflichtenheftEntity -> {
-                pflichtenheftZeilen.add(new PflichtenheftZeile(pflichtenheftEntity));
-            });
-
+        pflichtenheftZeilen.clear();
+        List<PflichtenheftEntity> pflichtenheftEntities2 = service.findOpenProjects();
+        pflichtenheftEntities2.forEach(pflichtenheftEntity -> {
+            pflichtenheftZeilen.add(new PflichtenheftZeile(pflichtenheftEntity));
+        });
     }
 
+    /**
+     * Methode, welche die Liste der Pflichtenhefte aktualisiert.
+     */
     private void updateList() {
         if (filterText.isEmpty()) {
             grid.setItems(this.pflichtenheftZeilen);
@@ -99,6 +98,9 @@ public class OpenProjectOverview extends VerticalLayout {
         }
     }
 
+    /**
+     * Methode, welche die Komponenten für die View zusammenstellt.
+     */
     private Component getContent() {
         HorizontalLayout content = new HorizontalLayout(grid);
         content.setFlexGrow(2, grid);
@@ -107,7 +109,10 @@ public class OpenProjectOverview extends VerticalLayout {
         return content;
     }
 
-
+    /**
+     * Methode, welche die Komponenten für die Toolbar zusammenstellt.
+     * @return Toolbar
+     */
     private Component getToolbar() {
         filterText.setPlaceholder("Filter by Titel");
         filterText.setClearButtonVisible(true);
@@ -117,6 +122,9 @@ public class OpenProjectOverview extends VerticalLayout {
         return toolbar;
     }
 
+    /**
+     * Methode, welche die Grid-Komponente konfiguriert.
+     */
     private void configureGrid() {
         grid.addClassName("contact-grid");
         grid.setSizeFull();
@@ -126,7 +134,6 @@ public class OpenProjectOverview extends VerticalLayout {
         grid.addComponentColumn(spec -> {
             Button btn1 = new Button("Details", new Icon(VaadinIcon.INFO_CIRCLE_O));
             btn1.addClickListener(e -> {
-                //UI.getCurrent().navigate("projekt-details");
                 Dialog dialog = new Dialog();
                 dialog.add(new ProjektDetailView(service, spec.getPflichtenheftEntity()));
                 dialog.setHeight("90%");
@@ -148,6 +155,11 @@ public class OpenProjectOverview extends VerticalLayout {
         grid.getColumns().forEach(column -> column.setSortable(true));
     }
 
+    /**
+     * Methode, welche prüft, ob der aktuelle Benutzer bereits Mitglied des Projekts ist.
+     * @param pflichtenheftEntity Pflichtenheft
+     * @return true, wenn der Benutzer bereits Mitglied ist, sonst false
+     */
     private boolean isMember(PflichtenheftEntity pflichtenheftEntity) {
         //SecurityService.getLoggedInUsername(), pflichtenheft
         String username = SecurityService.getLoggedInUsername();
@@ -158,8 +170,6 @@ public class OpenProjectOverview extends VerticalLayout {
         }
         return false;
     }
-
-
 }
 
 

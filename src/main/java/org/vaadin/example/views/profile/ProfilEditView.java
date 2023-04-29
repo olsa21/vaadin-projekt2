@@ -1,6 +1,5 @@
-package org.vaadin.example.views;
+package org.vaadin.example.views.profile;
 
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.notification.Notification;
@@ -9,7 +8,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-import org.vaadin.example.MainLayout;
 import org.vaadin.example.components.AbteilungComboBox;
 import org.vaadin.example.components.CustomPasswordField;
 import org.vaadin.example.components.CustomPicUpload;
@@ -18,12 +16,12 @@ import org.vaadin.example.entity.MitarbeiterEntity;
 import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
 import org.vaadin.example.utility.PasswordEncoder;
+import org.vaadin.example.views.MainLayout;
 
 import javax.annotation.security.PermitAll;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.stream.Stream;
 
 @PermitAll
 @Route(value = "/profil-edit", layout = MainLayout.class)
@@ -117,7 +115,7 @@ public class ProfilEditView extends VerticalLayout {
                 }
 
 
-                service.saveBenutzer(mitarbeiter);
+                service.addMitarbeiter(mitarbeiter);
 
                 service.saveAbteilungZuweisungen(mitarbeiter.getMitarbeiterOid(), abteilung.ausgewaehlteAbteilungen());
 

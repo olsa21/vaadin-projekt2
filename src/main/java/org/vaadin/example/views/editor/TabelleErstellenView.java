@@ -30,7 +30,7 @@ public class TabelleErstellenView extends FormLayout {
             spaltenNamen.add(textField);
             addFormItem(textField, "Spaltenname " + (i + 1));
         }
-        add(speichern);
+        addFormItem(speichern, "");
 
         enableTextfelder(2);
 

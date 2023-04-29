@@ -13,51 +13,50 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import org.vaadin.example.MainLayout;
+import org.vaadin.example.views.MainLayout;
 import org.vaadin.example.entity.MitarbeiterEntity;
 import org.vaadin.example.entity.PflichtenheftEntity;
 import org.vaadin.example.model.PflichtenheftZeile;
 import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
-import org.vaadin.example.views.ProjektDetailView;
-import org.vaadin.example.views.editor.TabelleErstellenView;
+import org.vaadin.example.views.project.ProjektDetailView;
 
 import javax.annotation.security.PermitAll;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
+/**
+ * Die Klasse ist dafür zuständig, dass eine passende View für die Projektübersicht angezeigt wird.
+ */
 @PermitAll
 @PageTitle("Projektübersicht")
-//ursprünglicher value="/project-overview", jedoch zu Testzwecken geändert TODO
 @Route(value = "", layout = MainLayout.class)
 public class ProjectOverview extends VerticalLayout
 {
     Grid<PflichtenheftZeile> grid = new Grid<>();
     private final SpecificationsService service;
     TextField filterText = new TextField();
-
-
-    //---------------------------------------------Testbeispieldaten für horizontalen Prototyp
     private ArrayList<PflichtenheftZeile> pflichtenhefter;
-    //---------------------------------------------Ende
 
+    /**
+     * Konstruktor, welcher die View für die Projektübersicht erstellt.
+     * @param service Service, welcher die Datenbankanbindung ermöglicht.
+     */
     public ProjectOverview(SpecificationsService service){
         this.service = service;
-
         this.pflichtenhefter = new ArrayList<>();
         addClassName("list-view");
         setSizeFull();
         configureGrid();
-        add(
-                getToolbar(),
-                getContent()
-        );
+        add(getToolbar(), getContent());
         loadSpecificProjects();
         updateList();
     }
 
+    /**
+     * Methode, welche die Projekte lädt, welche dem angemeldeten Mitarbeiter zugeordnet sind.
+     */
     private void loadSpecificProjects(){
         MitarbeiterEntity mitarbeiter = service.findSpecificUser(SecurityService.getLoggedInUsername());
         List<PflichtenheftEntity> list = service.getPflichtenheftListWhere(mitarbeiter.getMitarbeiterOid());
@@ -66,6 +65,9 @@ public class ProjectOverview extends VerticalLayout
         }
     }
 
+    /**
+     * Methode, welche die Liste der Projekte aktualisiert.
+     */
     private void updateList() {
         if (filterText.isEmpty()) {
             grid.setItems(this.pflichtenhefter);
@@ -74,6 +76,10 @@ public class ProjectOverview extends VerticalLayout
         }
     }
 
+    /**
+     * Methode, welche die View für die Projektübersicht erstellt.
+     * @return Gibt die View für die Projektübersicht zurück.
+     */
     private Component getContent() {
         HorizontalLayout content = new HorizontalLayout(grid);
         content.setFlexGrow(2, grid);
@@ -82,6 +88,10 @@ public class ProjectOverview extends VerticalLayout
         return content;
     }
 
+    /**
+     * Methode, welche die Toolbar für die Projektübersicht erstellt.
+     * @return Gibt die Toolbar für die Projektübersicht zurück.
+     */
     private Component getToolbar() {
         filterText.setPlaceholder("Filter by Titel");
         filterText.setClearButtonVisible(true);
@@ -91,6 +101,9 @@ public class ProjectOverview extends VerticalLayout
         return toolbar;
     }
 
+    /**
+     * Methode, welche die Grid für die Projektübersicht konfiguriert.
+     */
     private void configureGrid() {
         grid.addClassName("contact-grid");
         grid.setSizeFull();
@@ -111,8 +124,6 @@ public class ProjectOverview extends VerticalLayout
             Icon icon = new Icon(VaadinIcon.INFO_CIRCLE_O);
             Button btnDetails = new Button("Details", icon);
             btnDetails.addClickListener(e->{
-                //UI.getCurrent().navigate("projekt-details");
-                //So dann auch in OpenProjectOverview
                 Dialog dialog = new Dialog();
                 dialog.add(new ProjektDetailView(service, spec.getPflichtenheftEntity()));
 
@@ -125,5 +136,4 @@ public class ProjectOverview extends VerticalLayout
         grid.getColumns().forEach(column -> column.setAutoWidth(true));
         grid.getColumns().forEach(column -> column.setSortable(true));
     }
-
 }

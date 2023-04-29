@@ -1,17 +1,16 @@
-package org.vaadin.example.views;
+package org.vaadin.example.views.project;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
-import org.vaadin.example.MainLayout;
 import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.entity.MitarbeiterEntity;
 import org.vaadin.example.entity.PflichtenheftEntity;
 import org.vaadin.example.service.SpecificationsService;
+import org.vaadin.example.views.MainLayout;
 
 import javax.annotation.security.PermitAll;
 import java.util.Set;

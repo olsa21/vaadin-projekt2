@@ -11,16 +11,21 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import org.vaadin.example.MainLayout;
+import org.vaadin.example.views.MainLayout;
 import org.vaadin.example.entity.PflichtenheftEntity;
 import org.vaadin.example.model.ChapterModel;
 import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
-import org.vaadin.example.views.ProjektDetailMitExport;
+import org.vaadin.example.views.project.ProjektDetailMitExport;
 
 import javax.annotation.security.PermitAll;
 import java.util.ArrayList;
 
+/**
+ * Die Klasse ist dafür zuständig, dass der Pflichtenhefteditor angezeigt wird.
+ * Dabei soll auf der linken Seite eine Baumstruktur mit den Kapiteln angezeigt werden.
+ * Auf der rechten Seite soll entweder die Detailansicht eines Kapitels oder die Detailansicht des Projekts angezeigt werden.
+ */
 @PermitAll
 @PageTitle("Projektübersicht")
 @Route(value = "/project-editor", layout = MainLayout.class)
@@ -32,30 +37,29 @@ public class PflichtenheftEditor extends HorizontalLayout implements HasUrlParam
     private ProjektDetailMitExport projektDetailMitExport;
     final SpecificationsService service;
     PflichtenheftEntity pflichtenheftEntity;
-
     private int pflichtenheftOid;
 
-
+    /**
+     * Konstruktor, welcher den Pflichtenhefteditor initialisiert.
+     * @param service Service, welcher für die Kommunikation mit der Datenbank zuständig ist.
+     */
     public PflichtenheftEditor(SpecificationsService service){
-        System.out.println("=>2");
         this.service = service;
-
         addClassName("editor-view");
         setSizeFull();
         setWidthFull();
     }
 
+    /**
+     * Methode, welche die Kapitelstruktur lädt und die baumartige Ansicht auf der linken Seite des Editors anzeigt.
+     */
     private VerticalLayout createChapterOverview(){
         chapterOverview = new TreeGrid<>();
         chapterOverview.setHeightFull();
 
-        //Service wird erstmal mitgegeben
         ArrayList<ChapterModel> root = SpecificationBookChapters.getInstance(service).getChapter( null );
-        //chapterOverview.setItems(root, SpecificationBookChapters.getInstance(service)::getChapter);
         chapterOverview.setItems(root, SpecificationBookChapters.getInstance(service)::getChapter);
-        //chapterOverview.addHierarchyColumn(String::toString).setSortable(false);
         chapterOverview.addHierarchyColumn(ChapterModel::getChapterName).setSortable(false);
-
         projektButton = new Button("Pflichtenheft: " + pflichtenheftEntity.getTitel());
 
         VerticalLayout verticalLayout = new VerticalLayout(projektButton, chapterOverview);
@@ -74,17 +78,20 @@ public class PflichtenheftEditor extends HorizontalLayout implements HasUrlParam
             if (!chapterOverview.getDataProvider().hasChildren(event.getItem())){
                 remove(projektDetailMitExport);
                 remove(editBar);
-                //editBar = new EditorBar();
                 editBar.setWidth("60%");
                 add(editBar);
                 Notification.show(event.getItem().getChapterName());
-                editBar.setChapter( event.getItem().getChapterOid() ); //TODO:
+                editBar.setChapter( event.getItem().getChapterOid() );
             }
         });
-
         return verticalLayout;
     }
 
+    /**
+     * Methode, welche den Parameter des Pflichtenheftes aus der URL ausliest und das passende Pflichtenheft lädt.
+     * @param beforeEvent
+     * @param s
+     */
     @Override
     public void setParameter(BeforeEvent beforeEvent, String s) {
         try {
@@ -97,17 +104,12 @@ public class PflichtenheftEditor extends HorizontalLayout implements HasUrlParam
             }
 
             editBar = new EditorBar(service, pflichtenheftEntity);
-            Notification.show(pflichtenheftEntity.getTitel());
-            Notification.show("Parameter: " + s);
-            System.out.println("=>1");
             add(createChapterOverview());
             projektDetailMitExport = new ProjektDetailMitExport(this.service, pflichtenheftOid);
         } catch (NumberFormatException e) {
             System.err.println(e.getMessage());
             UI.getCurrent().navigate("open-project-overview");
         }
-
-
     }
 }
 

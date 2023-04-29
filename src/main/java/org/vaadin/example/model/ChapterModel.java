@@ -11,6 +11,11 @@ public class ChapterModel implements Comparable<ChapterModel> {
     private int chapterOid;
     private String chapterName;
 
+    /**
+     * Konstruktor, welcher das Kapitel-Modell mit den übergebenen Werten initialisiert.
+     * @param chapterOid die OID des Kapitels
+     * @param chapterName der Name des Kapitels
+     */
     public ChapterModel(int chapterOid, String chapterName) {
         //if (chapterName == null || chapterName.isEmpty()){
           //  throw new IllegalArgumentException("Der Kapitelname muss einen gültigen nicht leerer Wert beinhalten!");
@@ -18,20 +23,35 @@ public class ChapterModel implements Comparable<ChapterModel> {
         this.chapterOid = chapterOid;
         this.chapterName = chapterName;
     }
-    public ChapterModel(){}
 
+    /**
+     * Getter-Methode, welche die OID des Kapitels zurückgibt.
+     * @return die OID des Kapitels
+     */
     public int getChapterOid() {
         return chapterOid;
     }
 
+    /**
+     * Setter-Methode, welche die OID des Kapitels setzt.
+     * @param chapterOid die OID des Kapitels
+     */
     public void setChapterOid(int chapterOid) {
         this.chapterOid = chapterOid;
     }
 
+    /**
+     * Getter-Methode, welche den Namen des Kapitels zurückgibt.
+     * @return der Name des Kapitels
+     */
     public String getChapterName() {
         return chapterName;
     }
 
+    /**
+     * Setter-Methode, welche den Namen des Kapitels setzt.
+     * @param chapterName der Name des Kapitels
+     */
     public void setChapterName(String chapterName) {
         this.chapterName = chapterName;
     }
@@ -49,7 +69,6 @@ public class ChapterModel implements Comparable<ChapterModel> {
     public int hashCode() {
         return Objects.hash(chapterOid, chapterName);
     }
-
 
     @Override
     public int compareTo(ChapterModel o) {
