@@ -16,6 +16,9 @@ import javax.annotation.security.PermitAll;
 import java.util.Set;
 
 
+/**
+ * View zur Anezeige eines bestimmten Projekts
+ */
 @PermitAll
 @Route(value = "/projekt-details", layout = MainLayout.class)
 public class ProjektDetailView extends FormLayout {
@@ -34,6 +37,11 @@ public class ProjektDetailView extends FormLayout {
     private Button freischaltenBtn = new Button("Freischalten");
     private Button schliessenBtn = new Button("Schliessen");
 
+    /**
+     * Konstruktor initialisiert View
+     * @param service
+     * @param pflichtenheft Das anzuzeigende Pflichtenheft
+     */
     public ProjektDetailView(SpecificationsService service, PflichtenheftEntity pflichtenheft) {
         this.service = service;
         this.pflichtenheft = pflichtenheft;
@@ -42,11 +50,8 @@ public class ProjektDetailView extends FormLayout {
         beschreibung.setText(pflichtenheft.getBeschreibung());
         frist.setText(pflichtenheft.getFrist());
 
-        setResponsiveSteps(
-                new FormLayout.ResponsiveStep("0", 1)
-        );
+        setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1));
 
-        //verantwortlicher.setText(createVerantwortlicherString());
         verantwortlicher.setText(pflichtenheft.getVerantwortlicher().getVorname() + " " + pflichtenheft.getVerantwortlicher().getNachname());
         mitglieder.setText(createMitgliederString());
         repo.setText(pflichtenheft.getRepositoryLink());
@@ -81,16 +86,12 @@ public class ProjektDetailView extends FormLayout {
         addFormItem(mitglieder, "Mitglieder");
         addFormItem(repo, "Repository");
         add(new HorizontalLayout(beitretenBtn, editBtn, freischaltenBtn, schliessenBtn));
-
-
-        //getChildren().forEach(item -> {
-        //    if (item instanceof HorizontalLayout) {
-        //        ((HorizontalLayout) item).setAlignItems(Alignment.BASELINE);
-        //    }
-        //});
     }
 
-
+    /**
+     * Konfiguriert die Sichtbarkeit der Buttons abhängig davon, ob der aktuelle Nutzer Mitglied des Projekts ist
+     * @param isMember true, wenn der Nutzer Mitglied des Projekts ist
+     */
     private void setButtonVisibility(boolean isMember) {
         if (isMember) {
             beitretenBtn.setVisible(false);
@@ -108,6 +109,10 @@ public class ProjektDetailView extends FormLayout {
         }
     }
 
+    /**
+     * Erstellt einen String mit allen Mitgliedern des Projekts
+     * @return String mit allen Mitgliedern des Projekts
+     */
     private String createMitgliederString() {
         Set<MitarbeiterEntity> mitgliederList = pflichtenheft.getMitarbeiter();
         String mitgliederString = "";
@@ -115,14 +120,5 @@ public class ProjektDetailView extends FormLayout {
             mitgliederString += mitglied.getVorname() + " " + mitglied.getNachname() + ", ";
         }
         return mitgliederString;
-    }
-
-    private String createVerantwortlicherString(){
-        for(MitarbeiterEntity mitarbeiterEntity : pflichtenheft.getMitarbeiter()) {
-            if(mitarbeiterEntity.getMitarbeiterOid() == pflichtenheft.getVerantwortlicher().getMitarbeiterOid()){
-                return mitarbeiterEntity.getVorname() + " " + mitarbeiterEntity.getNachname();
-            }
-        }
-        return null;
     }
 }

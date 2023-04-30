@@ -1,18 +1,19 @@
 package org.vaadin.example.views.login;
 
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.login.LoginForm;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
+import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
 
+/**
+ * View stellt ein Login-Formular zur Verfügung inkl. Verweis auf Registrierung
+ */
 @Route("/login")
 public class LoginPage extends VerticalLayout implements BeforeEnterObserver {
     private final SpecificationsService service;
@@ -34,32 +35,19 @@ public class LoginPage extends VerticalLayout implements BeforeEnterObserver {
         add(createAccount);
 
         login.setAction("login");
-
-        //login.addLoginListener(e -> {
-        //    //boolean isAuthenticated = authenticate(e.getUsername(), e.getPassword());
-        //    boolean isAuthenticated = service.credentialsCorrect(e.getUsername(), e.getPassword());
-        //    if (isAuthenticated) {
-        //        Notification.show("Login successful");
-//
-        //        login.setVisible(false);
-        //        getUI().ifPresent(ui -> ui.navigate(""));
-        //    } else {
-        //        Notification.show("Login failed");
-        //        login.setEnabled(true);
-        //        login.setError(true);
-        //    }
-        //});
-//
-        //login.addForgotPasswordListener(e -> {
-        //    Dialog dialog = new Dialog();
-        //    dialog.add(new Text("Bitte kontaktieren Sie den Administrator"));
-        //    dialog.open();
-        //});
     }
 
+    /**
+     * Prüft vor Aufruf ob ein Nutzer eingeloggt ist und leitet ggf. auf die Startseite weiter
+     * oder ob die eingegebenen Zugangsdaten korrekt sind
+     * @param beforeEnterEvent
+     */
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        // inform the user about an authentication error
+        if(!SecurityService.getLoggedInUsername().equals("anonymousUser")){
+            beforeEnterEvent.forwardTo("");
+        }
+
         if(beforeEnterEvent.getLocation()
                 .getQueryParameters()
                 .getParameters()

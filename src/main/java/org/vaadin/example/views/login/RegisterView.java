@@ -15,10 +15,14 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.vaadin.example.components.CustomPasswordField;
 import org.vaadin.example.entity.MitarbeiterEntity;
+import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
 import org.vaadin.example.utility.PasswordEncoder;
 
@@ -32,7 +36,7 @@ import static com.vaadin.flow.component.button.ButtonVariant.LUMO_TERTIARY_INLIN
  */
 @AnonymousAllowed
 @Route("/register")
-public class RegisterView extends VerticalLayout {
+public class RegisterView extends VerticalLayout  implements BeforeEnterObserver {
 
     private TextField username;
     private CustomPasswordField password;
@@ -205,4 +209,14 @@ public class RegisterView extends VerticalLayout {
         return notification;
     }
 
+    /**
+     * Prüft vor Aufruf ob ein Nutzer eingeloggt ist und leitet ggf. auf die Startseite weiter
+     * @param beforeEnterEvent
+     */
+    @Override
+    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+        if(!SecurityService.getLoggedInUsername().equals("anonymousUser")){
+            beforeEnterEvent.forwardTo("");
+        }
+    }
 }

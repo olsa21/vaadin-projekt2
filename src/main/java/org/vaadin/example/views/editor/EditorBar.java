@@ -24,6 +24,7 @@ import org.vaadin.example.entity.*;
 import org.vaadin.example.listener.EditorBroadcaster;
 import org.vaadin.example.listener.PflichtenheftBroadcaster;
 import org.vaadin.example.model.ComponentModel;
+import org.vaadin.example.model.EditorBcValue;
 import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
 
@@ -55,16 +56,11 @@ public class EditorBar extends HorizontalLayout {
         super.onAttach(attachEvent);
         UI ui = attachEvent.getUI();
         broadcasterRegistration = EditorBroadcaster.register(newMessage -> {
-            String[] values = newMessage;
 
-            int projektOid = Integer.parseInt(values[0]);
-            int currentchapterMitgabe = Integer.parseInt(values[1]);
-            String user = values[2];
-            Integer componentOID = null;
-            if (values[3] != null) {
-                componentOID = Integer.parseInt(values[3]);
-            }
-            System.err.println(componentOID);
+            int projektOid = newMessage.getProjektOID();
+            int currentchapterMitgabe = newMessage.getCurrentchapter();
+            String user = newMessage.getUsername();
+            Integer componentOID = newMessage.getComponentOID();
 
             String currentUser = this.currentUsername;
             if(currentChapter == currentchapterMitgabe && pflichtenheftEntity.getProjektOid() == projektOid &&
@@ -352,6 +348,8 @@ public class EditorBar extends HorizontalLayout {
                     Dialog dialog = new Dialog();
                     dialog.add(new TabelleErstellenView(spaltenNamenList -> {
                         columnNames.addAll(spaltenNamenList);
+                        System.out.println("Spaltennamen: " + spaltenNamenList);
+                        //Dialog Schließen
                         UI.getCurrent().getPage().executeJs("document.querySelector('vaadin-dialog-overlay').close()");
 
                         CustomGrid grid = new CustomGrid(columnNames, e->{setChangesForBroadcast(componentOID);});
@@ -374,14 +372,7 @@ public class EditorBar extends HorizontalLayout {
         speichernBtn.click();
         String currentUser = this.currentUsername;
 
-        String[] values = {
-                String.valueOf(pflichtenheftEntity.getProjektOid()),
-                String.valueOf(currentChapter),
-                currentUser,
-                (componentOID != null) ? String.valueOf(componentOID) : null
-        };
-
-        EditorBroadcaster.broadcast(values);
+        EditorBroadcaster.broadcast(new EditorBcValue(pflichtenheftEntity.getProjektOid(), currentUser, currentChapter, componentOID));
     }
 
     /**
@@ -412,8 +403,7 @@ public class EditorBar extends HorizontalLayout {
         speichernBtn.addClickListener(click -> {
             int anordnung = 0;
             KapitelEntity kapitel = null;
-            //Alternativ sowas wie AbsenderID mitgeben, damit er selbst nicht aktualisiert
-            PflichtenheftBroadcaster.broadcast(String.valueOf(this.pflichtenheftEntity.getProjektOid()));
+
             if (pflichtenheftEntity.getKapitel().stream().filter(k -> k.getKapitelVordefiniert().getKapitelVordefiniertOid() == currentChapter).findFirst().isPresent()){
                 kapitel = pflichtenheftEntity.getKapitel().stream().filter(k -> k.getKapitelVordefiniert().getKapitelVordefiniertOid() == currentChapter).
                         findFirst().get();

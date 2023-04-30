@@ -7,8 +7,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 public class ResourceLoader {
-
-
     public static FileInputStream readFile(String filename){
         FileInputStream in = null;
         try {

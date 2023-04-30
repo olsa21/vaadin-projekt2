@@ -352,7 +352,7 @@ public class SpecificationsService {
         System.out.println("Öffentlichkeit wird geändert: =="  + oeffentlich);
         pflichtenheft.setOeffentlich((byte) oeffentlich);
         pflichtenheftRepository.save(pflichtenheft);
-        PflichtenheftBroadcaster.broadcast("");
+        PflichtenheftBroadcaster.broadcast();
     }
 
     /**

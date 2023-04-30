@@ -17,6 +17,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Diese Klasse stellt eine benutzerdefinierte Komponente für den Datei-Upload (png & jpg) und die Anzeige eines Bildes bereit.
+ */
 public class CustomPicUpload extends HorizontalLayout {
     private MemoryBuffer buffer;
     private Upload upload;
@@ -25,6 +28,9 @@ public class CustomPicUpload extends HorizontalLayout {
     private byte[] imageBytes;
     private byte[] bufferBytes;
 
+    /**
+     * Konstruktor - erstellt eine neue Instanz der Komponente
+     */
     public CustomPicUpload() {
         buffer = new MemoryBuffer();
         upload = new Upload(buffer);
@@ -45,6 +51,9 @@ public class CustomPicUpload extends HorizontalLayout {
     }
 
 
+    /**
+     * Zurücksetzen der Komponente
+     */
     public void clear() {
         imageBytes = null;
         bufferBytes = null;
@@ -65,6 +74,12 @@ public class CustomPicUpload extends HorizontalLayout {
         return bufferBytes;
     }
 
+    /**
+     * Diese Methode gibt die Bytes des herunterskalierten aktuellen Uploads zurück.
+     *
+     * @return Ein Byte-Array, das die Bytes des herunterskalierten aktuellen Uploads enthält.
+     * @throws IOException falls ein Fehler beim Lesen der Bytes auftritt.
+     */
     public byte[] getDownScaledBytesBuffer() throws IOException {
         try {
             // Originalbild aus dem Upload holen
@@ -74,18 +89,12 @@ public class CustomPicUpload extends HorizontalLayout {
             // Bild auf 512 x 512 Pixel verkleinern
             BufferedImage resizedImage = Scalr.resize(bufferedImage, Scalr.Method.SPEED, Scalr.Mode.AUTOMATIC, 512, 512);
 
-            // Bytes des verkleinerten Bildes als Base64 kodieren
+            // Datei Endung ermitteln und entsprechend behandeln
             String fileName = buffer.getFileName();
             String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
             System.out.println("fileExtension: " + fileExtension);
-            switch (fileExtension){
-                case "jpg": ImageIO.write(resizedImage, "jpg", byteArrayOutputStream);
-                    break;
-                case "png": ImageIO.write(resizedImage, "png", byteArrayOutputStream);
-            }
-
             if(fileExtension.equals("jpg")) {
                 ImageIO.write(resizedImage, "jpg", byteArrayOutputStream);
             } else if(fileExtension.equals("png")) {
@@ -122,7 +131,13 @@ public class CustomPicUpload extends HorizontalLayout {
         image.setWidth("100px");
     }
 
+    /**
+     * Diese Methode gibt die Bytes des herunterskalierten aktuellen Uploads zurück.
+     * @return Bild als Byte-Array
+     * @throws IOException
+     */
     public byte[] getImgBytesDownscaled() throws IOException {
+        //Daten können aus dem Upload stammen oder aus dem Image
         if(bufferBytes == null && imageBytes != null) {
             return imageBytes;
         }else if(bufferBytes != null){
@@ -131,6 +146,12 @@ public class CustomPicUpload extends HorizontalLayout {
             return null;
         }
     }
+
+    /**
+     * Diese Methode gibt die Bytes des aktuellen Uploads zurück.
+     * @return Bild als Byte-Array
+     * @throws IOException
+     */
     public byte[] getImgBytes() throws IOException {
         if(bufferBytes == null && imageBytes != null) {
             return imageBytes;

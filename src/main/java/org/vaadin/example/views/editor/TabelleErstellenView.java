@@ -9,12 +9,21 @@ import javax.management.Notification;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
+/**
+ * View, mit dem der Nutzer eine Tabelle erstellen kann.
+ * Hierbei wird eine Anzahl an Spalten(2-5) festgelegt.
+ * Entsprechend dazu werden die Spaltennamen festgelegt.
+ */
 public class TabelleErstellenView extends FormLayout {
     private Consumer<ArrayList<String>> onSave;
     private ComboBox<Integer> spalten = new ComboBox<>();
     private ArrayList<TextField> spaltenNamen = new ArrayList<>();
     private Button speichern = new Button("Tabelle erstellen");
 
+    /**
+     * Konstruktor der View
+     * @param onSave Consumer, der die Spaltennamen entgegennimmt
+     */
     public TabelleErstellenView(Consumer<ArrayList<String>> onSave) {
         this.onSave = onSave;
         spalten.setItems(2, 3, 4, 5);
@@ -39,8 +48,6 @@ public class TabelleErstellenView extends FormLayout {
         });
         speichern.addClickListener(e -> {
             //prüfen ob alle aktiven Textfelder ausgefüllt sind
-
-
             ArrayList<String> spaltenNamenList = new ArrayList<>();
             for (TextField tf : spaltenNamen) {
                 if(tf.isEnabled() && tf.getValue().isBlank()) {
@@ -51,10 +58,15 @@ public class TabelleErstellenView extends FormLayout {
                     spaltenNamenList.add(tf.getValue());
                 }
             }
+            //Übergabe der Liste der Spaltennamen
             onSave.accept(spaltenNamenList);
         });
     }
 
+    /**
+     * Aktiviert benötigte Anzahl an Textfelder
+     * @param neueAnzahl Anzahl Textfelder
+     */
     private void enableTextfelder(Integer neueAnzahl) {
         for (int i = 0; i < 5; i++) {
             if (i < neueAnzahl) {

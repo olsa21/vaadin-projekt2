@@ -23,6 +23,9 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+/**
+ * View mit der der Nutzer sein Profil bearbeiten kann
+ */
 @PermitAll
 @Route(value = "/profil-edit", layout = MainLayout.class)
 public class ProfilEditView extends VerticalLayout {
@@ -34,12 +37,15 @@ public class ProfilEditView extends VerticalLayout {
     private TextField nachname = new TextField();
     private AbteilungComboBox abteilung;
     private CustomPicUpload profilbild = new CustomPicUpload();
-    //private CustomPicUploadWithCaptionAndScaling profilbild = new CustomPicUploadWithCaptionAndScaling();
     private Button save = new Button("Speichern");
     private Button clearProfilbild = new Button("Profilbild löschen");
     private MitarbeiterEntity mitarbeiter;
     private final SpecificationsService service;
 
+    /**
+     * Konstruktor der View
+     * @param service
+     */
     public ProfilEditView(SpecificationsService service) {
         this.service = service;
         mitarbeiter = service.findSpecificUser(SecurityService.getLoggedInUsername());
@@ -53,7 +59,7 @@ public class ProfilEditView extends VerticalLayout {
         vorname.setValue(mitarbeiter.getVorname());
         nachname.setValue(mitarbeiter.getNachname());
 
-        //erstmal
+        //Änderung des Benutzernamens deaktivieren
         benutzername.setEnabled(false);
 
         if (mitarbeiter.getProfilbild() != null) {
@@ -75,17 +81,9 @@ public class ProfilEditView extends VerticalLayout {
         form.addFormItem(abteilung, "Abteilung");
         form.addFormItem(profilbild, "Profilbild");
 
-        add(
-                form
-        );
+        add(form);
 
         form.addFormItem(new HorizontalLayout(save, clearProfilbild), "");
-
-        getChildren().forEach(item -> {
-            if (item instanceof HorizontalLayout) {
-                ((HorizontalLayout) item).setAlignItems(Alignment.BASELINE);
-            }
-        });
 
         save.addClickListener(event -> {
             try {
@@ -99,7 +97,7 @@ public class ProfilEditView extends VerticalLayout {
 
 
                 MainLayout mainLayout = (MainLayout) getUI().get().getChildren().filter(item -> item instanceof MainLayout).findFirst().get();
-                mainLayout.setAvatarPicture(profilbild.getImgBytesDownscaled());
+                mainLayout.setAvatarPicture(mitarbeiter.getProfilbild());
 
                 if (!passwort1.getValue().isEmpty()) {
                     if (passwort1.isInvalid()) {
@@ -113,7 +111,6 @@ public class ProfilEditView extends VerticalLayout {
                         return;
                     }
                 }
-
 
                 service.addMitarbeiter(mitarbeiter);
 

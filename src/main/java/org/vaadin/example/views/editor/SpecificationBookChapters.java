@@ -60,6 +60,8 @@ public class SpecificationBookChapters {
             throw new IllegalArgumentException("Kapitelvordefiniert darf nicht null sein!");
         TreeMap<ChapterModel, ArrayList<ChapterModel>> treeMap = new TreeMap<>();
 
+        //Alle vordefinierten Kapitel werden der Map eingefügt
+        //Oid -> KapitelEntity
         Map<Integer, KapitelvordefiniertEntity> entityMap = new HashMap<>();
         for (KapitelvordefiniertEntity entity : kapitelvordefiniert) {
             entityMap.put(entity.getKapitelVordefiniertOid(), entity);
@@ -77,11 +79,13 @@ public class SpecificationBookChapters {
             }
 
             //if (!treeMap.containsKey(parentName)) {
+            // Das Parent-Kapitel wird der TreeMap hinzugefügt, falls nicht enthalten
             if (!treeMap.containsKey(parent)) {
                 //treeMap.put(parentName, new ArrayList<>());
                 treeMap.put(parent, new ArrayList<>());
             }
             //List<String> children = treeMap.get(parentName);
+            // Das aktuelle Kapitel wird dem Parent-Kapitel als Kind hinzugefügt
             List<ChapterModel> children = treeMap.get(parent);
             //children.add(entity.getName());
             children.add(new ChapterModel(entity.getKapitelVordefiniertOid(), entity.getName()));

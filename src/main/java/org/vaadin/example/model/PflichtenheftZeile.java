@@ -1,8 +1,10 @@
 package org.vaadin.example.model;
 
-import org.vaadin.example.entity.MitarbeiterEntity;
 import org.vaadin.example.entity.PflichtenheftEntity;
 
+/**
+ * Klasse stellt eine Zeile der Tabelle dar
+ */
 public class PflichtenheftZeile {
     private PflichtenheftEntity pflichtenheftEntity;
 
@@ -14,17 +16,8 @@ public class PflichtenheftZeile {
         return pflichtenheftEntity;
     }
 
-
-    public MitarbeiterEntity verantwortlicher(){
-        for(MitarbeiterEntity mitarbeiterEntity : pflichtenheftEntity.getMitarbeiter()) {
-            if(mitarbeiterEntity.getMitarbeiterOid() == pflichtenheftEntity.getVerantwortlicher().getMitarbeiterOid()){
-                return mitarbeiterEntity;
-            }
-        }
-        return null;
-    }
-
     public int anzahlMitarbeiter(){
         return pflichtenheftEntity.getMitarbeiter().size();
     }
+
 }

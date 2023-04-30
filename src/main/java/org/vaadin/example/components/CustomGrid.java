@@ -13,6 +13,9 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * Eine Tabelle, welche mehrere GridRow's enthält.
+ */
 public class CustomGrid extends VerticalLayout {
     private Grid<GridRow> grid = new Grid<>();
     private ArrayList<String> columnNames = new ArrayList<>();
@@ -21,6 +24,11 @@ public class CustomGrid extends VerticalLayout {
     private Button print = new Button("Print");
     private TextArea caption;
 
+    /**
+     * Konstruktor - erstellt ein neues Grid
+     * @param columnNames Liste von Spaltennamen
+     * @param listener
+     */
     public CustomGrid(ArrayList<String> columnNames, ComponentEventListener<SucceededEvent> listener) {
         this.columnNames = columnNames;
         caption = new TextArea("Tabellenbezeichnung");
