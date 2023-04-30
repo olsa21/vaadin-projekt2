@@ -1,6 +1,8 @@
 package org.vaadin.example.views.editor;
 
 
+import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.notification.Notification;
@@ -11,6 +13,8 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.shared.Registration;
+import org.vaadin.example.listener.ProjektDetailsBroadcaster;
 import org.vaadin.example.views.MainLayout;
 import org.vaadin.example.entity.PflichtenheftEntity;
 import org.vaadin.example.model.ChapterModel;
@@ -39,12 +43,41 @@ public class PflichtenheftEditor extends HorizontalLayout implements HasUrlParam
     PflichtenheftEntity pflichtenheftEntity;
     private int pflichtenheftOid;
 
+    Registration prjDetailsRegistration;
+
+    String currentUser;
+
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        super.onAttach(attachEvent);
+        UI ui = attachEvent.getUI();
+        System.out.println("ProjektDetailMitExport onAttach");
+        prjDetailsRegistration = ProjektDetailsBroadcaster.register(newMessage -> {
+            int projektOid = newMessage.getProjektOID();
+            String username = newMessage.getUsername();
+
+            if(pflichtenheftEntity.getProjektOid() == projektOid){
+                //Aktualisierung der Daten
+                pflichtenheftEntity = service.readPflichtenheft(projektOid);
+                ui.access(() -> {projektButton.setText("Pflichtenheft: " + pflichtenheftEntity.getTitel());});
+            }
+        });
+    }
+
+    @Override
+    protected void onDetach(DetachEvent detachEvent) {
+        super.onDetach(detachEvent);
+        System.out.println("ProjektDetailMitExport onDetach");
+        prjDetailsRegistration.remove();
+    }
+
     /**
      * Konstruktor, welcher den Pflichtenhefteditor initialisiert.
      * @param service Service, welcher für die Kommunikation mit der Datenbank zuständig ist.
      */
     public PflichtenheftEditor(SpecificationsService service){
         this.service = service;
+        this.currentUser = SecurityService.getLoggedInUsername();
         addClassName("editor-view");
         setSizeFull();
         setWidthFull();
@@ -70,6 +103,7 @@ public class PflichtenheftEditor extends HorizontalLayout implements HasUrlParam
         projektButton.addClickListener(event -> {
             remove(editBar);
             projektDetailMitExport.setWidth("60%");
+            projektDetailMitExport.reload();
             add(projektDetailMitExport);
         });
 

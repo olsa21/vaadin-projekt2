@@ -1,7 +1,7 @@
 package org.vaadin.example.listener;
 
 import com.vaadin.flow.shared.Registration;
-import org.vaadin.example.model.EditorBcValue;
+import org.vaadin.example.model.PojektDetailsBcValue;
 
 import java.util.LinkedList;
 import java.util.concurrent.Executor;
@@ -10,12 +10,12 @@ import java.util.function.Consumer;
 
 /**
  * Broadcaster um registrierte Listener zu benachrichtigen.
- * Es wird speziell für die Editor-Funktion verwendet.
+ * Es wird speziell für die Projektdetails verwendet.
  */
-public class EditorBroadcaster {
+public class ProjektDetailsBroadcaster {
     static Executor executor = Executors.newSingleThreadExecutor();
 
-    static LinkedList<Consumer<EditorBcValue>> listeners = new LinkedList<>();
+    static LinkedList<Consumer<PojektDetailsBcValue>> listeners = new LinkedList<>();
 
     /**
      * Registriert einen Listener.
@@ -23,7 +23,7 @@ public class EditorBroadcaster {
      * @return
      */
     public static synchronized Registration register(
-            Consumer<EditorBcValue> listener) {
+            Consumer<PojektDetailsBcValue> listener) {
         listeners.add(listener);
 
         return () -> {
@@ -35,10 +35,10 @@ public class EditorBroadcaster {
 
     /**
      * Benachrichtigt alle registrierten Listener.
-     * @param values String-Array aus: ProjektOID, currentchapter, Username, componentOID
+     * @param values String-Array aus: ProjektOID, Username
      */
-    public static synchronized void broadcast(EditorBcValue values) {
-        for (Consumer<EditorBcValue> listener : listeners) {
+    public static synchronized void broadcast(PojektDetailsBcValue values) {
+        for (Consumer<PojektDetailsBcValue> listener : listeners) {
             executor.execute(() -> listener.accept(values));
         }
     }
