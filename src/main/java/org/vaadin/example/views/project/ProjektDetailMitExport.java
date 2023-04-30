@@ -12,6 +12,9 @@ import org.vaadin.example.service.SpecificationsService;
 import javax.annotation.security.PermitAll;
 import java.time.LocalDate;
 
+/**
+ * View zum Bearbeiten von Projektdaten mit Exportfunktion
+ */
 @PermitAll
 @Route("ProjektDetailMitExport")
 public class ProjektDetailMitExport extends VerticalLayout {
@@ -55,10 +58,6 @@ public class ProjektDetailMitExport extends VerticalLayout {
             Notification.show("Projekt bearbeitet");
         });
         export.exportButton.addClickListener(event -> {
-            Notification.show("Exportiere als " + export.exportCombo.getValue());
-
-
-            //Hinweis muss mit Enter ausgeführt werden
             if (export.exportCombo.getValue().equals("PDF")) {
                 UI.getCurrent().getPage().open("/pdf/" + projektOid, "_blank");
             } else {

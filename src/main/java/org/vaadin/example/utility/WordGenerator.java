@@ -90,6 +90,12 @@ public class WordGenerator {
 
     }
 
+    /**
+     * Fügt dem Dokument den Inhalt des Pflichtenhefts hinzu
+     * @param doc
+     * @param pflichtenheftEntity
+     * @param styles
+     */
     private static void insertContent(XWPFDocument doc, PflichtenheftEntity pflichtenheftEntity, Map<String, XWPFStyle> styles) {
         ArrayList<KapitelEntity> kapitelList = new ArrayList<>(pflichtenheftEntity.getKapitel());
         List<KapitelModel> s = sortKapitelList(kapitelList);
@@ -115,6 +121,11 @@ public class WordGenerator {
         }
     }
 
+    /**
+     * Fügt dem Dokument Textinhalt hinzu
+     * @param doc
+     * @param text
+     */
     private static void insertText(XWPFDocument doc, String text) {
         XWPFParagraph p = doc.createParagraph();
         XWPFRun run;
@@ -169,6 +180,11 @@ public class WordGenerator {
         }
     }
 
+    /**
+     * Fügt dem Dokument ein Abbildungsverzeichnis hinzu
+     * @param document
+     * @param styles
+     */
     private static void insertAbbVerz(XWPFDocument document, Map<String, XWPFStyle> styles) {
         insertUeberschrift(document, styles, 1, "Abbildungsverzeichnis");
 
@@ -178,6 +194,11 @@ public class WordGenerator {
         toc.setDirty(STOnOff.TRUE); //set dirty to forcing update
     }
 
+    /**
+     * Fügt dem Dokument ein Tabellenverzeichnis hinzu
+     * @param document
+     * @param styles
+     */
     private static void insertTblVerz(XWPFDocument document, Map<String, XWPFStyle> styles) {
         insertUeberschrift(document, styles, 1, "Tabellenverzeichnis");
 
@@ -187,6 +208,13 @@ public class WordGenerator {
         toc.setDirty(STOnOff.TRUE); //set dirty to forcing update
     }
 
+    /**
+     * Fügt dem Dokument ein Bild hinzu
+     * @param doc
+     * @param image Bildinhalt
+     * @param bildbeschriftung Bildunterschrift
+     * @param width Breite des Bildes im Dokument
+     */
     private static void insertImage(XWPFDocument doc, byte[] image, String bildbeschriftung, int width) {
         try {
             // Ein neuer Absatz erstellen
@@ -223,6 +251,12 @@ public class WordGenerator {
         }
     }
 
+    /**
+     * Fügt dem Dokument eine Tabelle hinzu
+     * @param doc
+     * @param tabelle Tabelleninhalt
+     * @param tabellenbeschriftung Tabellenunterschrift
+     */
     private static void insertTable(XWPFDocument doc, TabellenEntity tabelle, String tabellenbeschriftung) {
         XWPFTable table = doc.createTable();
         table.setTableAlignment(TableRowAlign.CENTER);
@@ -271,6 +305,11 @@ public class WordGenerator {
         run.setText(": " + ((tabellenbeschriftung.isBlank()) ? "Kein Titel" : tabellenbeschriftung));
     }
 
+    /**
+     * Prüft ob eine Zeile leer ist
+     * @param row Zeile
+     * @return true wenn leer
+     */
     private static boolean isRowEmpty(ArrayList<String> row) {
         for (String cell : row) {
             if (!cell.isEmpty()) {
@@ -280,6 +319,10 @@ public class WordGenerator {
         return true;
     }
 
+    /**
+     * Fügt dem Dokument ein Inhaltsverzeichnis hinzu
+     * @param document
+     */
     private static void insertInhaltsverzeichnis(XWPFDocument document) {
         XWPFParagraph paragraph = document.createParagraph();
         XWPFRun run = paragraph.createRun();
@@ -293,10 +336,20 @@ public class WordGenerator {
         toc.setDirty(STOnOff.TRUE);
     }
 
+    /**
+     * Einfügen einer neuen Seite
+     * @param doc
+     */
     private static void newpage(XWPFDocument doc) {
         doc.createParagraph().setPageBreak(true);
     }
 
+    /**
+     * Einfügen eines Deckblatts
+     * @param document
+     * @param styles
+     * @param pflichtenheft
+     */
     private static void insertDeckblatt(XWPFDocument document, Map<String, XWPFStyle> styles, PflichtenheftEntity pflichtenheft) {
         document.createParagraph().setPageBreak(true);
 
@@ -352,6 +405,13 @@ public class WordGenerator {
         runZusatz.addBreak();
     }
 
+    /**
+     * Einfügen einer Ueberschrift. Dieser wird anhand des Levels entsprechend formatiert
+     * @param document
+     * @param styles
+     * @param level Level der Überschrift
+     * @param text Text der Überschrift
+     */
     private static void insertUeberschrift(XWPFDocument document, Map<String, XWPFStyle> styles, int level, String text) {
         XWPFParagraph pBody = document.createParagraph();
         XWPFRun run1 = pBody.createRun();
@@ -363,6 +423,11 @@ public class WordGenerator {
 
     }
 
+    /**
+     * Sortieren einer Liste an Kapitel unter Berücksichtigung deren Parents
+     * @param kapitelList Liste an Kapitel, die sortiert werden soll
+     * @return sortierte Liste von KapitelModel (KapitelEntity + Level)
+     */
     private static List<KapitelModel> sortKapitelList(List<KapitelEntity> kapitelList) {
         List<KapitelModel> sortedList = new ArrayList<>();
         //Kapitel ohne Kinder werden rausgefiltert und nach kapitelVordefiniertOID sortiert
@@ -378,6 +443,13 @@ public class WordGenerator {
         return sortedList;
     }
 
+    /**
+     * Rekursive Methode zum Sortieren der Kapitel
+     * @param parent Kapitel, dessen Kinder sortiert werden sollen
+     * @param kapitelList Liste aller Kapitel
+     * @param sortedList Sortierte Liste
+     * @param level Level des Kapitels
+     */
     private static void sortKapitelHierarchy(KapitelEntity parent, List<KapitelEntity> kapitelList, List<KapitelModel> sortedList, int level) {
         sortedList.add(new KapitelModel(parent, level));
         //Untergeordnete Kapitel des mitgegebenen parent Filtern

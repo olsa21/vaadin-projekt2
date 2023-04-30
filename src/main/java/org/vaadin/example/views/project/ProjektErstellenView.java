@@ -11,6 +11,9 @@ import org.vaadin.example.views.MainLayout;
 
 import javax.annotation.security.PermitAll;
 
+/**
+ * View zum Erstellen von Projekten
+ */
 @PermitAll
 @Route(value = "/ProjektErstellen", layout = MainLayout.class)
 public class ProjektErstellenView extends VerticalLayout {
@@ -22,14 +25,11 @@ public class ProjektErstellenView extends VerticalLayout {
         MitarbeiterEntity mitarbeiter = service.findSpecificUser(SecurityService.getLoggedInUsername());
 
         projectForm.titel.setAutofocus(true);
-        //add(NavigationBar.getInstance());
         add("Projekt erstellen");
         add(projectForm);
 
-
         projectForm.speichern.addClickListener(event -> {
             if(!projectForm.titel.getValue().isBlank() && !projectForm.beschreibung.getValue().isBlank())
-                //service.addPflichtenheft(mitarbeiter.getMitarbeiterOid(), projectForm.titel.getValue(), projectForm.beschreibung.getValue(), projectForm.frist.getValue(), projectForm.repo.getValue(), 0);
                 service.createPflichtenheft(mitarbeiter, projectForm.titel.getValue(), projectForm.beschreibung.getValue(), projectForm.frist.getValue(), projectForm.repo.getValue(), 0);
             else{
                 if (projectForm.titel.getValue().isBlank())

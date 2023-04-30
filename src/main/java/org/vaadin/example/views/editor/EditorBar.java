@@ -70,7 +70,7 @@ public class EditorBar extends HorizontalLayout {
             System.err.println("HALLI HALLO");
             System.err.println(componentOID);
 
-            System.err.println("... hat eine Nachricht erhalten: " + values[0] + " " + values[1] + "bzgl. folgendem Component: " + (componentOID != null ? componentOID : "null"));
+            System.err.println(currentUsername + " hat eine Nachricht erhalten: " + values[0] + " " + values[1] + "bzgl. folgendem Component: " + (componentOID != null ? componentOID : "null"));
 
             //String currentUser = SecurityService.getLoggedInUsername();
             String currentUser = this.currentUsername;
@@ -435,6 +435,7 @@ public class EditorBar extends HorizontalLayout {
                     dialog.add(new TabelleErstellenView(spaltenNamenList -> {
                         columnNames.addAll(spaltenNamenList);
                         System.out.println("Spaltennamen: " + spaltenNamenList);
+                        //Dialog Schließen
                         UI.getCurrent().getPage().executeJs("document.querySelector('vaadin-dialog-overlay').close()");
 
                         CustomGrid grid = new CustomGrid(columnNames, e->{setChangesForBroadcast(componentOID);}); //TODO 3
@@ -496,8 +497,7 @@ public class EditorBar extends HorizontalLayout {
             System.out.println("FIRE");
             int anordnung = 0;
             KapitelEntity kapitel = null;
-            //Alternativ sowas wie AbsenderID mitgeben, damit er selbst nicht aktualisiert
-            PflichtenheftBroadcaster.broadcast(String.valueOf(this.pflichtenheftEntity.getProjektOid()));
+
             if (pflichtenheftEntity.getKapitel().stream().filter(k -> k.getKapitelVordefiniert().getKapitelVordefiniertOid() == currentChapter).findFirst().isPresent()){
                 kapitel = pflichtenheftEntity.getKapitel().stream().filter(k -> k.getKapitelVordefiniert().getKapitelVordefiniertOid() == currentChapter).
                         findFirst().get();

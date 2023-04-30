@@ -6,6 +6,9 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
+/**
+ * Export Komponente mit ComboBox (PDF, Word) mit Button
+ */
 public class ExportComponent extends VerticalLayout {
     public ComboBox<String> exportCombo = new ComboBox<>();
     public Button exportButton = new Button("Exportieren");
@@ -20,5 +23,4 @@ public class ExportComponent extends VerticalLayout {
             }
         });
     }
-
 }

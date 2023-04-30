@@ -9,6 +9,9 @@ import org.vaadin.example.views.login.LoginPage;
 
 @EnableWebSecurity
 @Configuration
+/**
+ * Enthält die Konfiguration für den Login
+ */
 public class SecurityConfig extends VaadinWebSecurity {
     private final SpecificationsService service;
 

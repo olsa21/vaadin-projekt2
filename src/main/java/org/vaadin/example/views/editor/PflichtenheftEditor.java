@@ -99,7 +99,7 @@ public class PflichtenheftEditor extends HorizontalLayout implements HasUrlParam
             pflichtenheftEntity = service.readPflichtenheft(pflichtenheftOid);
 
             if(!SecurityService.userIsMemberOf(pflichtenheftEntity)){
-                UI.getCurrent().navigate("open-project-overview");
+                beforeEvent.forwardTo("");
                 return;
             }
 
@@ -108,7 +108,7 @@ public class PflichtenheftEditor extends HorizontalLayout implements HasUrlParam
             projektDetailMitExport = new ProjektDetailMitExport(this.service, pflichtenheftOid);
         } catch (NumberFormatException e) {
             System.err.println(e.getMessage());
-            UI.getCurrent().navigate("open-project-overview");
+            beforeEvent.forwardTo("");
         }
     }
 }

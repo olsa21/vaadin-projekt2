@@ -12,7 +12,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
-import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.router.*;
 import org.vaadin.example.components.ClickableAvatar;
 import org.vaadin.example.entity.MitarbeiterEntity;
 import org.vaadin.example.security.SecurityService;
@@ -24,7 +24,7 @@ import org.vaadin.example.views.projectoverview.ProjectOverview;
 /**
  * Die Klasse ist dafür zuständig, dass die Navigation und das Layout der Anwendung erstellt wird.
  */
-public class MainLayout extends AppLayout {
+public class MainLayout extends AppLayout implements HasErrorParameter<NotFoundException> {
     private final SecurityService securityService;
     private final SpecificationsService service;
     private ClickableAvatar clickableAvatar;
@@ -108,5 +108,11 @@ public class MainLayout extends AppLayout {
         tabs.setOrientation(Tabs.Orientation.VERTICAL);
 
         addToDrawer(tabs);
+    }
+
+    @Override
+    public int setErrorParameter(BeforeEnterEvent beforeEnterEvent, ErrorParameter<NotFoundException> errorParameter) {
+        beforeEnterEvent.forwardTo("");
+        return 301;
     }
 }

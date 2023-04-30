@@ -10,12 +10,10 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.stereotype.Component;
 import org.vaadin.example.entity.PflichtenheftEntity;
 
-import javax.xml.bind.DatatypeConverter;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 @Component
+/**
+ * Klasse enthält Methoden, unter anderem für den Login und Logout
+ */
 public class SecurityService {
 
     private static final String LOGOUT_SUCCESS_URL = "/";
@@ -26,7 +24,6 @@ public class SecurityService {
         if (principal instanceof UserDetails) {
             return (UserDetails) principal;
         }
-        // Anonymous or no authentication.
         return null;
     }
 
@@ -38,15 +35,22 @@ public class SecurityService {
                 null);
     }
 
+    /**
+     * Gibt den Benutzernamen des angemeldeten Benutzers zurück
+     * @return den angemeldeten Benutzernamen
+     */
     public static String getLoggedInUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
-        //System.out.println("==>" + authentication.);
-
         return username;
     }
 
+    /**
+     * Methode überprüft, ob der angemeldete Benutzer Mitglied des mitgegebenen Pflichtenheftes ist
+     * @param pflichtenheftEntity das Pflichtenheft, welches überprüft werden soll
+     * @return true, wenn der Benutzer Mitglied des Pflichtenheftes ist, ansonsten false
+     */
     public static boolean userIsMemberOf(PflichtenheftEntity pflichtenheftEntity){
         if(pflichtenheftEntity == null){
             return false;

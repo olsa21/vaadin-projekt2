@@ -3,16 +3,33 @@ package org.vaadin.example.components;
 
 import com.vaadin.flow.component.textfield.PasswordField;
 
+/**
+ * Eine benutzerdefinierte PasswordField, die es dem Benutzer ermöglicht, ein Passwort einzugeben.
+ * Das Passwort muss Bestehen aus:
+ * mindestens 8 Zeichen,
+ * mindestens 1 Großbuchstaben,
+ * mindestens 1 Kleinbuchstaben,
+ * mindestens 1 Zahl
+ */
 public class CustomPasswordField extends PasswordField {
-    private String pattern= "^(?=.*[0-9])(?=.*[a-zA-Z]).{8}.*$" ;
+    private final String pattern= "^(?=.*[0-9])(?=.*[a-zA-Z]).{8}.*$" ;
+
+    /**
+     * Konstruktor - erstellt ein neues PasswordField ohne Label
+     */
     public CustomPasswordField() {
         setPattern(pattern);
         setHelperText("Das Password muss haben: Klein- und Großbuchstaben sowie eine Länge von mindestens 8 Zeichen");
 
         setErrorMessage("Unzulässiges Passwort");
     }
-    public CustomPasswordField(String label) {
-        setLabel(label);
+
+    /**
+     * Konstruktor - erstellt ein neues PasswordField mit Label
+     * @param labeltext Labeltext
+     */
+    public CustomPasswordField(String labeltext) {
+        setLabel(labeltext);
         setPattern(pattern);
         setHelperText("Das Password muss haben: Klein- und Großbuchstaben sowie eine Länge von mindestens 8 Zeichen");
 
