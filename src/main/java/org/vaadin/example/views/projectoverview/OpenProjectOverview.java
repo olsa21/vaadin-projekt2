@@ -67,6 +67,8 @@ public class OpenProjectOverview extends VerticalLayout {
      * @param service
      */
     public OpenProjectOverview(SpecificationsService service) {
+        if (service == null)
+            throw new IllegalArgumentException("service muss eine gültige Referenz besitzen!");
         this.service = service;
         getData();
         addClassName("list-view");
@@ -161,6 +163,8 @@ public class OpenProjectOverview extends VerticalLayout {
      * @return true, wenn der Benutzer bereits Mitglied ist, sonst false
      */
     private boolean isMember(PflichtenheftEntity pflichtenheftEntity) {
+        if (pflichtenheftEntity == null)
+            throw new IllegalArgumentException("pflichtenheftEntity muss eine gültige Referenz besitzen!");
         //SecurityService.getLoggedInUsername(), pflichtenheft
         String username = SecurityService.getLoggedInUsername();
         for (MitarbeiterEntity mitarbeiterEntity : pflichtenheftEntity.getMitarbeiter()) {

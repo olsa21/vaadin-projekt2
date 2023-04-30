@@ -20,7 +20,13 @@ public class CustomIdentityAuthenticationProvider implements AuthenticationProvi
 
     private final SpecificationsService service;
 
+    /**
+     * Konstruktor, welcher den SpecificationsService setzt.
+     * @param service die Service-Klasse, welche die Datenbankzugriffe durchführt
+     */
     public CustomIdentityAuthenticationProvider(SpecificationsService service) {
+        if (service == null)
+            throw new IllegalArgumentException("service darf nicht null sein!");
         this.service = service;
     }
 

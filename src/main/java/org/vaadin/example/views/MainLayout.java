@@ -35,6 +35,10 @@ public class MainLayout extends AppLayout {
      * @param service Service, welcher die Datenbankanbindung ermöglicht.
      */
     public MainLayout(SecurityService securityService, SpecificationsService service){
+        if (securityService == null)
+            throw new IllegalArgumentException("SecurityService darf nicht null sein!");
+        if (service == null)
+            throw new IllegalArgumentException("Service darf nicht null sein!");
         this.securityService = securityService;
         this.service = service;
         createHeader();

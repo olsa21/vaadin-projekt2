@@ -37,6 +37,9 @@ public class ClickableAvatar extends HorizontalLayout {
      * @param name der Name des Avatars
      */
     public ClickableAvatar(String name) {
+        if (name == null){
+            throw new IllegalArgumentException("Name darf nicht null sein!");
+        }
         this.avatar = new Avatar(name);
         init();
     }
@@ -46,6 +49,9 @@ public class ClickableAvatar extends HorizontalLayout {
      * @param avatar der Avatar
      */
     public ClickableAvatar(Avatar avatar) {
+        if (avatar == null){
+            throw new IllegalArgumentException("Avatar darf nicht null sein!");
+        }
         this.avatar = avatar;
         init();
     }

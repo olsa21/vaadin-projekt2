@@ -44,6 +44,9 @@ public class PflichtenheftEditor extends HorizontalLayout implements HasUrlParam
      * @param service Service, welcher für die Kommunikation mit der Datenbank zuständig ist.
      */
     public PflichtenheftEditor(SpecificationsService service){
+        if (service == null) {
+            throw new IllegalArgumentException("Service muss eine gültige Referenz besitzen!");
+        }
         this.service = service;
         addClassName("editor-view");
         setSizeFull();

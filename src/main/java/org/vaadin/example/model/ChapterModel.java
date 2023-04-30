@@ -17,9 +17,6 @@ public class ChapterModel implements Comparable<ChapterModel> {
      * @param chapterName der Name des Kapitels
      */
     public ChapterModel(int chapterOid, String chapterName) {
-        //if (chapterName == null || chapterName.isEmpty()){
-          //  throw new IllegalArgumentException("Der Kapitelname muss einen gültigen nicht leerer Wert beinhalten!");
-        //}
         this.chapterOid = chapterOid;
         this.chapterName = chapterName;
     }

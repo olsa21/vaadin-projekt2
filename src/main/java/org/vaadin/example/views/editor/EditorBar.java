@@ -1,6 +1,9 @@
 package org.vaadin.example.views.editor;
 
-import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.DetachEvent;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -14,7 +17,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.shared.Registration;
-import org.aspectj.weaver.ast.Not;
 import org.vaadin.example.components.CustomGrid;
 import org.vaadin.example.components.CustomPicUploadWithCaption;
 import org.vaadin.example.components.GridRow;
@@ -34,15 +36,10 @@ public class EditorBar extends HorizontalLayout {
     private final SpecificationsService service;
     private ComboBox<String> cb;
     private ArrayList<ComponentModel> components;
-
     private PflichtenheftEntity pflichtenheftEntity;
-
     private Button speichernBtn;
-
     private int currentChapter;
-
     private String currentUsername;
-
     Registration broadcasterRegistration;
 
 
@@ -67,75 +64,16 @@ public class EditorBar extends HorizontalLayout {
             if (values[3] != null) {
                 componentOID = Integer.parseInt(values[3]);
             }
-            System.err.println("HALLI HALLO");
             System.err.println(componentOID);
 
-            System.err.println("... hat eine Nachricht erhalten: " + values[0] + " " + values[1] + "bzgl. folgendem Component: " + (componentOID != null ? componentOID : "null"));
-
-            //String currentUser = SecurityService.getLoggedInUsername();
             String currentUser = this.currentUsername;
             if(currentChapter == currentchapterMitgabe && pflichtenheftEntity.getProjektOid() == projektOid &&
                 !user.equals(currentUser)) { //NUTZER ID
-                System.out.println("NEU LADEN");
                 Integer finalComponentOID = componentOID;
 
-
-                for (  ComponentModel c : components){
-                    Component cm = c.getComponent().getChildren().findFirst().get().getChildren().findFirst().get();
-                    if (cm.getClass() == TextArea.class){
-                        TextArea temp = (TextArea) cm;
-                        System.err.println("FOKUS?: " +temp  );
-                    }
-                    System.err.println(c.getComponent().getChildren().findFirst().get().getChildren().findFirst().get().getClass().toString());
-                }
-
                 if (finalComponentOID != null){
-
-                    int i = 0;
-                    for (  ComponentModel c : components){
-                        Component cm = c.getComponent().getChildren().findFirst().get().getChildren().findFirst().get();
-                        if (c.getComponentOid() == finalComponentOID && cm.getClass() == TextArea.class){
-                            // aus components-Liste die richtige Stelle finden, die aktualisiert worden ist
-                            // den INhalt an der Stelle ersetzen mit dem neuen Inhalt
-                            //System.err.println(components.indexOf(components.stream().filter(cmp->cmp.getComponentOid()==finalComponentOID).findFirst()));
-                            System.err.println("UNTEN!");
-                            System.err.println("i: " + i);
-                            System.err.println(components.indexOf(c));
-
-                            components.remove(i);
-                            InhaltEntity testTemp = service.readInhalt(finalComponentOID);
-
-                            HorizontalLayout tempLayout = addComponent("Textfeld", testTemp.getTextinhalt().getTextInhalt(), null,null,testTemp.getInhaltOid());
-                            this.components.add(i, new ComponentModel( testTemp.getInhaltOid(), tempLayout) );
-                            //TODO Einfach los programmiert
-                            //TODO die Tage mal anschauen ob der Ansatz überhaupt funktionieren kann
-                            //TODO ansonsten einfach lassen yolo
-
-                            //TODO ANSATZ NICHT MÖGLICH WEIL MAN ENTWEDER PER SETVALUE DEN LISTENER ANTREIBT SPRICH ENDLOSSCHLEIFE
-
-                            //TODO IRGENWIE MUSS DAS ÜBER FOCUSLISTENER GEMERKT WERDEN, WAS ICH ANGEKLICKT HATTE
-                            //
-                        }
-                        i++;
-                    }
-
-                    /*TextArea temp123 = (TextArea) components.stream().filter(cmp->cmp.getComponentOid()==inhaltOid).findFirst().get().getComponent().getChildren().findFirst().get()
-                            .getChildren().findFirst().get();  //component.getComponent().getChildren().findFirst().get().getChildren().findFirst().get();
-                    boolean focused = temp123.isAutofocus();
-                    System.err.println(temp123.getClass());
-                    temp123.setValue(service.readInhalt(inhaltOid).getTextinhalt().getTextInhalt());
-*/
-
-
-
                     ui.access(() -> {
-                        //reloadSpecificContent(finalComponentOID);
-                        //Notification.show(finalComponentOID.toString());
-                        //updateComponentView();
                         updateComponentViewOptimized(finalComponentOID);
-                        //pflichtenheftEntity = service.readPflichtenheft(pflichtenheftEntity.getProjektOid());
-                        //reloadContent();
-        //                Notification.show("Erhalt!");
                     });
                 }else{
                     ui.access(() -> {
@@ -143,24 +81,6 @@ public class EditorBar extends HorizontalLayout {
                         reloadContent();
                     });
                 }
-                /*ui.access(() -> {
-                    // TODO: fehlerhafte Stelle!!!
-                    if (finalComponentOID != null) {
-                        //ComponentModel componentModel = components.stream().filter(c -> c.getComponentOID() == componentOID).findFirst().get();
-                        //componentModel.reloadContent();
-                        reloadSpecificContent(finalComponentOID);
-                        updateComponentView();
-                        //Notification.show("EINS LADEN");
-                    } else {
-                        //updateComponentView();
-                        pflichtenheftEntity = service.readPflichtenheft(pflichtenheftEntity.getProjektOid());
-                        //Notification.show("ALLES NEU LADEN");
-                        reloadContent();
-                    }
-                    //pflichtenheftEntity = service.readPflichtenheft(pflichtenheftEntity.getProjektOid());
-                    //System.err.println("!!!");
-                    //reloadContent();
-                });*/
             }else if(currentChapter != currentchapterMitgabe && pflichtenheftEntity.getProjektOid() == projektOid && !user.equals(currentUser)){
                 //"Es wurde ein Kapitel geändert (von jmd anderen) zu dem der Nutzer gehört aber dessen Kapitel nicht geöffnet ist"
                 //=> Änderung muss in internen pflichtenheftEntity übernommen werden
@@ -178,15 +98,26 @@ public class EditorBar extends HorizontalLayout {
 
     private void updateComponentViewOptimized(Integer finalComponentOID) {
         pflichtenheftEntity = service.readPflichtenheft(pflichtenheftEntity.getProjektOid());
-        //ermitteln welche Komponente einen Fokus hatte
-        //ComponentModel componentModel = components.stream().filter(c -> c.getComponentOid() == finalComponentOID).findFirst().get();
-
-        //for ( ComponentModel c : components) {
-        //    System.err.println(c.getComponent().getChildren().findFirst().get().getChildren().findFirst().get().getChildren().findFirst().get().getClass().toString());
-        //}
-
 
         this.resetComponents();
+
+        InhaltEntity imporantInhalt = null;
+        for (KapitelEntity kapitelEntity : pflichtenheftEntity.getKapitel()) {
+            if (kapitelEntity.getKapitelVordefiniert().getKapitelVordefiniertOid() == currentChapter){
+                Set<InhaltEntity> inhalte = kapitelEntity.getInhalte();
+                for (InhaltEntity inhaltEntity : inhalte) {
+                    if (inhaltEntity.getInhaltOid() == finalComponentOID){
+                        imporantInhalt = inhaltEntity;
+                        break;
+                    }
+                }
+
+            }
+        }
+
+        pflichtenheftEntity.getKapitel().stream().filter(k -> k.getKapitelVordefiniert().getKapitelVordefiniertOid() == currentChapter).findFirst().get().getInhalte().remove(imporantInhalt);
+        InhaltEntity newInhaltEntity = service.readInhalt(finalComponentOID);
+        pflichtenheftEntity.getKapitel().stream().filter(k -> k.getKapitelVordefiniert().getKapitelVordefiniertOid() == currentChapter).findFirst().get().getInhalte().add(newInhaltEntity);
         this.loadChapterComponents();
     }
 
@@ -308,23 +239,10 @@ public class EditorBar extends HorizontalLayout {
     }
 
     private void reloadSpecificContent(int inhaltOid){
-        // gucken welche componte aus coomponent oid
-        // dessen inhalt laden austauschen
-        // reload content
-        /*components.stream().filter(cmp -> cmp.getComponentOid() == inhaltOid).findFirst().get().setComponent(
-            addComponent("Textfeld", service.readInhalt(inhaltOid).getTextinhalt().getTextInhalt(), null,null,inhaltOid )) ;*/
-     //   TextArea text= components.stream().filter(cmp -> cmp.getComponentOid() == inhaltOid).findFirst().get().getComponent().getChildren().findFirst().get().getChildren().findFirst().get().;
-      //  ;
-
-     //   Component temp = component.getComponent().getChildren().findFirst().get().getChildren().findFirst().get();
-
         TextArea temp123 = (TextArea) components.stream().filter(cmp->cmp.getComponentOid()==inhaltOid).findFirst().get().getComponent().getChildren().findFirst().get()
-                .getChildren().findFirst().get();  //component.getComponent().getChildren().findFirst().get().getChildren().findFirst().get();
+                .getChildren().findFirst().get();
         boolean focused = temp123.isAutofocus();
-        System.err.println(temp123.getClass());
         temp123.setValue(service.readInhalt(inhaltOid).getTextinhalt().getTextInhalt());
-        if (focused)
-            temp123.focus();
     }
 
     /**
@@ -378,7 +296,7 @@ public class EditorBar extends HorizontalLayout {
                 textArea.setWidthFull();
                 textArea.setValueChangeMode(ValueChangeMode.LAZY);
                 textArea.addValueChangeListener(event -> {
-                    setChangesForBroadcast(componentOID);//TODO 1
+                    setChangesForBroadcast(componentOID);
                 });
                 tempLayout.add(div);
                 tempLayout.add(buttonLayout);
@@ -391,7 +309,7 @@ public class EditorBar extends HorizontalLayout {
                     pic.setCaptionText(textInhalt);
                 }
                 div.add(pic);
-                pic.addChangeListener(event -> setChangesForBroadcast(componentOID)); //TODO 2
+                pic.addChangeListener(event -> setChangesForBroadcast(componentOID));
                 tempLayout.add(div);
                 pic.setWidth("100%");
                 tempLayout.add(buttonLayout);
@@ -409,7 +327,7 @@ public class EditorBar extends HorizontalLayout {
                         if (caption != null)
                             columnNames.add(caption);
                     }
-                    CustomGrid grid = new CustomGrid(columnNames, e-> setChangesForBroadcast(componentOID)); //TODO 3
+                    CustomGrid grid = new CustomGrid(columnNames, e-> setChangesForBroadcast(componentOID));
 
                     if (textInhalt != null)
                         grid.setCaptionText(textInhalt);
@@ -428,20 +346,19 @@ public class EditorBar extends HorizontalLayout {
                     grid.setWidth("100%");
                     tempLayout.add(div);
                     tempLayout.add(buttonLayout);
-                    grid.addCaptionChangeListener(e -> setChangesForBroadcast(componentOID)); //TODO 3
+                    grid.addCaptionChangeListener(e -> setChangesForBroadcast(componentOID));
                 }else{
                     // leere Tabelle wird erzeugt
                     Dialog dialog = new Dialog();
                     dialog.add(new TabelleErstellenView(spaltenNamenList -> {
                         columnNames.addAll(spaltenNamenList);
-                        System.out.println("Spaltennamen: " + spaltenNamenList);
                         UI.getCurrent().getPage().executeJs("document.querySelector('vaadin-dialog-overlay').close()");
 
-                        CustomGrid grid = new CustomGrid(columnNames, e->{setChangesForBroadcast(componentOID);}); //TODO 3
+                        CustomGrid grid = new CustomGrid(columnNames, e->{setChangesForBroadcast(componentOID);});
                         div.add(grid);
                         tempLayout.add(div);
                         tempLayout.add(buttonLayout);
-                        grid.addCaptionChangeListener(e -> setChangesForBroadcast(componentOID)); //TODO 4
+                        grid.addCaptionChangeListener(e -> setChangesForBroadcast(componentOID));
                         setChangesForBroadcast(null);
                     }));
                     dialog.setHeight("90%");
@@ -493,7 +410,6 @@ public class EditorBar extends HorizontalLayout {
         speichernBtn = new Button("Speichern");
 
         speichernBtn.addClickListener(click -> {
-            System.out.println("FIRE");
             int anordnung = 0;
             KapitelEntity kapitel = null;
             //Alternativ sowas wie AbsenderID mitgeben, damit er selbst nicht aktualisiert
@@ -501,7 +417,6 @@ public class EditorBar extends HorizontalLayout {
             if (pflichtenheftEntity.getKapitel().stream().filter(k -> k.getKapitelVordefiniert().getKapitelVordefiniertOid() == currentChapter).findFirst().isPresent()){
                 kapitel = pflichtenheftEntity.getKapitel().stream().filter(k -> k.getKapitelVordefiniert().getKapitelVordefiniertOid() == currentChapter).
                         findFirst().get();
-                System.err.println(kapitel);
             }else{
                 kapitel = new KapitelEntity();
                 kapitel.setKapitelVordefiniert(new KapitelvordefiniertEntity());
@@ -566,16 +481,7 @@ public class EditorBar extends HorizontalLayout {
                     service.saveTable(inhalt.getTabelle());
 
                     Set<TabellenzeileEntity> deleteList2 = new HashSet<>(inhalt.getTabelle().getZellen());
-                    for ( GridRow row : ((CustomGrid) temp).getData() ) {
-                        for ( String test : row.getContent() ) {
-                            System.err.print(test+"  ");
-                        }
-                        System.err.println();
-                    }
-
                     int index = 0;
-                    // FIXME SEHR UNOPTIMIERT. ERST ALLES LÖSCHEN UND DANN HINZUFÜGEN, damit bei Löscheung und Hinzufügen die gleiche ID verwendet wird
-                    // TODO Mapping der einzelnen Zeilen mit der DB-OID, damit man Löschung und Hinzufügen vermeiden kann
                     for ( TabellenzeileEntity tabellenzeileEntity: deleteList2 ) {
                         inhalt.getTabelle().getZellen().remove(tabellenzeileEntity);
                         try{service.deleteTabellenzeile(tabellenzeileEntity);}catch(Exception e){}
@@ -610,7 +516,7 @@ public class EditorBar extends HorizontalLayout {
                 }
                 inhalt.setAnordnungIndex(anordnung);
                 inhalt = service.saveInhalt(inhalt);
-                component.setComponentOid(inhalt.getInhaltOid());//HOTFIX geändert, damit der Inhalt nicht neu erstellt und gelöscht wird!!!
+                component.setComponentOid(inhalt.getInhaltOid());
                 ++anordnung;
             }
             for(InhaltEntity inhalt : deleteList) {

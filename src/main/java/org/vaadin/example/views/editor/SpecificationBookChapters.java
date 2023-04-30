@@ -17,10 +17,12 @@ public class SpecificationBookChapters {
 
     /**
      * Gibt die Instanz der Klasse zurück. (Singleton-Pattern)
-     * @param service
-     * @return
+     * @param service Service, welcher für die Kommunikation mit der Datenbank zuständig ist.
+     * @return Instanz der Klasse.
      */
     public static SpecificationBookChapters getInstance(SpecificationsService service){
+        if (service == null)
+            throw new IllegalArgumentException("Service darf nicht null sein!");
         if (instance == null)
             instance = new SpecificationBookChapters(service);
         return instance;
@@ -54,6 +56,8 @@ public class SpecificationBookChapters {
      * @return Baumstruktur mit den Kapiteln.
      */
     public TreeMap<ChapterModel, ArrayList<ChapterModel>> createTreemap(List<KapitelvordefiniertEntity> kapitelvordefiniert) {
+        if (kapitelvordefiniert == null)
+            throw new IllegalArgumentException("Kapitelvordefiniert darf nicht null sein!");
         TreeMap<ChapterModel, ArrayList<ChapterModel>> treeMap = new TreeMap<>();
 
         Map<Integer, KapitelvordefiniertEntity> entityMap = new HashMap<>();

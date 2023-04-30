@@ -15,7 +15,9 @@ public interface MitarbeiterRepository extends JpaRepository<MitarbeiterEntity, 
     @Query("select c from MitarbeiterEntity c where c.benutzername = ?1 and c.passwort like ?2")
     public MitarbeiterEntity readUserWhere(String username, String passwordHash);
 
-    //TODO In separates Repository auslagern
+    @Query("select c from MitarbeiterEntity c where c.mail = ?1")
+    public MitarbeiterEntity readUserWhereMail(String mail);
+
     @Query("select c from AbteilungEntity c")
     public List<AbteilungEntity> readAbteilungen();
 

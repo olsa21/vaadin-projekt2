@@ -44,6 +44,8 @@ public class ProjectOverview extends VerticalLayout
      * @param service Service, welcher die Datenbankanbindung ermöglicht.
      */
     public ProjectOverview(SpecificationsService service){
+        if (service == null)
+            throw new IllegalArgumentException("Service darf nicht null sein!");
         this.service = service;
         this.pflichtenhefter = new ArrayList<>();
         addClassName("list-view");

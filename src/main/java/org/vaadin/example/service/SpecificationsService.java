@@ -74,6 +74,15 @@ public class SpecificationsService {
     }
 
     /**
+     * Methode, welche prüft, ob eine Mail bereits in der DB eingetragen ist.
+     * @param mail die Mail, welche geprüft werden soll
+     * @return true, wenn die Mail bereits in der DB eingetragen ist, ansonsten false
+     */
+    public boolean findSpecificUserByMail(String mail){
+        return benutzerRepository.readUserWhereMail(mail) != null;
+    }
+
+    /**
      * Methode, welche einen Benutzer anhand seiner OID zurückgibt.
      * @param id die OID des Benutzers, welcher zurückgegeben werden soll
      * @return der Benutzer, welcher die OID besitzt

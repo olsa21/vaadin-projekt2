@@ -15,7 +15,7 @@ public class ComponentModel {
      * @param component die Komponente
      */
     public ComponentModel(Integer componentOid, Component component){
-        // componentOid darf explizit null sein, um anzuzeigen, dass es sich nicht um eine bestehende Komponente handelt
+        // componentOid darf explizit null sein, um anzuzeigen, dass es sich nicht um eine aus der DB bestehende Komponente handelt!
         if (component == null){
             throw new IllegalArgumentException("Die Komponente muss eine gültige Referenz besitzen!");
         }
