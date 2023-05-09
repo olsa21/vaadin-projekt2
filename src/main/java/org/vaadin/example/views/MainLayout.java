@@ -3,6 +3,7 @@ package org.vaadin.example.views;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
+import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
@@ -53,6 +54,14 @@ public class MainLayout extends AppLayout implements HasErrorParameter<NotFoundE
      */
     public void setAvatarPicture(byte[] picture){
         clickableAvatar.setPicture(picture);
+    }
+
+    /**
+     * Ändert den Namen des Avatars
+     * @param name
+     */
+    public void setAvatarName(String name){
+        clickableAvatar.setAvatarName(name);
     }
 
     /**

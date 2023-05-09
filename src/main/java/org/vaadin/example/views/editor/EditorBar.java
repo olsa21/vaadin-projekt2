@@ -1,9 +1,6 @@
 package org.vaadin.example.views.editor;
 
-import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.DetachEvent;
-import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -39,6 +36,7 @@ public class EditorBar extends HorizontalLayout {
     private ArrayList<ComponentModel> components;
     private PflichtenheftEntity pflichtenheftEntity;
     private Button speichernBtn;
+    private Text infoText = new Text("Kursiv: \\i{} Fett: \\b{} Unterstrichen: \\u{}");
     private int currentChapter;
     private String currentUsername;
     Registration broadcasterRegistration;
@@ -138,6 +136,7 @@ public class EditorBar extends HorizontalLayout {
         //tempLayout should be scrollable
 
         tempLayout.add(getToolbar());
+        tempLayout.add(infoText);
         for (ComponentModel c : components) {
             tempLayout.add(c.getComponent());
         }

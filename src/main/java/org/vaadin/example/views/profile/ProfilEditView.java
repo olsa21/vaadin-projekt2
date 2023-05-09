@@ -98,6 +98,7 @@ public class ProfilEditView extends VerticalLayout {
 
                 MainLayout mainLayout = (MainLayout) getUI().get().getChildren().filter(item -> item instanceof MainLayout).findFirst().get();
                 mainLayout.setAvatarPicture(mitarbeiter.getProfilbild());
+                mainLayout.setAvatarName(mitarbeiter.getVorname() + " " + mitarbeiter.getNachname());
 
                 if (!passwort1.getValue().isEmpty()) {
                     if (passwort1.isInvalid()) {

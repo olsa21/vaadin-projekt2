@@ -43,6 +43,9 @@ public class ProjektDetailView extends FormLayout {
      * @param pflichtenheft Das anzuzeigende Pflichtenheft
      */
     public ProjektDetailView(SpecificationsService service, PflichtenheftEntity pflichtenheft) {
+        if(pflichtenheft == null){
+            throw new IllegalArgumentException("Pflichtenheft darf nicht null sein");
+        }
         this.service = service;
         this.pflichtenheft = pflichtenheft;
         boolean isMember = SecurityService.userIsMemberOf(pflichtenheft);

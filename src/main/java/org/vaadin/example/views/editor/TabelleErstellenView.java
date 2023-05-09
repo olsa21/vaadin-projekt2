@@ -25,6 +25,9 @@ public class TabelleErstellenView extends FormLayout {
      * @param onSave Consumer, der die Spaltennamen entgegennimmt
      */
     public TabelleErstellenView(Consumer<ArrayList<String>> onSave) {
+        if(onSave == null) {
+            throw new IllegalArgumentException("onSave darf nicht null sein");
+        }
         this.onSave = onSave;
         spalten.setItems(2, 3, 4, 5);
         spalten.setValue(2);

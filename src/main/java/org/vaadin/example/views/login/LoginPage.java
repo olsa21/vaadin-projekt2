@@ -4,6 +4,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.login.LoginForm;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
@@ -35,6 +36,9 @@ public class LoginPage extends VerticalLayout implements BeforeEnterObserver {
         add(createAccount);
 
         login.setAction("login");
+        login.addForgotPasswordListener(e -> {
+            Notification.show("Kontaktieren Sie den Administrator");
+        });
     }
 
     /**

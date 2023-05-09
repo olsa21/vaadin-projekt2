@@ -57,6 +57,14 @@ public class ClickableAvatar extends HorizontalLayout {
     }
 
     /**
+     * Ändert den Namen des Avatars
+     * @param name
+     */
+    public void setAvatarName(String name){
+        avatar.setName(name);
+    }
+
+    /**
      * Methode, welche das Bild des Avatars setzt.
      * @param imageData das Bild des Avatars
      */

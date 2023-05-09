@@ -12,7 +12,7 @@ import com.vaadin.flow.component.textfield.PasswordField;
  * mindestens 1 Zahl
  */
 public class CustomPasswordField extends PasswordField {
-    private final String pattern= "^(?=.*[0-9])(?=.*[a-zA-Z]).{8}.*$" ;
+    private final String pattern= "^(?=.*[a-z])(?=.*[A-Z]).{8,}$" ;
 
     /**
      * Konstruktor - erstellt ein neues PasswordField ohne Label
