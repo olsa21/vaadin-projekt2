@@ -234,6 +234,12 @@ public class WordGenerator {
             int newWidth = Units.toEMU(width);
             int newHeight = (int) Math.round(((double) newWidth / (double) imgWidth) * imgHeight);
 
+            //Abfrage ob das Bild nicht zu hoch ist für die Seite -> Überlauf
+            if(newHeight > Units.toEMU(550)) {
+                newHeight = Units.toEMU(550);
+                newWidth = (int) Math.round(((double) newHeight / (double) imgHeight) * imgWidth);
+            }
+
             run.addPicture(new ByteArrayInputStream(image), pictureType, "image.png", newWidth, newHeight);
 
             if (bildbeschriftung != null) {
