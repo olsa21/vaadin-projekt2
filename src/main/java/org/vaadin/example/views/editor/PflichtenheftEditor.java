@@ -5,7 +5,6 @@ import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
@@ -14,12 +13,12 @@ import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.shared.Registration;
-import org.vaadin.example.listener.ProjektDetailsBroadcaster;
-import org.vaadin.example.views.MainLayout;
 import org.vaadin.example.entity.PflichtenheftEntity;
+import org.vaadin.example.listener.ProjektDetailsBroadcaster;
 import org.vaadin.example.model.ChapterModel;
 import org.vaadin.example.security.SecurityService;
 import org.vaadin.example.service.SpecificationsService;
+import org.vaadin.example.views.MainLayout;
 import org.vaadin.example.views.project.ProjektDetailMitExport;
 
 import javax.annotation.security.PermitAll;
@@ -117,7 +116,6 @@ public class PflichtenheftEditor extends HorizontalLayout implements HasUrlParam
                 remove(editBar);
                 editBar.setWidth("60%");
                 add(editBar);
-                Notification.show(event.getItem().getChapterName());
                 editBar.setChapter( event.getItem().getChapterOid() );
             }
         });

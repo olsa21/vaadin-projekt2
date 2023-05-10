@@ -263,7 +263,7 @@ public class WordGenerator {
 
         //Spaltennamen setzen
         ArrayList<ArrayList<String>> data = new ArrayList<>();
-        data.add(new ArrayList<>(Arrays.asList(tabelle.getSpaltenCaption1(), tabelle.getSpaltenCaption1(), tabelle.getSpaltenCaption3(), tabelle.getSpaltenCaption4(), tabelle.getSpaltenCaption5())));
+        data.add(new ArrayList<>(Arrays.asList(tabelle.getSpaltenCaption1(), tabelle.getSpaltenCaption2(), tabelle.getSpaltenCaption3(), tabelle.getSpaltenCaption4(), tabelle.getSpaltenCaption5())));
 
         //Alle Zellen Inhalte setzen
         ArrayList<TabellenzeileEntity> zeilen = new ArrayList<>(tabelle.getZellen());
