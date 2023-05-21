@@ -18,7 +18,6 @@ public class ClickableAvatar extends HorizontalLayout {
 
     private void init(){
         addClickListener(e -> {
-            //redirect to route profil-edit
             UI.getCurrent().navigate("profil-edit");
         });
         add(avatar);

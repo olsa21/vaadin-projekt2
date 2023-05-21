@@ -19,6 +19,4 @@ public interface AbteilungzuweisungRepository extends JpaRepository<Abteilungszu
     @Query(value = "insert into abteilungszuweisung (mitarbeiterOid, abteilungOid) values (?1, ?2)", nativeQuery = true)
     public void saveRaw(int mitarbeiterOid, int abteilungOid);
 
-    //@Query("insert into AbteilungszuweisungEntity (abteilungOid, mitarbeiterOid) values (?1, (select b.mitarbeiterOid from MitarbeiterEntity b where b.benutzername = ?2))")
-    //public void addZuweisung(String benutzername, String abteilungId);
 }

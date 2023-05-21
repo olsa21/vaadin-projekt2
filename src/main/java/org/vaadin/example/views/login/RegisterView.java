@@ -130,7 +130,6 @@ public class RegisterView extends VerticalLayout  implements BeforeEnterObserver
                 String hashedPassword = PasswordEncoder.hashPassword((password.getValue()));
                 mitarbeiter.setPasswort(hashedPassword);
 
-                //mitarbeiter.setPasswort(password.getValue());
                 mitarbeiter.setMail(email.getValue());
                 mitarbeiter.setVorname(firstName.getValue());
                 mitarbeiter.setNachname(lastName.getValue());

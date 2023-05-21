@@ -84,7 +84,6 @@ public class KapitelEntity {
         KapitelEntity that = (KapitelEntity) o;
 
         if (kapitelOid != that.kapitelOid) return false;
-        //if (projektOid != that.projektOid) return false;
         if (kapitelVordefiniert != that.kapitelVordefiniert) return false;
 
         return true;

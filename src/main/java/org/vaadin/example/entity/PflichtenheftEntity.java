@@ -29,7 +29,6 @@ public class PflichtenheftEntity {
     @Column(name = "repositoryLink")
     private String repositoryLink;
 
-    //create verantwortlicher as object
     @ManyToOne
     @JoinColumn(name = "verantwortlicher")
     private MitarbeiterEntity verantwortlicher;

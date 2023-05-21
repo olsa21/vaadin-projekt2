@@ -66,7 +66,7 @@ public class CustomPicUpload extends HorizontalLayout {
     public void addUploadSucceededListener(ComponentEventListener<SucceededEvent> listener) {
         upload.addSucceededListener(listener);
     }
-    public byte[] getImageBytes() {//FIXME
+    public byte[] getImageBytes() {
         return imageBytes;
     }
 
@@ -110,7 +110,7 @@ public class CustomPicUpload extends HorizontalLayout {
     }
 
 
-    public byte[] getBytesBuffer() {//TODO das wurde immer aufgerufen
+    public byte[] getBytesBuffer() {
         try {
             byte[] bytes = buffer.getInputStream().readAllBytes();
             if (bytes.length == 0) {

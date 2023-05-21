@@ -66,7 +66,6 @@ public class ProjektDetailMitExport extends VerticalLayout {
         //Laden und setzen der Werte
         pflichtenheftEntity = service.readPflichtenheft(projektOid);
         setData();
-        //add(NavigationBar.getInstance());
         add("Projekt bearbeiten");
         add(
                 projectForm,

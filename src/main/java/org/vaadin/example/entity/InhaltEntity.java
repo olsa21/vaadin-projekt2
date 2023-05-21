@@ -103,11 +103,8 @@ public class InhaltEntity {
         InhaltEntity that = (InhaltEntity) o;
 
         if (inhaltOid != that.inhaltOid) return false;
-        //if (kapitelOid != that.kapitelOid) return false;
         if (anordnungIndex != null ? !anordnungIndex.equals(that.anordnungIndex) : that.anordnungIndex != null)
             return false;
-        //if (textInhalt != null ? !textInhalt.equals(that.textInhalt) : that.textInhalt != null) return false;
-        //if (!Arrays.equals(bildInhalt, that.bildInhalt)) return false;
 
         return true;
     }

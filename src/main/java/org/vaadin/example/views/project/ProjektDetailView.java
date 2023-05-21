@@ -66,7 +66,6 @@ public class ProjektDetailView extends FormLayout {
             UI.getCurrent().navigate("project-editor/" + pflichtenheft.getProjektOid());
         });
         beitretenBtn.addClickListener(e -> {
-            //TODO Check ob immer noch offen
             service.addProjektZuweisung(SecurityService.getLoggedInUsername(), pflichtenheft.getProjektOid());
             UI.getCurrent().getPage().executeJs("document.querySelector('vaadin-dialog-overlay').close()");
             UI.getCurrent().navigate("project-editor/" + pflichtenheft.getProjektOid());
@@ -80,7 +79,6 @@ public class ProjektDetailView extends FormLayout {
             setButtonVisibility(isMember);
         });
 
-        //add(NavigationBar.getInstance());
         add("Projekt Details");
         addFormItem(titel, "Titel");
         addFormItem(beschreibung, "Beschreibung");

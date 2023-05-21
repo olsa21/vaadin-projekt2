@@ -62,7 +62,7 @@ public class EditorBar extends HorizontalLayout {
 
             String currentUser = this.currentUsername;
             if(currentChapter == currentchapterMitgabe && pflichtenheftEntity.getProjektOid() == projektOid &&
-                !user.equals(currentUser)) { //NUTZER ID
+                !user.equals(currentUser)) {
                 Integer finalComponentOID = componentOID;
 
                 if (finalComponentOID != null){
@@ -133,7 +133,6 @@ public class EditorBar extends HorizontalLayout {
         tempDiv.setSizeFull();
         tempDiv.getStyle().set("overflow-y", "auto");
         VerticalLayout tempLayout = new VerticalLayout();
-        //tempLayout should be scrollable
 
         tempLayout.add(getToolbar());
         tempLayout.add(infoText);

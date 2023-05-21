@@ -165,7 +165,6 @@ public class OpenProjectOverview extends VerticalLayout {
     private boolean isMember(PflichtenheftEntity pflichtenheftEntity) {
         if (pflichtenheftEntity == null)
             throw new IllegalArgumentException("pflichtenheftEntity muss eine gültige Referenz besitzen!");
-        //SecurityService.getLoggedInUsername(), pflichtenheft
         String username = SecurityService.getLoggedInUsername();
         for (MitarbeiterEntity mitarbeiterEntity : pflichtenheftEntity.getMitarbeiter()) {
             if (mitarbeiterEntity.getBenutzername().equals(username)) {

@@ -68,26 +68,20 @@ public class SpecificationBookChapters {
         }
 
         for (KapitelvordefiniertEntity entity : kapitelvordefiniert) {
-            //String parentName = "";
             ChapterModel parent = new ChapterModel(-1,"");
             if (entity.getParent() != null) {
                 KapitelvordefiniertEntity parentEntity = entityMap.get(entity.getParent());
                 if (parentEntity != null) {
-                    //parentName = parentEntity.getName();
                     parent = new ChapterModel(parentEntity.getKapitelVordefiniertOid(), parentEntity.getName());
                 }
             }
 
-            //if (!treeMap.containsKey(parentName)) {
             // Das Parent-Kapitel wird der TreeMap hinzugefügt, falls nicht enthalten
             if (!treeMap.containsKey(parent)) {
-                //treeMap.put(parentName, new ArrayList<>());
                 treeMap.put(parent, new ArrayList<>());
             }
-            //List<String> children = treeMap.get(parentName);
             // Das aktuelle Kapitel wird dem Parent-Kapitel als Kind hinzugefügt
             List<ChapterModel> children = treeMap.get(parent);
-            //children.add(entity.getName());
             children.add(new ChapterModel(entity.getKapitelVordefiniertOid(), entity.getName()));
         }
         return treeMap;

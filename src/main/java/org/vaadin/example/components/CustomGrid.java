@@ -110,7 +110,6 @@ public class CustomGrid extends VerticalLayout {
         return data;
     }
 
-    //Getter for caption
     public ArrayList<String> getColumnNames() {
         return columnNames;
     }
